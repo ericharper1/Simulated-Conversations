@@ -19,14 +19,14 @@ git clone git@github.com:Likhovodov/Simulated-Conversations.git
 # Change into django project directory. (this is optional... you can create your virtual environment anywhere)
 cd Simulated-Conversations/simcon_project
 
-python3 --version					# Confirm that you are using Python 3.8.5
-virtualenv -p python3 env			# Create virtual environment 'env' using python3 (which for me points to python 3.8.5)
-source env/bin/activate				# Activate virtual environment
+python3 --version			# Confirm that you are using Python 3.8.5
+virtualenv -p python3 env		# Create virtual environment 'env' using python3 (which for me points to python 3.8.5)
+source env/bin/activate			# Activate virtual environment
 pip3 install -r requirements.txt	# Install all the project dependencies inside your virtual environment
 ```
 The project should now be set up . To start the development server run:
 ```sh
-python manage.py runserver			# 'manage.py' is inside Simulated-Conversations/simcon_project
+python manage.py runserver		# 'manage.py' is inside Simulated-Conversations/simcon_project
 ```
 Ignore unapplied migration messages. As of writing this walk-through, this is not something we need to worry about. 
 You should now be able to access the site at  http://127.0.0.1:8000/
