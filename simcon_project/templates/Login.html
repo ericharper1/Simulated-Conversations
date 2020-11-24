@@ -1,0 +1,36 @@
+{% extends "Student_Base.html" %}
+
+{% block title %}Student Login{% endblock %}
+{% block extrahead %}
+<script>
+      $("#formButton").on("click", "#progress", $("#form1").submit());
+</script>
+{% endblock %}
+{% block content %}
+	{# TODO url this action #}
+      <form id="form1" action="/studentinfo/" method = "post">{%csrf_token%}
+
+        <p>Enter Your Email and Password </p>
+        <div class="form-group">
+          <input type="email" class="form-control" name="login_email" placeholder="Email">
+          <input type="password" class="form-control" name="login_password" placeholder="Password">
+        </div>
+
+<hr>
+        <div class="panel panel-info">
+          <div class="panel-heading">Acceptable Use Policy</div>
+          <div class="panel-body" id="formButton">
+            <p>I agree to have my audio recordings collected and used for research within accordance with Portland State's <a target="_blank" href="http://www.pdx.edu/oit/acceptable-use-policy">Acceptable Use Policy</a>.</p>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" onClick='$("#progress").removeAttr("disabled", false)'> I accept
+              </label>
+            </div>
+			<button type="button" name="progress" id="progress" class="btn btn-default" style="float: right;" >Login</button>
+          </div>
+        </div>
+      </form>
+
+<hr>
+
+{% endblock %}
