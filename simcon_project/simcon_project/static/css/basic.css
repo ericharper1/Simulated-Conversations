@@ -2,9 +2,13 @@ body{
     background-color: teal;
 }
 
-#Banner{
+#Page{
     background-color: white;
+}
 
+#Banner{
+    background-color: gray;
+    margin: 1px;
 }
 
 .flex-container{
@@ -27,7 +31,6 @@ body{
 .flex-large{
     padding: 2px;
     width: 80%;
-    min-height: auto;
     min-height: 200px;
 }
 
@@ -35,11 +38,7 @@ body{
     background-color: grey;
 }
 
-#Content{
-    background-color: white;
-}
-
 #Footer{
-    background-color: white;
+    background-color:gray;
     margin: 1px;
 }
