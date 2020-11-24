@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import CustomUser
-from django.template import loader, Context
 
 # Create your views here.
-def Login(request):
+def Home(request):    
+    return render(request, 'Home.html')
 
-    t = loader.get_template('Login.html')
-    c = Context({
-    'message': 'I am the Login View.'
-    })
-    request.session.modified = True
+def Login(request):
     return render(request, 'Login.html')
+
+def ResearcherView(request):
+    return render(request, 'ResearcherView.html')
+
+def StudentView(request):
+    return render(request, 'StudentView.html')
