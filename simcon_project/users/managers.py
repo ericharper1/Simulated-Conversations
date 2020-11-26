@@ -19,14 +19,30 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
+    def create_researcher(self, email, password, **extra_fields):
+        """
+        Create and save a Researcher with the given email and password.
+        """
+        extra_fields.setdefault('is_researcher', True)
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_active', True)
+
+        if extra_fields.get('is_researcher') is not True:
+            raise ValueError(_('Superuser must have is_researcher=True.'))
+        return self.create_user(email, password, **extra_fields)
+
     def create_superuser(self, email, password, **extra_fields):
         """
         Create and save a SuperUser with the given email and password.
         """
+        extra_fields.setdefault('is_researcher', True)
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
 
+        if extra_fields.get('is_researcher') is not True:
+            raise ValueError(_('Superuser must have is_researcher=True.'))
         if extra_fields.get('is_staff') is not True:
             raise ValueError(_('Superuser must have is_staff=True.'))
         if extra_fields.get('is_superuser') is not True:
