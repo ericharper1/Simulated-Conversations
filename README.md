@@ -35,3 +35,15 @@ If you add new dependencies to the project, update requirements.txt. This can be
 ```sh
 # This should take all the dependencies installed in the virtual environment and dump them into requirements.txt
 pip3 freeze > requirements.txt
+```
+
+#### Making database migrations
+
+If any changes have been made to models.py, then Django will suggest that you make migrations. This will essentially
+synchronize the database with the model fields.
+
+To do this, change into the project-level directory and run:
+```sh
+python manage.py makemigrations
+python manage.py migrate
+```
