@@ -15,15 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import Home, Login, RedirectToView, StudentView, ResearcherView
+from users.views import Home, RedirectFromLogin, StudentView, ResearcherView
 from django.conf.urls import include
 
 urlpatterns = [
     path('', Home, name="Home"),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('redirect/', RedirectToView, name="RedirectToView"),
-    # path('login/', Login, name="Login"),
-    path('student_view', StudentView, name="StudentView"),
-    path('researcher_view', ResearcherView, name="ResearcherView"),
+    path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
+    path('student-view/', StudentView, name="StudentView"),
+    path('researcher-view/', ResearcherView, name="ResearcherView"),
 ]
