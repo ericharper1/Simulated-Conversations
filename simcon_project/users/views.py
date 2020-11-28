@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.contrib.auth import get_user_model
 from .models import CustomUser
 
 
 # Create your views here.
 def Home(request):
-    return render(request, 'Home.html')
+    return render(request, 'home.html')
 
 
 def Login(request):
@@ -14,21 +15,16 @@ def Login(request):
 
 def RedirectToView(request):
 
-    # user = str(request.session.get('id_username'))
-    user = CustomUser.objects.filter(email=request.GET.get("email"))
-    # user = request.get(id_username="student@student.com")
+    user = get_user_model()
 
-    # email = str(request.GET.get("id_username"))
-    return HttpResponse(user)
-    # if user.is_researcher == True:
-    #     return ResearcherView(request)
-    # else:
-    #     return StudentView
-
+    if user.get_is_researcher(request.user) == True:
+        return ResearcherView(request)
+    else:
+        return StudentView(request)
 
 def ResearcherView(request):
-    return render(request, 'ResearcherView.html')
+    return render(request, 'researcher_view.html')
 
 
 def StudentView(request):
-    return render(request, 'StudentView.html')
+    return render(request, 'student_view.html')

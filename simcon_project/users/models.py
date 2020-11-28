@@ -21,3 +21,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    def get_is_researcher(self):
+        """
+        Returns whether the user is a researcher or not.
+        """
+        return self.is_researcher
