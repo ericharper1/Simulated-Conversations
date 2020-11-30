@@ -4,7 +4,7 @@
 ## Setup for dev
 
 #### Prereqs 
-- Python 3.8.5
+- Python 3.6.12
 - Some sort of python virtual environment software (I will be using virtualenv)
  
 #### TLDR:
@@ -19,8 +19,8 @@ git clone git@github.com:Likhovodov/Simulated-Conversations.git
 # Change into django project directory. (this is optional... you can create your virtual environment anywhere)
 cd Simulated-Conversations/simcon_project
 
-python3 --version			# Confirm that you are using Python 3.8.5
-virtualenv -p python3 env		# Create virtual environment 'env' using python3 (which for me points to python 3.8.5)
+python3 --version			# Confirm that you are using Python 3.6.12
+virtualenv -p python3 env		# Create virtual environment 'env' using python3 (which for me points to python 3.6.12)
 source env/bin/activate			# Activate virtual environment
 pip3 install -r requirements.txt	# Install all the project dependencies inside your virtual environment
 ```
