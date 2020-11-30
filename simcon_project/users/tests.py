@@ -6,8 +6,12 @@ class UsersManagersTests(TestCase):
     def test_create_user(self):
         User = get_user_model()
         user = User.objects.create_user(email='normal@user.com',
-                                        password='foo')
+                                        password='foo',
+                                        first_name='John',
+                                        last_name='Doe')
         self.assertEqual(user.email, 'normal@user.com')
+        self.assertEqual(user.get_first_name(), 'John')
+        self.assertEqual(user.get_last_name(), 'Doe')
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
@@ -27,10 +31,14 @@ class UsersManagersTests(TestCase):
     def test_create_researcher(self):
         User = get_user_model()
         user = User.objects.create_researcher(email='researcher@user.com',
-                                              password='foo')
+                                              password='foo',
+                                              first_name='Jane',
+                                              last_name='Doe')
         self.assertEqual(user.email, 'researcher@user.com')
+        self.assertEqual(user.get_first_name(), 'Jane')
+        self.assertEqual(user.get_last_name(), 'Doe')
         self.assertTrue(user.is_active)
-        self.assertTrue(user.is_researcher)
+        self.assertTrue(user.get_is_researcher())
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
         try:
@@ -51,6 +59,7 @@ class UsersManagersTests(TestCase):
         admin_user = User.objects.create_superuser('super@user.com', 'foo')
         self.assertEqual(admin_user.email, 'super@user.com')
         self.assertTrue(admin_user.is_active)
+        self.assertTrue(admin_user.get_is_researcher())
         self.assertTrue(admin_user.is_staff)
         self.assertTrue(admin_user.is_superuser)
         try:
