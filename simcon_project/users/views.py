@@ -1,12 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from .models import CustomUser
 
 # Create your views here.
-def Home(request):
-    return render(request, 'home.html')
-
 def RedirectFromLogin(request):
     user = get_user_model()
     if user.get_is_researcher(request.user) == True:
