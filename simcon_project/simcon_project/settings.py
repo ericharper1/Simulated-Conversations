@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Our apps
     'users',
+    'conversation_templates',
 ]
 
 MIDDLEWARE = [
