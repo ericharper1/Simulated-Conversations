@@ -6,7 +6,7 @@ from .subject_label import SubjectLabel
 class Assignment():
     id = models.UUIDField(unique=True, editable=False, primary_key=True)
     name = models.CharField(max_length=100) 
-    creation_date = models.DateField()
+    date_assigned = models.DateField()
     templates = models.ForeignKey(Template, related_name='assignments')
     students = models.ManyToMany(Student, related_name='assignments')
     labels = models.ManyToMany(SubjectLabel, related_name='assignments')
@@ -14,5 +14,5 @@ class Assignment():
     def get_name(self):
         return self.name
 
-    def get_creation_date(self):
-        return self.creation_date
+    def get_date_assigned(self):
+        return self.date_assigned
