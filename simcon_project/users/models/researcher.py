@@ -1,12 +1,9 @@
 from django.db import models
-from .custom_user import CustomUser
-from conversation_templates.models.template import Template
-from .assignment import Assignment
-from .student import Student
-from .subject_label import SubjectLabel
+from conversation_templates.models.conv_template import ConversationTemplate
+
 
 class Researcher(CustomUser):
-    templates = models.ForeignKey(Template, on_delete=models.CASCADE)
-    assignments = models.ForeginKey(Assignment, on_delete=models.CASCADE)
+    templates = models.ForeignKey(ConversationTemplate, on_delete=models.CASCADE)
+    assignments = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     students = models.ManyToManyField(Student, related_name='researchers')
     labels = models.ManyToManyField(SubjectLabel, related_name='researchers')

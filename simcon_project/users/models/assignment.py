@@ -1,13 +1,11 @@
 from django.db import models
-from conversation_templates.models.template import Template
-from .student import Student
-from .subject_label import SubjectLabel
+from conversation_templates.models.conv_template import ConversationTemplate
 
 class Assignment(models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True)
     name = models.CharField(max_length=100) 
     date_assigned = models.DateField()
-    templates = models.ForeignKey(Template, related_name='assignments')
+    templates = models.ForeignKey(ConversationTemplate, related_name='assignments')
     students = models.ManyToMany(Student, related_name='assignments')
     labels = models.ManyToMany(SubjectLabel, related_name='assignments')
 

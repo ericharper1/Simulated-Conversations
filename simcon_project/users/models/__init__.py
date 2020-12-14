@@ -1,5 +1,5 @@
 from .custom_user import CustomUser
-from .student import student
+from .student import Student
 from .researcher import Researcher
-from .subject_label import Subject_Label
+from .subject_label import SubjectLabel
 from .assignment import Assignment

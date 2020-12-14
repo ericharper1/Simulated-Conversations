@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class TemplateResponse (models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True)
     completion_date = models.DateTimeField(default=timezone.now)

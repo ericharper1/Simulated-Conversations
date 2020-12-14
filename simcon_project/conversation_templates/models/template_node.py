@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class TemplateNode (models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True)
     description = models.CharField(max_length=4000)
