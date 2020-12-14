@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 
 
+
 class TemplateResponse (models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     completion_date = models.DateTimeField(default=None)

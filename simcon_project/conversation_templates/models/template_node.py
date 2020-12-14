@@ -3,6 +3,7 @@ from embed_video.fields import EmbedVideoField
 import uuid
 
 
+
 class TemplateNode (models.Model):
     """
     Stores description and video for a node in a conversation, and has
