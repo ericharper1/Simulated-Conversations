@@ -3,7 +3,7 @@ from conversation_templates.models.template import Template
 from .student import Student
 from .subject_label import SubjectLabel
 
-class Assignment():
+class Assignment(models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True)
     name = models.CharField(max_length=100) 
     date_assigned = models.DateField()
