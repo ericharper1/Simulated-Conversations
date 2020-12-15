@@ -3,7 +3,7 @@ from .custom_user import CustomUser
 
 
 class Student(CustomUser):
-    researcher = models.ForeignKey('users.Researcher', related_name='researcher', on_delete=models.CASCADE)
+    added_by = models.ForeignKey('users.Researcher', related_name='researcher', on_delete=models.CASCADE, default="None")
 # needs fixing
 # ERRORS:
 # users.Student.researcher: (models.E006) The field 'researcher' clashes with the field 'researcher' from model 'users.customuser'.
