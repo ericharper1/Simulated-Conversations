@@ -1,10 +1,10 @@
 from django.db import models
-from .template_node_choice import TemplateNodeChoice
 
 
 class TemplateNode (models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True)
     description = models.CharField(max_length=4000)
-    video_url = models.CharField(max_length=100)
+    video_url = models.URLField(max_length=100)
+    start = models.BooleanField(default=False)
     terminal = models.BooleanField(default=False)
-    choices = models.ManyToManyField(TemplateNodeChoice, related_name='template_node')
+    parent_template = models.ForeignKey('conversation_templates.ConversationTemplate', related_name='template_nodes', on_delete=models.CASCADE)
