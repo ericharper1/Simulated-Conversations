@@ -1,4 +1,5 @@
 from django.db import models
+from .template_node import TemplateNode
 
 
 class TemplateNodeResponse (models.Model):

@@ -1,4 +1,5 @@
 from django.db import models
+from .template_node_choice import TemplateNodeChoice
 
 
 class TemplateNode (models.Model):

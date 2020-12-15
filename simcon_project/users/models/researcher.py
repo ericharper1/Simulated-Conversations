@@ -1,5 +1,9 @@
 from django.db import models
 from conversation_templates.models.conv_template import ConversationTemplate
+from .custom_user import CustomUser
+from .assignment import Assignment
+from .student import Student
+from .subject_label import SubjectLabel
 
 
 class Researcher(CustomUser):
