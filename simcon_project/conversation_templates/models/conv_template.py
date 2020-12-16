@@ -7,6 +7,6 @@ class ConversationTemplate (models.Model):
     name = models.CharField(max_length=40)
     description = models.CharField(max_length=4000)
     creation_date = models.DateTimeField(default=timezone.now)
-    researcher = models.ForeignKey('users.Researcher', related_name='templates', on_delete=models.CASCADE)
+    researcher = models.ForeignKey('users.Researcher', related_name='templates', default=0, on_delete=models.CASCADE)
 
 

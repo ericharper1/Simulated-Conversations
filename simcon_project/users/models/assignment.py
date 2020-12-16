@@ -7,7 +7,7 @@ class Assignment(models.Model):
     date_assigned = models.DateField()
     templates = models.ManyToManyField('conversation_templates.ConversationTemplate', related_name='assignments')
     students = models.ManyToManyField('users.Student', related_name='assignments')
-    researcher = models.ForeignKey('users.Researcher', related_name='assignments', on_delete=models.CASCADE)
+    researcher = models.ForeignKey('users.Researcher', default=0, related_name='assignments', on_delete=models.CASCADE)
     # labels are not part of MVP
     labels = models.ManyToManyField('users.SubjectLabel', related_name='assignments')
 

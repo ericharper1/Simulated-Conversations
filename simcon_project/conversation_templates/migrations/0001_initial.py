@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ConversationTemplate',
             fields=[
-                ('id', models.UUIDField(editable=False, primary_key=True, serialize=False, unique=True)),
+                ('id', models.UUIDField(editable=False, primary_key=True, serialize=False, unique=True, default=0)),
                 ('name', models.CharField(max_length=40)),
                 ('description', models.CharField(max_length=4000)),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now)),
