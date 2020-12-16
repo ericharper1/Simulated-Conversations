@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils import timezone
+import uuid
 
 
 class ConversationTemplate (models.Model):
-    id = models.UUIDField(unique=True, editable=False, primary_key=True)
+    id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=40)
     description = models.CharField(max_length=4000)
     creation_date = models.DateTimeField(default=timezone.now)
