@@ -8,5 +8,5 @@ class SubjectLabel(models.Model):
     students = models.ManyToManyField('users.Student', related_name='labels')
     researcher = models.ForeignKey('users.Researcher', related_name='labels', default=0, on_delete=models.CASCADE)
 
-    def get_file_name(self):
-        return self.file_name
+    def get_label_name(self):
+        return self.label_name
