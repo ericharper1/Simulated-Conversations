@@ -22,9 +22,21 @@
 
   <body>
     <div class="container">
-      <h1> THIS IS THE STUDENT PAGE</h1>
-        {% block content %}
-        {% endblock %}
+      <h1> Student Landing Page</h1>
+      <table>
+        <tr>
+          <th>Template Name</th>
+          <th>Date Assigned</th>
+          <th>Last Response</th>
+        </tr>
+          {% for x,y,z in assigned_templates %}
+        <tr>
+          <td>{{x}}</td>
+          <td>{{y}}</td>
+          <td>{{z}}</td>
+        </tr>
+        {% endfor %}
+      </table>
     </div> <!-- /container -->
 
     <!-- Bootstrap core JavaScript
