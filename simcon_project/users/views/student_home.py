@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from users.models import *
 from conversation_templates.models import *
@@ -11,8 +12,8 @@ def StudentView(request):
             'date_assigned',
             'conversation_templates__template_responses__completion_date')\
         .order_by('conversation_templates__template_responses__completion_date', 'date_assigned')
+    assigned_templates_paginated = Paginator(assigned_templates, 1)
+    page_number = request.GET.get('page')
+    template_page = assigned_templates_paginated.get_page(page_number)
     # must pass context as a dictionary
-    table_dict = {
-        'assigned_templates': assigned_templates
-    }
-    return render(request, 'student_view.html', table_dict)
+    return render(request, 'student_view.html', {'template_page': template_page})

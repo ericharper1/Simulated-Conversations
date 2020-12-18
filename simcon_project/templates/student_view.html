@@ -29,7 +29,7 @@
           <th>Date Assigned</th>
           <th>Last Response</th>
         </tr>
-          {% for x,y,z in assigned_templates %}
+          {% for x,y,z in template_page %}
         <tr>
           <td>{{x}}</td>
           <td>{{y}}</td>
@@ -38,7 +38,23 @@
         {% endfor %}
       </table>
     </div> <!-- /container -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if template_page.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
 
+            <span class="current">
+                Page {{ template_page.number }} of {{ template_page.paginator.num_pages }}.
+            </span>
+
+            {% if template_page.has_next %}
+                <a href="?page={{ template_page.next_page_number }}">next</a>
+                <a href="?page={{ template_page.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
 
