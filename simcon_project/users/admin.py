@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth import get_user_model
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser
+from django.apps import apps
 
 
 class CustomUserAdmin(UserAdmin):
@@ -29,3 +30,10 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
+
+models = apps.get_models()
+for model in models:
+    try:
+        admin.site.register(model)
+    except admin.sites.AlreadyRegistered:
+        pass
