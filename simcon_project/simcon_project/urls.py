@@ -26,4 +26,5 @@ urlpatterns = [
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
+    path('conversation/', include('conversation_templates.urls')),
 ]
