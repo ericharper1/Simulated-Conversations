@@ -23,9 +23,27 @@
   <body>
     <div class="container">
         <h1> THIS IS A VALID RESPONSE </h1>
-        {% for node in {{response}}
-        {% block content %}
-        {% endblock %}
+        <div class="container">
+            {% block content %}
+            {% for node in response %}
+                <div class="row">
+                    <h2> Response {{node.position_in_sequence}}</h2>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h2> This is where a recording would go IF I HAD ONE</h2>
+                    </div>
+                    <div class="col-sm-4">
+                       {{node.transcription}}
+                   </div>
+                   <div class="col-sm-4">
+                       <h2> This is where a feedback form would go IF I HAD ONE</h2>
+                   </div>
+               </div>
+            {% endfor %}
+
+            {% endblock %}
+        </div>
 
     </div> <!-- /container -->
 
