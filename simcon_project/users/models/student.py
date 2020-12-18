@@ -1,13 +1,6 @@
 from django.db import models
-from conversation_templates.models.conv_template import ConversationTemplate
-from conversation_templates.models.template_response import TemplateResponse
+from .custom_user import CustomUser
 
 
 class Student(CustomUser):
-    template_response = models.ForeignKey(TemplateResponse, on_delete=models.CASCADE)
-    available_templates = models.ManyToManyField(ConversationTemplate, related_name='')
-    completed_templates = models.ManyToManyField(ConversationTemplate, related_name='')
-    registered = models.BooleanField(default=False)
-
-    def get_is_registered(self):
-        return self.registered
+    added_by = models.ForeignKey('users.Researcher', default=0, related_name='researcher', on_delete=models.CASCADE)

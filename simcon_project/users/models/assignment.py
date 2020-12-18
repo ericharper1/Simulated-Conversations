@@ -1,13 +1,16 @@
 from django.db import models
-from conversation_templates.models.conv_template import ConversationTemplate
+import uuid
+
 
 class Assignment(models.Model):
-    id = models.UUIDField(unique=True, editable=False, primary_key=True)
+    id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=100) 
     date_assigned = models.DateField()
-    templates = models.ForeignKey(ConversationTemplate, related_name='assignments')
-    students = models.ManyToMany(Student, related_name='assignments')
-    labels = models.ManyToMany(SubjectLabel, related_name='assignments')
+    conversation_templates = models.ManyToManyField('conversation_templates.ConversationTemplate', related_name='assignments')
+    students = models.ManyToManyField('users.Student', related_name='assignments')
+    researcher = models.ForeignKey('users.Researcher', default=0, related_name='assignments', on_delete=models.CASCADE)
+    # labels are not part of MVP
+    subject_labels = models.ManyToManyField('users.SubjectLabel', related_name='assignments')
 
     def get_name(self):
         return self.name

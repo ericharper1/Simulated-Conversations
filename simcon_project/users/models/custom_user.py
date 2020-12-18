@@ -57,11 +57,12 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30, default="None")
+    last_name = models.CharField(max_length=30, default="None")
     is_researcher = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    registered = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = 'email'
@@ -80,3 +81,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def get_is_researcher(self):
         return self.is_researcher
+
+    def get_is_registered(self):
+        return self.registered
