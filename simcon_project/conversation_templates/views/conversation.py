@@ -3,20 +3,40 @@ from django.template import Context
 from django.http import HttpResponse
 
 # Create your views here.
+ct_templates_dir = 'conversation'
 def conversation_start(request):
-    context = {}
-    t = get_template('conversation/conversation_start.html')
-    html = t.render(Context(context))
+    ctx = {}
+    t_name = '{}/conversation_start.html'.format(ct_templates_dir)
+    t = get_template(t_name)
+    html = t.render(ctx)
     return HttpResponse(html)
 
 def conversation_step(request):
-    context = {}
-    t = get_template('conversation/conversation_step.html')
-    html = t.render(Context(context))
+    ctx = {}
+    t_name = '{}/conversation_step.html'.format(ct_templates_dir)
+    t = get_template(t_name)
+    html = t.render(ctx)
     return HttpResponse(html)
 
 def conversation_end(request):
-    context = {}
-    t = get_template('conversation/conversation_end.html')
-    html = t.render(Context(context))
+    # for testing
+    ct_list = [
+        {
+            'description': 'scene1',
+            'transcription': 'response1'
+        },
+        {
+            'description': 'scene2',
+            'transcription': 'response2'
+        },
+        {
+            'description': 'scene3',
+            'transcription': 'response3'
+        }
+    ]
+
+    ctx = {'ct_list': ct_list}
+    t_name = '{}/conversation_end.html'.format(ct_templates_dir)
+    t = get_template(t_name)
+    html = t.render(ctx)
     return HttpResponse(html)
