@@ -1,16 +1,77 @@
+{% load bootstrap4 %}
+{% load static %}
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        <title>Template Management</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
     </head>
     <body>
-        <div>
-        Hello There
-        </div>
+        <!-- Template Search Bar --->
+        <input type="text" placeholder="Search Templates">
+
+        <!-- Folder Table --->
+        <table class="table">
+            <thead>
+            <th scope="col">Name</th>
+            <th scope="col">Add</th>
+            <th scope="col">Delete</th>
+            </thead>
+            <tbody>
+            {% for folder in folders.all %}
+            <tr>
+                <td>{{ folder.name }}</td>
+                <td>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Add Templates">
+                    </form>
+                </td>
+                <td>
+                    <form action="{% url 'templates:delete_folder' folder.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="submit" value="Delete">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <!-- Add new Folder Input (Should have a button later)--->
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+        </form>
+
+        <!-- Template Search Bar --->
+        <br/> <!-- take this out once it's formatted --->
+        <input type="text" placeholder="Search Templates">
+
+        <!-- Template Table --->
+        <table class="table">
+            <thead>
+                <th scope="col">Name</th>
+                <th scope="col">Creation Date</th>
+                <th scope="col">Delete</th>
+            </thead>
+            <tbody>
+            {% for template in templates.all %}
+                <tr>
+                    <td>{{ template.name }}</td>
+                    <td>{{ template.creation_date }}</td>
+                    <td>
+                        <form action="{% url 'templates:delete_template' template.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="Delete">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button>Create New Template</button> <!-- This should route to template creation page --->
     </body>
 </html>

@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users.views import RedirectFromLogin, StudentView, ResearcherView
-from conversation_templates.views import TemplateManagementView
 from django.conf.urls import include
 from django.contrib.auth import views
 
+app_name = 'simcon'
 urlpatterns = [
     path('', views.LoginView.as_view(), name="Login"),
     path('admin/', admin.site.urls),
@@ -27,5 +27,5 @@ urlpatterns = [
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
-    path('template-management/', TemplateManagementView, name="TemplateManagementView"),
+    path('template-management/', include('conversation_templates.urls') , name="TemplateManagementView"),
 ]

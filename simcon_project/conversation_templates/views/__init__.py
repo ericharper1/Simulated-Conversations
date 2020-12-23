@@ -1,1 +1,1 @@
-from .template_management import TemplateManagementView
+from .template_management import *

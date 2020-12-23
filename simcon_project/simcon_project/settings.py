@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third-party apps
+    'bootstrap4',
+    'bootstrap_modal_forms',
 
     # Our apps
     'users',
