@@ -12,7 +12,7 @@ def StudentView(request):
             'date_assigned',
             'conversation_templates__template_responses__completion_date')\
         .order_by('conversation_templates__template_responses__completion_date', 'date_assigned')
-    assigned_templates_paginated = Paginator(assigned_templates, 1)
+    assigned_templates_paginated = Paginator(assigned_templates, 10)
     page_number = request.GET.get('page')
     template_page = assigned_templates_paginated.get_page(page_number)
     # must pass context as a dictionary
