@@ -17,10 +17,13 @@
     <body>
         <h1>Simulated Conversations</h1>
         <h3>Template name</h3>
+        <h3 style='text-align:right;'>{{ user_email }}</h3>
         <p>This is where the description of the template goes.</p>
-        <button type="button">Cancel</button>
-        <form action='step' method='GET'>
-        <button type='submit'>Start</button>
+        <form action='{{ request.get_host }}/student-view' method='GET'>
+            <button type='submit'>Cancel</button>
+        </form>
+        <form action='{{ request.get_host }}/conversation/step' method='GET'>
+            <button type='submit'>Start</button>
         </form>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->

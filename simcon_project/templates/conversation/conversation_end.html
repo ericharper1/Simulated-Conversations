@@ -17,6 +17,7 @@
     <body>
         <h1>Simulated Conversations</h1>
         <h3>Template name</h3>
+        <h3 style="text-align:right;">{{ user_email }}</h3>
         <p>This is where the description of the template goes.</p>
         {% for ct in ct_list %}
             <table>
@@ -26,7 +27,9 @@
                 </tr>
             </table>
         {% endfor %}
-        <button type="button">Finish</button>
+        <form action='{{ request.get_host }}/student-view' method='GET'>
+            <button type='submit'>Finish</button>
+        </form>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
