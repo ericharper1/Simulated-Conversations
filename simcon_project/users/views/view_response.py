@@ -12,6 +12,6 @@ def ViewResponse(request, response=TemplateResponse.objects.get(id="e5f6dfd6-9a4
             else:
                 break
 
-        return render(request, 'view_response.html', {'response': nodes})
+        return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response })
     else:
         return render(request, 'invalid_response.html')

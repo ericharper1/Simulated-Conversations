@@ -26,19 +26,25 @@
         <h1> THIS IS A VALID RESPONSE </h1>
         <div class="container">
             {% block content %}
+            <div class="row">
+                <h2>Overall feedback:</h2>
+            </div>
+            <div class="row">
+            {{response.feedback}}
+            </div>
             {% for node in response %}
                 <div class="row">
                     <h2> Response {{node.position_in_sequence}}</h2>
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-                        This is where a recording would go IF I HAD ONE
+
                     </div>
                     <div class="col-sm-4">
                        {{node.transcription}}
                     </div>
                     <div class="col-sm-4">
-                        This is where a feedback form would go IF I HAD ONE
+                        {{node.feedback}}
                     </div>
                </div>
             {% endfor %}
