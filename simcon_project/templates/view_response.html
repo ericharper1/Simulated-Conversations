@@ -38,13 +38,26 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-
+                        "Audio goes here"
                     </div>
                     <div class="col-sm-4">
                        {{node.transcription}}
                     </div>
                     <div class="col-sm-4">
-                        {{node.feedback}}
+                        {{node.feedback}} <button onclick="myFunction()">Edit</button>
+
+                        <script>
+                        function changeFeedback() {
+                            var txt;
+                            var newFeedback = prompt("Enter Feedback:", {{node.feedback}});
+                            if (newFeedback == null || newFeedback == "") {
+                                {{node.feedback}} = None;
+                            } else {
+                                {{node.feedback}} = newFeedback;
+                            }
+                                document.getElementById("demo").innerHTML = "Saved!";
+                        }
+                        </script>
                     </div>
                </div>
             {% endfor %}
