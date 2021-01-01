@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView, SettingsView
+from users.views import RedirectFromLogin, StudentView, ResearcherView, SettingsView, TemplateStartView
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -27,4 +27,5 @@ urlpatterns = [
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('settings/', SettingsView, name="SettingsView"),
+    path('template-start/', TemplateStartView, name="TemplateStartView"),
 ]
