@@ -21,7 +21,7 @@
   <body>
     <div class="d-flex" id="master-parent-div">
         <div class="themed-container" id="sidebar">
-            <a href="{% }">
+            <a href="{% url 'SettingsView' %}">
                 <img id="gear" src="{% static 'users/settings.png' %}" alt="Image of gear to access settings">
                 <!---Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" title="Vitaly Gorbachev">Vitaly Gorbachev</a>
                  from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>-->
@@ -35,9 +35,11 @@
                     <div class="col-4 themed-grid-col grid-header">Date Assigned</div>
                     <div class="col-4 themed-grid-col grid-header">Last Response</div>
                 </div>
-                {% for x,y,z in template_page %}
+                {% for x,y,z,a in template_page %}
                 <div class="row mb-3">
-                    <div class="col-4 themed-grid-col">{{x}}</div>
+                    <div class="col-4 themed-grid-col">
+                        <a href="{% url 'TemplateStartView' %}">{{x}}</a>
+                    </div>
                     <div class="col-4 themed-grid-col">{{y}}</div>
                     <div class="col-4 themed-grid-col">{{z}}</div>
                 </div>
