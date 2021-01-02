@@ -2,7 +2,8 @@ from django.shortcuts import render
 from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 
 
-def ViewResponse(request, response=TemplateResponse.objects.get(id="e5f6dfd6-9a41-43e5-aadf-7747e4f33403")):
+def ViewResponse(request, responseID):
+    response = TemplateResponse.objects.get(responseID)
     if response is not None:
         nodes = []
         num_nodes = TemplateNodeResponse.objects.filter(parent_template_response=response).count()
@@ -12,6 +13,6 @@ def ViewResponse(request, response=TemplateResponse.objects.get(id="e5f6dfd6-9a4
             else:
                 break
 
-        return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response })
+        return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
     else:
         return render(request, 'invalid_response.html')

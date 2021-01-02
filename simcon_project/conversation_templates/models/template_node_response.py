@@ -11,4 +11,4 @@ class TemplateNodeResponse (models.Model):
                                                  related_name='node_responses', on_delete=models.CASCADE)
     position_in_sequence = models.IntegerField()
     feedback = models.CharField(max_length=1000, default='No feedback')
-    # audio_response = models.FileField('audio/%Y/%m/%d')
+    audio_response = models.FileField(upload_to='audio/%Y/%m/%d', default=None)
