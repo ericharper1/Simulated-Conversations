@@ -1,3 +1,9 @@
-body {
-    background-color: lightblue;
+.container-fluid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.column-button {
+    width: 80px !important;
 }
