@@ -3,7 +3,6 @@ import uuid
 
 
 class FolderManager (models.Manager):
-
     def create_folder(self, name):
         folder = self.create(name=name)
         return folder
@@ -24,3 +23,6 @@ class TemplateFolder (models.Model):
     name = models.CharField(max_length=50)
     templates = models.ManyToManyField('conversation_templates.ConversationTemplate', related_name='folder', blank=True)
     objects = FolderManager()
+
+    def __str__(self):
+        return self.name
