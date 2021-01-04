@@ -1,13 +1,15 @@
 from django import forms
-from .models import TemplateFolder
-from bootstrap_modal_forms.forms import BSModalModelForm
+from .models import TemplateFolder, ConversationTemplate
 
 
-class FolderCreationForm(forms.Form):
-    name = forms.CharField(label="", max_length=50,  widget=forms.TextInput(attrs={'placeholder': 'Enter Folder Name'}))
+class SelectTemplates(forms.SelectMultiple):
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        return option
 
 
-class FolderModalForm(BSModalModelForm):
+class FolderCreationForm(forms.ModelForm):
     class Meta:
         model = TemplateFolder
-        fields = ['name']
+        fields = ['name', 'templates']
+        widgets = {'templates': SelectTemplates}

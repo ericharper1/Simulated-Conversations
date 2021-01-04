@@ -1,0 +1,26 @@
+{% block content %}
+    {% csrf_token %}
+    <div class="modal fade" role="dialog", id="{{ target }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Folder Creation</h3>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    {% if empty %}
+                        {{ empty_form.as_p }}
+                    {% else %}
+                        {{ form.as_p }}
+                    {% endif %}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-failure" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
