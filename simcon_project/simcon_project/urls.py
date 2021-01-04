@@ -21,6 +21,7 @@ from django.contrib.auth import views
 
 urlpatterns = [
     path('', views.LoginView.as_view(), name="Login"),
+    path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
