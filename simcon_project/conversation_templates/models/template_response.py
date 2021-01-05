@@ -1,4 +1,5 @@
 from django.db import models
+
 import uuid
 
 
@@ -11,3 +12,4 @@ class TemplateResponse(models.Model):
     assignment = models.ForeignKey('users.Assignment', default=0, related_name='template_responses',
                                    on_delete=models.CASCADE)
     feedback = models.CharField(max_length=1000, default='No feedback')
+

@@ -26,5 +26,6 @@ urlpatterns = [
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
-    path('view_response/', ViewResponse, name="ViewResponse")
+    path('view_response/', ViewResponse, name="ViewResponse"),
+    path('view_response/<uuid:pk>/update/', ViewResponse, name='UpdateFeedback')
 ]

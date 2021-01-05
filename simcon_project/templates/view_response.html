@@ -61,20 +61,11 @@
                        {{node.transcription}}
                     </div>
                     <div class="col-sm-4" id="feedback">
-                        {{node.feedback}} <button onclick="changeFeedback()">Edit</button>
-
-                        <script>
-                        function changeFeedback() {
-                            var txt;
-                            var newFeedback = prompt("Enter Feedback:", );
-                            if (newFeedback == null || newFeedback == "") {
-                                {{node.feedback}} = None;
-                            } else {
-                                {{node.feedback}} = newFeedback;
-                            }
-                                document.getElementById("feedback").innerHTML = "Saved!";
-                        }
-                        </script>
+                        <form action="/team_name_url/" method="post">
+                            <label for="team_name">Enter name: </label>
+                            <input id="team_name" type="text" name="name_field" value="Default name for team.">
+                            <input type="submit" value="OK">
+                        </form>
                     </div>
                </div>
             {% endfor %}
