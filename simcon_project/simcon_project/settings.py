@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third-party apps
-
+    'django_tables2',
     # Our apps
     'users',
     'conversation_templates',
@@ -126,6 +126,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+# Static Directories  
+STATICFILES_DIRS = [
+  os.path.join(BASE_DIR, 'static'),
+]
 
+# Static URLS [These are used when in non production enviroments]
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/redirect-from-login'
+
+# Uncomment when we move to production
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')  
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Bootstrap Template for Django Tables 
+DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
