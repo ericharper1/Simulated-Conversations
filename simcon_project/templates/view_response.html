@@ -32,30 +32,47 @@
             <div class="row">
             {{response.feedback}}
             </div>
-            {% for node in response %}
+            {% for node in response_nodes %}
                 <div class="row">
                     <h2> Response {{node.position_in_sequence}}</h2>
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-                        "Audio goes here"
+                        <audio id="myAudio">
+                          <source src="?" type="audio/m4a">
+                          Your browser does not support the audio element.
+                        </audio>
+
+                        <script>
+                            var audioSRC = {{node.audio_response}}
+                            document.getElementByID("myAudio").value=audioSRC
+                        </script>
+
+                        <button onclick="playAudio()" type="button">Play Audio</button>
+                        <script>
+                        var x = document.getElementById("myAudio");
+
+                        function playAudio() {
+                            x.play();
+                        }
+                        </script>
                     </div>
                     <div class="col-sm-4">
                        {{node.transcription}}
                     </div>
-                    <div class="col-sm-4">
-                        {{node.feedback}} <button onclick="myFunction()">Edit</button>
+                    <div class="col-sm-4" id="feedback">
+                        {{node.feedback}} <button onclick="changeFeedback()">Edit</button>
 
                         <script>
                         function changeFeedback() {
                             var txt;
-                            var newFeedback = prompt("Enter Feedback:", {{node.feedback}});
+                            var newFeedback = prompt("Enter Feedback:", );
                             if (newFeedback == null || newFeedback == "") {
                                 {{node.feedback}} = None;
                             } else {
                                 {{node.feedback}} = newFeedback;
                             }
-                                document.getElementById("demo").innerHTML = "Saved!";
+                                document.getElementById("feedback").innerHTML = "Saved!";
                         }
                         </script>
                     </div>
