@@ -39,24 +39,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-                        <audio id="myAudio">
-                          <source src="?" type="audio/m4a">
-                          Your browser does not support the audio element.
-                        </audio>
-
-                        <script>
-                            var audioSRC = {{node.audio_response}}
-                            document.getElementByID("myAudio").value=audioSRC
-                        </script>
-
-                        <button onclick="playAudio()" type="button">Play Audio</button>
-                        <script>
-                        var x = document.getElementById("myAudio");
-
-                        function playAudio() {
-                            x.play();
-                        }
-                        </script>
+                        <audio src="{{node.audio_response}}" controls></audio>
                     </div>
                     <div class="col-sm-4">
                        {{node.transcription}}
