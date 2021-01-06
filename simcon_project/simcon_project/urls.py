@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse
+from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateResponseFeedback
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -27,5 +27,5 @@ urlpatterns = [
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('view_response/', ViewResponse, name="ViewResponse"),
-    path('view_response/<uuid:pk>/update/', ViewResponse, name='UpdateFeedback')
+    path('view_response/<uuid:pk>/update/', UpdateResponseFeedback, name='UpdateResponseFeedback')
 ]

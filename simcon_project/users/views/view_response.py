@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+# from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -23,7 +24,10 @@ def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
         return render(request, 'invalid_response.html')
 
 
+# @login_required
+# @permission_required('catalog.can_mark_returned', raise_exception=True)
 def UpdateResponseFeedback(request, pk):
+    """Function for updating feedback on a response"""
     feedback_instance = get_object_or_404(TemplateResponse, pk=pk)
 
     # If this is a POST request then process the Form data
@@ -51,4 +55,4 @@ def UpdateResponseFeedback(request, pk):
         'feedback_instance': feedback_instance,
     }
 
-    return render(request, 'view_response.html', context)
+    return render(request, 'update_response.html', context)

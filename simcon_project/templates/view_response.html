@@ -24,6 +24,7 @@
   <body>
     <div class="container">
         <h1> THIS IS A VALID RESPONSE </h1>
+        <h2><a href="{% url 'UpdateResponseFeedback' response.id %}">Edit feedback</a></h2>
         <div class="container">
             {% block content %}
             <div class="row">
@@ -61,11 +62,7 @@
                        {{node.transcription}}
                     </div>
                     <div class="col-sm-4" id="feedback">
-                        <form action="/team_name_url/" method="post">
-                            <label for="team_name">Enter name: </label>
-                            <input id="team_name" type="text" name="name_field" value="Default name for team.">
-                            <input type="submit" value="OK">
-                        </form>
+                        {{node.feedback}}
                     </div>
                </div>
             {% endfor %}
