@@ -8,7 +8,7 @@ from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 
 
 def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
-    response = TemplateResponse.objects.get(id=responseid)
+    response = get_object_or_404(TemplateResponse, pk=responseid)
     if response is not None:
         nodes = []
         num_nodes = TemplateNodeResponse.objects.filter(parent_template_response=response).count()
@@ -19,7 +19,9 @@ def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
             else:
                 break
 
-        return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
+        form = UpdateFeedback(request.POST)
+        return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response, 'form': form, 'nodeform': form})
+
     else:
         return render(request, 'invalid_response.html')
 
@@ -48,7 +50,7 @@ def UpdateOverallResponseFeedback(request, pk):
     # If this is a GET (or any other method) create the default form.
     else:
         default_feedback = feedback_instance.feedback
-        form = UpdateFeedback(initial={'feedback': default_feedback,})
+        form = UpdateFeedback(initial={'feedback': default_feedback, })
 
     context = {
         'form': form,
@@ -66,12 +68,12 @@ def UpdateNodeResponseFeedback(request, pk):
     if request.method == 'POST':
 
         # Create a form instance and populate it with data from the request (binding):
-        form = UpdateFeedback(request.POST)
+        nodeform = UpdateFeedback(request.POST)
 
         # Check if the form is valid:
-        if form.is_valid():
+        if nodeform.is_valid():
             # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-            feedback_instance.feedback = form.cleaned_data['feedback']
+            feedback_instance.feedback = nodeform.cleaned_data['feedback']
             feedback_instance.save()
 
         # redirect to a new URL:
@@ -80,10 +82,10 @@ def UpdateNodeResponseFeedback(request, pk):
     # If this is a GET (or any other method) create the default form.
     else:
         default_feedback = feedback_instance.feedback
-        form = UpdateFeedback(initial={'feedback': default_feedback,})
+        nodeform = UpdateFeedback(initial={'feedback': default_feedback,})
 
     context = {
-        'form': form,
+        'form': nodeform,
         'feedback_instance': feedback_instance,
     }
 

@@ -30,9 +30,16 @@
             <div class="row">
                 <h2>Overall feedback:</h2>
             </div>
-            <div class="row">
+            <dv class="row">
             {{response.feedback}}
-            </div>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <table>
+                        {{ form.as_table }}
+                    </table>
+                    <input type="submit" value="Save">
+                </form>
+            </dv>
             {% for node in response_nodes %}
                 <div class="row">
                     <h2> Response {{node.position_in_sequence}}</h2>
@@ -62,7 +69,15 @@
                        {{node.transcription}}
                     </div>
                     <div class="col-sm-4" id="feedback">
-                        {{node.feedback}} <a href="{% url 'UpdateNodeResponseFeedback' node.id %}">Edit feedback</a>
+                        {{node.feedback}}
+                        <form action="" method="post">
+                          {% csrf_token %}
+                          <table>
+                          {{ nodeform.as_table }}
+                          </table>
+                          <input type="submit" value="Save">
+                        </form>
+                        <!--{{node.feedback}} <a href="{% url 'UpdateNodeResponseFeedback' node.id %}">Edit feedback</a>-->
                     </div>
                </div>
             {% endfor %}
