@@ -46,24 +46,7 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-4">
-                        <audio id="myAudio">
-                          <source src="?" type="audio/m4a">
-                          Your browser does not support the audio element.
-                        </audio>
-
-                        <script>
-                            var audioSRC = {{node.audio_response}}
-                            document.getElementByID("myAudio").value=audioSRC
-                        </script>
-
-                        <button onclick="playAudio()" type="button">Play Audio</button>
-                        <script>
-                        var x = document.getElementById("myAudio");
-
-                        function playAudio() {
-                            x.play();
-                        }
-                        </script>
+                        {{node.audio_response}}
                     </div>
                     <div class="col-sm-4">
                        {{node.transcription}}
@@ -73,7 +56,7 @@
                         <form action="" method="post">
                           {% csrf_token %}
                           <table>
-                          {{ nodeform.as_table }}
+                          {{ nodeform[0].as_table }}
                           </table>
                           <input type="submit" value="Save">
                         </form>

@@ -17,24 +17,10 @@ def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
         if TemplateNodeResponse.objects.get(parent_template_response=response, position_in_sequence=i):
             nodes.append(TemplateNodeResponse.objects.get(parent_template_response=response,
                                                           position_in_sequence=i))
-            if request.method == 'POST':
-
-                # Create a form instance and populate it with data from the request (binding):
-                nodeform = UpdateFeedback(request.POST)
-
-                # Check if the form is valid:
-                if form.is_valid():
-                    # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
-                    response.feedback = form.cleaned_data['feedback']
-                    response.save()
-
-                # redirect to a new URL:
-                return HttpResponseRedirect(reverse('ViewResponse'))
-
-            # If this is a GET (or any other method) create the default form.
-            else:
-                default_feedback = response.feedback
-                form = UpdateFeedback(initial={'feedback': default_feedback, })
+            nodeform.append(UpdateFeedback(request.POST))
+            if nodeform[i-1].is_valid():
+                response.feedback = nodeform[i].cleaned_data['feedback']
+                response.save()
         else:
             break
 
@@ -57,7 +43,8 @@ def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
         default_feedback = response.feedback
         form = UpdateFeedback(initial={'feedback': default_feedback, })
 
-    return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response, 'form': form, 'nodeform': nodeform})
+    return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response, 'form': form,
+                                                  'nodeform': nodeform})
 
 
 
