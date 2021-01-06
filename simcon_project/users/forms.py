@@ -20,3 +20,4 @@ class CustomUserChangeForm(UserChangeForm):
 class UpdateFeedback(forms.Form):
 
     feedback = forms.CharField(help_text="Enter new Feedback")
+

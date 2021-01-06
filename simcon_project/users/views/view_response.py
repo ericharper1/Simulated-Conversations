@@ -26,7 +26,7 @@ def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
 
 # @login_required
 # @permission_required('catalog.can_mark_returned', raise_exception=True)
-def UpdateResponseFeedback(request, pk):
+def UpdateOverallResponseFeedback(request, pk):
     """Function for updating feedback on a response"""
     feedback_instance = get_object_or_404(TemplateResponse, pk=pk)
 
@@ -48,7 +48,7 @@ def UpdateResponseFeedback(request, pk):
     # If this is a GET (or any other method) create the default form.
     else:
         default_feedback = feedback_instance.feedback
-        form = UpdateFeedback(initial={'feedback': default_feedback})
+        form = UpdateFeedback(initial={'feedback': default_feedback,})
 
     context = {
         'form': form,
@@ -56,3 +56,36 @@ def UpdateResponseFeedback(request, pk):
     }
 
     return render(request, 'update_response.html', context)
+
+
+def UpdateNodeResponseFeedback(request, pk):
+    """Function for updating feedback on a response"""
+    feedback_instance = get_object_or_404(TemplateNodeResponse, pk=pk)
+
+    # If this is a POST request then process the Form data
+    if request.method == 'POST':
+
+        # Create a form instance and populate it with data from the request (binding):
+        form = UpdateFeedback(request.POST)
+
+        # Check if the form is valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required (here we just write it to the model due_back field)
+            feedback_instance.feedback = form.cleaned_data['feedback']
+            feedback_instance.save()
+
+        # redirect to a new URL:
+        return HttpResponseRedirect(reverse('ViewResponse'))
+
+    # If this is a GET (or any other method) create the default form.
+    else:
+        default_feedback = feedback_instance.feedback
+        form = UpdateFeedback(initial={'feedback': default_feedback,})
+
+    context = {
+        'form': form,
+        'feedback_instance': feedback_instance,
+    }
+
+    return render(request, 'update_response.html', context)
+

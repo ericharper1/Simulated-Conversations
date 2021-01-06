@@ -24,7 +24,7 @@
   <body>
     <div class="container">
         <h1> THIS IS A VALID RESPONSE </h1>
-        <h2><a href="{% url 'UpdateResponseFeedback' response.id %}">Edit feedback</a></h2>
+        <h2><a href="{% url 'UpdateOverallResponseFeedback' response.id %}">Edit feedback</a></h2>
         <div class="container">
             {% block content %}
             <div class="row">
@@ -62,7 +62,7 @@
                        {{node.transcription}}
                     </div>
                     <div class="col-sm-4" id="feedback">
-                        {{node.feedback}}
+                        {{node.feedback}} <a href="{% url 'UpdateNodeResponseFeedback' node.id %}">Edit feedback</a>
                     </div>
                </div>
             {% endfor %}
