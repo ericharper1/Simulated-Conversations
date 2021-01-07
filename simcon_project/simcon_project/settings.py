@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     # Our apps
     'users',
     'conversation_templates',
+
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/redirect-from-login'
+
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'TEST.DUMMY.SIM.CON@gmail.com'
+EMAIL_HOST_PASSWORD = 'SimconTest'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

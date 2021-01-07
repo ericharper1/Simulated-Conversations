@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<div lang="en">
+  <head>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
+
+    <!-- prevent line breaks when using form fields -->
+    <style type="text/css">
+    form {display:inline; margin:0px; padding:0px;}
+    </style>
+
+    <title>
+    {% block title %}Simulated Conversations | Student{% endblock %}
+    </title>
+    
+    {% block extrahead %} {% endblock %}
+  </head>
+
+  <div>
+    <p class="container">
+      <h1>User Registration</h1>
+        {% block content %}
+        {% endblock %}
+  </div>
+
+  <div class="row">
+      <div class="col-md-6">
+        <p>Full Name:</p>
+        <form method="post">
+          {%csrf_token%}
+          <small>First Name:</small><br/>
+          <input type="text" placeholder="First Name" name="first_name"><br/>
+          <small>Last Name:</small><br/>
+          <input type="text" placeholder="Last Name" name="last_name"><br/><br/>
+          <p>Set Password:</p>
+          <small>Password:</small><br/>
+          <input type="text" placeholder="Password" name="password_1"><br/>
+          <small>Repeat Password:</small><br/>
+          <input type="text" placeholder="Password" name="password_2"><br/>
+          <button type="submit" class="btn btn-success">Submit</button><br/><br/>
+        </form>
+      </div>
+  </div>
+  </body>
+</html>
