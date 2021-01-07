@@ -18,12 +18,29 @@ class NewStudentCreationForm(CustomUserManager):
         model.email = 'email'#wrong not CustomUserManager need to find self ref
         model.password = 'password'
 
+
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
 
     class Meta:
         model = Student
         fields = ('email', 'first_name', 'last_name', 'password1', 'password2', )
+
+
+class SendForm(UserCreationForm):
+    student_email = forms.EmailField(max_length=254, required=True)
+
+    def clean_email(self):
+        data =self.clean_email('student_email')
+        return data
+
+    class Meta:
+        model = Student
+        fields = ('email',)
+
+
+class SendEmail(forms.Form):
+    student_email = forms.EmailField(max_length=254, required=True)
 
 
 class CustomUserChangeForm(UserChangeForm):

@@ -30,12 +30,13 @@
   <div class="row">
       <div class="col-md-6">
         <p>Add New Label:</p>
-        <small>Label Name:</small><br/>
 
-        <form method="post">
+
+        <form action='/student-management/' method="post">
           {%csrf_token%}
-          <input type="text" placeholder="Label Name" name="new_label"><br/>
-          <button type="submit" class="btn btn-success">Submit</button><br/><br/>
+          <label for = "new_label"><small>Label Name:</small></label><br/>
+          <input id = "new_label" type="text" placeholder="Label Name" name="label_name"><br/>
+          <input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
         </form>
 
 
@@ -53,12 +54,11 @@
 
       <div class="col-md-6">
         <p>Add New User:</p>
-        <small>Email:</small><br/>
 
-        <form method="post">
+        <form action='/student-management/' method="post">
           {%csrf_token%}
-          <input type="text" placeholder="Email@email.com" name="new_student"><br/>
-          <button type="submit" class="btn btn-success">Submit</button><br/><br/>
+          {{ form }}
+          <br/><input type="submit" class="btn btn-success" value="Add Student"><br/><br/>
         </form>
 
 
@@ -74,6 +74,7 @@
 
       </div>
 
-    </div>
+   </div>
+
   </body>
 </html>
