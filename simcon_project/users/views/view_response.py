@@ -85,5 +85,5 @@ def UpdateNodeResponseFeedback(request, pk):
         'feedback_instance': feedback_instance,
     }
 
-    return render(request, 'update_response.html', context)
+    return render(request, 'update_node_response.html', context)
 

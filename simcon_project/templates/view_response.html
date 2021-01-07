@@ -24,14 +24,14 @@
   <body>
     <div class="container">
         <h1> THIS IS A VALID RESPONSE </h1>
-        <h2><a href="{% url 'UpdateOverallResponseFeedback' response.id %}">Edit feedback</a></h2>
+
         <div class="container">
             {% block content %}
             <div class="row">
                 <h2>Overall feedback:</h2>
             </div>
             <div class="row">
-            {{response.feedback}}
+            {{response.feedback}} <a href="{% url 'UpdateOverallResponseFeedback' response.id %}"> Edit feedback</a>
             </div>
             {% for node in response_nodes %}
                 <div class="row">
