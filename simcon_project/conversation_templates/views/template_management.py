@@ -1,20 +1,38 @@
 from django.views.generic import TemplateView
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
+from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView
+
+
+class FolderCreateView(BSModalCreateView):
+    template_name = 'folder_creation_modal.html'
+    form_class = FolderCreationForm
+    success_message = 'Success: Folder was created.'
+    success_url = reverse_lazy('templates:main')
+
+    def form_valid(self, form):
+        name = form.cleaned_data['name']
+        templates = form['templates'].value()
+        folder = TemplateFolder.objects.create_folder(name)
+        folder.templates.set(templates)
+        folder.save()
+        return redirect(reverse('templates:main'))
+
+
+class FolderUpdateView(BSModalUpdateView):
+    template_name = 'folder_creation_modal.html'
+    form_class = FolderCreationForm
+    success_message = 'Success: Folder was created.'
+    success_url = reverse_lazy('templates:main')
 
 
 class TemplateManagementView(TemplateView):
-    """
-    empty_form is used solely for create_folder method. form is used to populate
-    the FolderCreationForm with the currently selected folder in edit_form method
-    """
     context = {
         "templates": ConversationTemplate.objects.all(),
         "folders": TemplateFolder.objects.all(),
         "current_folder": None,
-        "empty_form": FolderCreationForm(),
         "form": FolderCreationForm(),
     }
 
@@ -24,10 +42,10 @@ class TemplateManagementView(TemplateView):
         if redirected from static views or if the current_folder is not in the
         current path (redirected from post method in this class)
         """
-        if self.context["current_folder"] is None or str(current_folder) not in request.path:
+        current_folder = self.context["current_folder"]
+        if current_folder is None or str(current_folder) not in request.path:
             self.context.update({
                "templates": ConversationTemplate.objects.all(),
-               "empty_form": FolderCreationForm(),
                "form": FolderCreationForm(),
                "folders": TemplateFolder.objects.all(),
                "current_folder": None,
@@ -43,6 +61,8 @@ class TemplateManagementView(TemplateView):
             form = FolderCreationForm(initial=form_fields)
             templates = folder.templates.all()
             self.context.update({"templates": templates, "current_folder": pk, "form": form})
+            print(folder.name)
+            print(templates)
             return render(request, 'template_management/main_view.html', self.context)
         else:
             return redirect("/template-management")
@@ -53,15 +73,14 @@ def create_folder(request):
     Uses empty_form from context to give user a blank form to create a TemplateFolder object
     """
     form = FolderCreationForm(request.POST)
-    print(request.POST)
-    if form.is_valid():
-        name = form.cleaned_data['name']
-        templates = form['templates'].value()
-        folder = TemplateFolder.objects.create_folder(name)
-        folder.templates.set(templates)
-        folder.save()
-
-    return redirect('/template-management')
+    if request.method == "POST":
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            templates = form['templates'].value()
+            folder = TemplateFolder.objects.create_folder(name)
+            folder.templates.set(templates)
+            folder.save()
+        return redirect('/template-management')
 
 
 def create_template(request, pk):

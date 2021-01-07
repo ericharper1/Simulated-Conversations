@@ -9,5 +9,7 @@ urlpatterns = [
     path('folder/delete/<uuid:pk>', delete_folder, name="delete_folder"),
     path('folder/edit/<uuid:pk>', edit_folder, name="edit_folder"),
     path('template/delete/<uuid:pk>', delete_template, name="delete_template"),
-    path('folder/<uuid:folder_pk>/remove/<uuid:template_pk>', remove_template, name="remove_template")
+    path('folder/<uuid:folder_pk>/remove/<uuid:template_pk>', remove_template, name="remove_template"),
+    path('folder/creation_menu', FolderCreateView.as_view(), name='create_modal'),
+    path('folder/update_menu', FolderCreateView.as_view(), name='update_modal'),
 ]
