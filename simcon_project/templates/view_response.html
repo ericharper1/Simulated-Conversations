@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,56 +8,58 @@
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
     <!-- prevent line breaks when using form fields -->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}
+
     </style>
 
 
     <title>
-    {% block title %}Simulated Conversations | Researcher{% endblock %}
+        {% block title %}Simulated Conversations | Researcher{% endblock %}
     </title>
 
     {% block extrahead %} {% endblock %}
-  </head>
+</head>
 
-  <body>
+<body>
+<div class="container">
+    <h1> THIS IS A VALID RESPONSE </h1>
+
     <div class="container">
-        <h1> THIS IS A VALID RESPONSE </h1>
-
-        <div class="container">
-            {% block content %}
-            <div class="row">
-                <h2>Overall feedback:</h2>
-            </div>
-            <div class="row">
-            {{response.feedback}} <a href="{% url 'UpdateOverallResponseFeedback' response.id %}"> Edit feedback</a>
-            </div>
-            {% for node in response_nodes %}
-                <div class="row">
-                    <h2> Response {{node.position_in_sequence}}</h2>
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <audio src="../../media/{{node.audio_response}}" controls></audio>
-                    </div>
-                    <div class="col-sm-4">
-                       {{node.transcription}}
-                    </div>
-                    <div class="col-sm-4" id="feedback">
-                        {{node.feedback}} <a href="{% url 'UpdateNodeResponseFeedback' node.id %}">Edit feedback</a>
-                    </div>
-               </div>
-            {% endfor %}
-
-            {% endblock %}
+        {% block content %}
+        <div class="row">
+            <h2>Overall feedback:</h2>
         </div>
+        <div class="row">
+            {{response.feedback}} <a href="{% url 'UpdateOverallResponseFeedback' response.id %}"> Edit feedback</a>
+        </div>
+        {% for node in response_nodes %}
+        <div class="row">
+            <h2> Response {{node.position_in_sequence}}</h2>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <audio src="../../media/{{node.audio_response}}" controls></audio>
+            </div>
+            <div class="col-sm-4">
+                {{node.transcription}}
+            </div>
+            <div class="col-sm-4" id="feedback">
+                {{node.feedback}} <a href="{% url 'UpdateNodeResponseFeedback' node.id %}">Edit feedback</a>
+            </div>
+        </div>
+        {% endfor %}
 
-    </div> <!-- /container -->
+        {% endblock %}
+    </div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
+</div> <!-- /container -->
 
-    <!-- Placed at the end of the document so the pages load faster -->
-  </body>
+<!-- Bootstrap core JavaScript
+================================================== -->
+
+<!-- Placed at the end of the document so the pages load faster -->
+</body>
 </html>
