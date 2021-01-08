@@ -6,7 +6,7 @@
 </head>
 <body>
     {% block content %}
-        <h1>Give feedback for: {{feedback_instance.parent_template_response.student}}</h1>
+        <h1>Feedback for: {{feedback_instance.parent_template_response.student}}</h1>
         <p>Response Transcription: {{ feedback_instance.transcription }}</p>
         <audio src="../../../media/{{feedback_instance.audio_response}}" controls></audio>
 
