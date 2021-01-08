@@ -7,8 +7,8 @@ from users.forms import UpdateFeedback
 from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 
 
-def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
-    response = get_object_or_404(TemplateResponse, pk=responseid)
+def ViewResponse(request, pk=None):
+    response = get_object_or_404(TemplateResponse, pk=pk)
 
     nodes = []
     num_nodes = TemplateNodeResponse.objects.filter(parent_template_response=response).count()
@@ -19,7 +19,6 @@ def ViewResponse(request, responseid="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
         else:
             break
     return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
-
 
 
 # @login_required
@@ -56,6 +55,8 @@ def UpdateOverallResponseFeedback(request, pk):
     return render(request, 'update_response.html', context)
 
 
+# @login_required
+# @permission_required('catalog.can_mark_returned', raise_exception=True)
 def UpdateNodeResponseFeedback(request, pk):
     """Function for updating feedback on a response"""
     feedback_instance = get_object_or_404(TemplateNodeResponse, pk=pk)
