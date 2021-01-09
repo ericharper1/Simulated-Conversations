@@ -1,15 +1,16 @@
+{% load static %}
+{% load render_table from django_tables2 %}
 <!DOCTYPE html>
 <html lang="en">
-{% load static %}
   <head>
-    
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'users/grid.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'users/student_home.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
 
     <title>
     {% block title %}Simulated Conversations | Student{% endblock %}
@@ -19,55 +20,30 @@
   </head>
 
   <body>
-    <div class="d-flex" id="master-parent-div">
-        <div class="themed-container" id="sidebar">
-            <a href="{% url 'SettingsView' %}">
-                <img id="gear" src="{% static 'users/settings.png' %}" alt="Image of gear to access settings">
-                <!---Icons made by <a href="https://www.flaticon.com/authors/vitaly-gorbachev" title="Vitaly Gorbachev">Vitaly Gorbachev</a>
-                 from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>-->
-            </a>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Simulated Conversations</a>
         </div>
-        <div class="themed-container" id="main-body">
-          <h1>Simulated Conversations</h1>
-            <div class="themed-container" id="table">
-                <div class="row mb-3">
-                    <div class="col-4 themed-grid-col grid-header">Template Name</div>
-                    <div class="col-4 themed-grid-col grid-header">Date Assigned</div>
-                    <div class="col-4 themed-grid-col grid-header">Last Response</div>
-                </div>
-                {% for x,y,z,a in template_page %}
-                <div class="row mb-3">
-                    <div class="col-4 themed-grid-col">
-                        <a href="{% url 'TemplateStartView' %}">{{x}}</a>
-                    </div>
-                    <div class="col-4 themed-grid-col">{{y}}</div>
-                    <div class="col-4 themed-grid-col">{{z}}</div>
-                </div>
-                {% endfor %}
-                <div class="pagination">
-                    <span class="step-links">
-                        {% if template_page.has_previous %}
-                            <a href="?page=1">&laquo; first</a>
-                            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-                        {% endif %}
-
-                        <span class="current pages">
-                            Page {{ template_page.number }} of {{ template_page.paginator.num_pages }}.
-                        </span>
-
-                        {% if template_page.has_next %}
-                            <a href="?page={{ template_page.next_page_number }}">next</a>
-                            <a href="?page={{ template_page.paginator.num_pages }}">last &raquo;</a>
-                        {% endif %}
-                    </span>
-                </div>
-            </div>
-            <footer class="themed-container">
-                <p>Copyright 2020 Portland State University</p>
-                <p>Team camel_case_best_case</p>
-            </footer>
-        </div>
-    </div> <!-- /container -->
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="#">Create Template</a></li>
+          <li><a href="#">Add Student</a></li>
+          <li><a href="#">Create Assignment</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#"><span class="glyphicon glyphicon-user"></span> User</a></li>
+          <li><a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="body-container">
+          {% render_table table %}
+        <footer>
+          <p>Copyright 2020 Portland State University</p>
+          <p>Team camel_case_best_case</p>
+        </footer>
+     </div><!-- /container -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
   </body>
