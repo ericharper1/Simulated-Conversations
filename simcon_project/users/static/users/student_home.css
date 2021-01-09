@@ -1,0 +1,29 @@
+.body-container {
+    text-align: center;
+}
+
+.table-container {
+    width: 70%;
+    margin: auto;
+}
+
+table {
+    width: 100%;
+}
+
+thead {
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+tbody {
+    margin-bottom: 10px;
+}
+
+th, td {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+
+
