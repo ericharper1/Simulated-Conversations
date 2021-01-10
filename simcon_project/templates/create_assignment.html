@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+    />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Create Assignment</title>
+  </head>
+  <body>
+    <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
+        <h2>Simulated Conversations</h2>
+        <div class="left" style="width:50%; float:left;">
+            <div class="form-group">
+                <label for="assign_name">Assignment name:</label>
+                <input type="text" class="form-control col-lg-10" id="assign_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="assign_date">Assignment start date:</label>
+                <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="MM/DD/YYYY" required>
+            </div>
+
+            <!--<div class="form-group">
+                <label for="add_stu">Add student</label>
+                <div class="add" action="/ca_add_stu/" method="post" style="display: flex;">
+                    {% csrf_token %}
+                    <input type="text" class="form-control col-lg-7" name="stu_name" placeholder="Please input student email." required>
+                    <input type="button" class="btn btn-primary" value="Add student">
+                </div>
+                <br>
+                <div class="form-control col-lg-10 students">{{ rlt }}</div>
+                {% if messages %}
+                <script>
+                    {% for msg in messages %}
+                        alert('{{ msg.message }}');
+                    {% endfor %}
+                </script>
+                {% endif %}
+            </div>-->
+            <div class="form-group">
+                <label for="add_stu">Add student</label>
+                <div class="add" style="display: flex;">
+                    <input type="text" class="form-control col-lg-7" name="stu_name" placeholder="Please input student email." required>
+                    <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
+                </div>
+                <br>
+                <!--<div class="form-control col-lg-10 students" id="students"></div>-->
+                <table id="tbl" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="right" style="width:50%; float: left;">
+            <div class="form-group">
+                <label for="add_temp">Add template</label>
+                <div class="add" style="display: flex;">
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name or ID." required>
+                    <input type="button" class="btn btn-primary" value="Add template" onclick="add_stu(tbl1, template_name.value)">
+                </div>
+                <br>
+                <!--<div class="form-control col-lg-10 templates"></div>-->
+                <table id="tbl1" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label for="add_label">Add label</label>
+                <div class="add" style="display: flex;">
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name or ID." required>
+                    <input type="button" class="btn btn-primary" value="Add label" onclick="add_stu(tbl2, label_name.value)">
+                </div>
+                <br>
+                <table id="tbl2" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"></input>
+        </div>
+
+        <!--<input type="button" class="btn btn-primary" value="Submit" onclick="submit()">-->
+    </form>
+
+  </body>
+  <script>
+      var students={{ ctx|safe }};
+      //var students=ctx.students;
+      //var templates=ctx.templates;
+      //var labels=ctx.labels;
+      var addedStu=new Array();
+
+      function add2table(tblId,name,email){
+          //console.log(tblId);
+          //var tbl = document.getElementById(tblId);
+          var tBody = tblId.tBodies[0];
+          //创建tr和td元素
+          var tr = document.createElement('tr');
+          var tUsername = document.createElement('td');
+          var tEmail = document.createElement('td');
+          //为各个单元格添加表单提交的数据
+          tUsername.innerHTML = name;
+          tEmail.innerHTML = email;
+          //添加删除超链接
+          var tDel = document.createElement('td');
+          tDel.innerHTML = '<a href="javascript:;">Delete</a>';
+          //执行删除表格行操作
+          var oA = tDel.children[0];
+          oA.onclick = function(){
+              //if(confirm("Delete?")){
+              tBody.removeChild(this.parentNode.parentNode);
+              var em=this.parentNode.parentNode.cells[1].innerHTML;
+              var index=addedStu.indexOf(em);
+              console.log(em+"  "+index);
+              if(index>-1) {
+                  addedStu.splice(index,1);
+              }
+          };
+          //为表格添加单元格和行
+          tr.appendChild(tUsername);
+          tr.appendChild(tEmail);
+          tr.appendChild(tDel);
+          tBody.appendChild(tr);
+      }
+
+      function add_stu(tbl, stu){
+          //console.log(eval("students[0]."+"fields.email"));
+          var tmp=students[0].fields;
+          //console.log(tmp.email);
+          //console.log(students[0].fields);
+          var find=false;
+          for(var i=0;i<students.length;i++){
+              var stuTmp=students[i].fields;
+              if(stuTmp.email==stu){
+                  find=true;
+                  if(stuTmp.is_researcher==1){
+                      window.alert("Add failed. This user is a researcher");
+                  }
+                  else if(stuTmp.is_staff==1){
+                      window.alert("Add failed. This user is a staff");
+                  }
+                  else if(stuTmp.is_active!=1){
+                      window.alert("Add failed. This user is a not an active user");
+                  }
+                  else{
+                      if(addedStu.indexOf(stu)>-1){
+                          window.alert("Adding failed, the student is already in the table.");
+                      }
+                      else {
+                          var name = stuTmp.first_name + " " + stuTmp.last_name;
+                          //document.getElementById("students").innerHTML = name;
+                          add2table(tbl, name, stu);
+                          addedStu.push(stu);
+                      }
+                  }
+              }
+          }
+          if(find==false){
+              window.alert("Cannot find: "+stu);
+          }
+      }
+      function sub(){
+          $.ajaxSetup({
+              data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+          });
+          stuJSON=JSON.stringify(addedStu)
+          $.ajax({
+              url:"{% url 'assignments:add_data' %}",
+              type:'POST',
+              data: {'stuData': stuJSON},
+              dataType:'json',
+              success: function(data){
+                  if(data.success==0){
+                      window.alert("Submitted successfully!");
+                      location.reload();
+                  }
+              }
+          })
+      }
+  </script>
+</html>
