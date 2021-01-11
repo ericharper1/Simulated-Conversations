@@ -15,6 +15,7 @@
   <body>
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
         <h2>Simulated Conversations</h2>
+        <!--left part -->
         <div class="left" style="width:50%; float:left;">
             <div class="form-group">
                 <label for="assign_name">Assignment name:</label>
@@ -23,26 +24,10 @@
 
             <div class="form-group">
                 <label for="assign_date">Assignment start date:</label>
-                <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="MM/DD/YYYY" required>
+                <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="YYYY-MM-DD" required>
             </div>
 
-            <!--<div class="form-group">
-                <label for="add_stu">Add student</label>
-                <div class="add" action="/ca_add_stu/" method="post" style="display: flex;">
-                    {% csrf_token %}
-                    <input type="text" class="form-control col-lg-7" name="stu_name" placeholder="Please input student email." required>
-                    <input type="button" class="btn btn-primary" value="Add student">
-                </div>
-                <br>
-                <div class="form-control col-lg-10 students">{{ rlt }}</div>
-                {% if messages %}
-                <script>
-                    {% for msg in messages %}
-                        alert('{{ msg.message }}');
-                    {% endfor %}
-                </script>
-                {% endif %}
-            </div>-->
+            <!--add student -->
             <div class="form-group">
                 <label for="add_stu">Add student</label>
                 <div class="add" style="display: flex;">
@@ -50,7 +35,6 @@
                     <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
                 </div>
                 <br>
-                <!--<div class="form-control col-lg-10 students" id="students"></div>-->
                 <table id="tbl" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
                     <thead>
                         <tr>
@@ -63,21 +47,23 @@
                 </table>
             </div>
         </div>
-        
+
+        <!--right part -->
         <div class="right" style="width:50%; float: left;">
+
+            <!--add template -->
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name or ID." required>
-                    <input type="button" class="btn btn-primary" value="Add template" onclick="add_stu(tbl1, template_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template ID." required>
+                    <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                 </div>
                 <br>
-                <!--<div class="form-control col-lg-10 templates"></div>-->
                 <table id="tbl1" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Email</th>
+                        <th>ID</th>
                         <th>Delete</th>
                     </tr>
                     </thead>
@@ -85,77 +71,91 @@
                 </table>
             </div>
 
+            <!--add label -->
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name or ID." required>
-                    <input type="button" class="btn btn-primary" value="Add label" onclick="add_stu(tbl2, label_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label ID." required>
+                    <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
                 </div>
                 <br>
                 <table id="tbl2" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Email</th>
+                        <th>ID</th>
                         <th>Delete</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
-            <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"></input>
+            <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"/>
         </div>
-
-        <!--<input type="button" class="btn btn-primary" value="Submit" onclick="submit()">-->
     </form>
 
   </body>
   <script>
-      var students={{ ctx|safe }};
-      //var students=ctx.students;
-      //var templates=ctx.templates;
-      //var labels=ctx.labels;
+      var students={{ student|safe }};
+      var templates={{ template|safe }};
+      var subLabels={{ subLabel|safe }};
       var addedStu=new Array();
+      var addedTmp=new Array();
+      var addedLabel=new Array();
 
-      function add2table(tblId,name,email){
-          //console.log(tblId);
-          //var tbl = document.getElementById(tblId);
+      function add2table(tblId,name,key,id){
+          console.log(tblId);
           var tBody = tblId.tBodies[0];
-          //创建tr和td元素
+          //Create tr and td elements
           var tr = document.createElement('tr');
           var tUsername = document.createElement('td');
-          var tEmail = document.createElement('td');
-          //为各个单元格添加表单提交的数据
+          var tKey = document.createElement('td');
+          //Add the data submitted by the form to each cell
           tUsername.innerHTML = name;
-          tEmail.innerHTML = email;
-          //添加删除超链接
+          tKey.innerHTML = key;
+          //Add and delete hyperlinks
           var tDel = document.createElement('td');
           tDel.innerHTML = '<a href="javascript:;">Delete</a>';
-          //执行删除表格行操作
+          //Perform delete table row operation
           var oA = tDel.children[0];
           oA.onclick = function(){
-              //if(confirm("Delete?")){
               tBody.removeChild(this.parentNode.parentNode);
               var em=this.parentNode.parentNode.cells[1].innerHTML;
-              var index=addedStu.indexOf(em);
-              console.log(em+"  "+index);
-              if(index>-1) {
-                  addedStu.splice(index,1);
+              if(id==1) {
+                  var index = addedStu.indexOf(em);
+                  console.log(em + "  " + index);
+                  if (index > -1) {
+                      addedStu.splice(index, 1);
+                  }
+              }
+              else if(id==2){
+                  var index = addedTmp.indexOf(em);
+                  console.log(em + "  " + index);
+                  if (index > -1) {
+                      addedTmp.splice(index, 1);
+                  }
+              }
+              else{
+                  var index = addedLabel.indexOf(em);
+                  console.log(em + "  " + index);
+                  if (index > -1) {
+                      addedLabel.splice(index, 1);
+                  }
               }
           };
-          //为表格添加单元格和行
+          //Add cells and rows to the table
           tr.appendChild(tUsername);
-          tr.appendChild(tEmail);
+          tr.appendChild(tKey);
           tr.appendChild(tDel);
           tBody.appendChild(tr);
       }
 
       function add_stu(tbl, stu){
           //console.log(eval("students[0]."+"fields.email"));
-          var tmp=students[0].fields;
+          //var tmp=students[0].fields;
           //console.log(tmp.email);
           //console.log(students[0].fields);
-          var find=false;
+          var find=false;   //Record find the corresponding student or not
           for(var i=0;i<students.length;i++){
               var stuTmp=students[i].fields;
               if(stuTmp.email==stu){
@@ -170,13 +170,13 @@
                       window.alert("Add failed. This user is a not an active user");
                   }
                   else{
+                      //Determine whether this student is already in the table.
                       if(addedStu.indexOf(stu)>-1){
                           window.alert("Adding failed, the student is already in the table.");
                       }
                       else {
                           var name = stuTmp.first_name + " " + stuTmp.last_name;
-                          //document.getElementById("students").innerHTML = name;
-                          add2table(tbl, name, stu);
+                          add2table(tbl, name, stu, 1);
                           addedStu.push(stu);
                       }
                   }
@@ -186,15 +186,69 @@
               window.alert("Cannot find: "+stu);
           }
       }
+
+      function add_temp(tbl, id){
+          var find=false;
+          for(var i=0;i<templates.length;i++){
+              var tempTmp=templates[i].fields;
+              if(tempTmp.id==id){
+                  find=true;
+                  if(addedTmp.indexOf(id)>-1){
+                      window.alert("Adding failed, the template is already in the table.");
+                  }
+                  else {
+                      var name = tempTmp.name;
+                      add2table(tbl1, name, id, 2);
+                      addedTmp.push(id);
+                  }
+              }
+          }
+          if(find==false){
+              window.alert("Cannot find: "+id);
+          }
+      }
+
+      function add_label(tbl, id){
+          var find=false;
+          for(var i=0;i<subLabels.length;i++){
+              var labelTmp=subLabels[i].fields;
+              if(labelTmp.id==id){
+                  find=true;
+                  if(addedLabel.indexOf(id)>-1){
+                      window.alert("Adding failed, the label is already in the table.");
+                  }
+                  else {
+                      var name = labelTmp.name;
+                      add2table(tbl2, name, id, 3);
+                      addedLabel.push(id);
+                  }
+              }
+          }
+          if(find==false){
+              window.alert("Cannot find: "+id);
+          }
+      }
+
+      //Pass the client data to django through ajax.
       function sub(){
           $.ajaxSetup({
               data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
           });
-          stuJSON=JSON.stringify(addedStu)
+          assign_name=document.getElementById("assign_name").value;
+          assign_date=document.getElementById("assign_date").value;
+          stuJSON=JSON.stringify(addedStu);
+          tempJSON=JSON.stringify(addedTmp);
+          labelJSON=JSON.stringify(addedLabel);
           $.ajax({
               url:"{% url 'assignments:add_data' %}",
               type:'POST',
-              data: {'stuData': stuJSON},
+              data: {
+                  'name': assign_name,
+                  'date': assign_date,
+                  'stuData': stuJSON,
+                  'tempData': tempJSON,
+                  'labelData': labelJSON
+              },
               dataType:'json',
               success: function(data){
                   if(data.success==0){
