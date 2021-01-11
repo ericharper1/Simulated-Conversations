@@ -1,61 +1,47 @@
 from django.shortcuts import render
 from users.models import CustomUser
-from django.contrib import messages
+from users.models import SubjectLabel
+from users.models import Assignment
+from conversation_templates.models import ConversationTemplate
 from django.views.generic import TemplateView
 import json
 from django.core import serializers
 from django.http import HttpResponse
-from django.views.decorators import csrf
-from django.forms.models import model_to_dict
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
 class CreateAssignmentView(TemplateView):
-    context = {
-        "students": CustomUser.objects.all(),
-        "templates": CustomUser.objects.all(),
-        "labels": CustomUser.objects.all(),
-    }
     def get(self, request):
         stud=CustomUser.objects.all()
-        tmpJson = serializers.serialize("json",stud)
-        #return HttpResponse(tmpJson, content_type='application/json')
-        #tmpObj = json.loads(tmpJson)
-        #return render(request, 'create_assignment.html', {'ctx': json.dumps(tmpObj)})
-        return render(request, 'create_assignment.html', {'ctx': tmpJson})
-        #return JsonResponse(model_to_dict(stud))
+        label=SubjectLabel.objects.all()
+        template=ConversationTemplate.objects.all()
+        student = serializers.serialize("json",stud)
+        subLabel = serializers.serialize("json",label)
+        template = serializers.serialize("json",template)
+        return render(request, 'create_assignment.html', {
+            'student': student,
+            'subLabel': subLabel,
+            'template': template
+        })
 
 
 def add_data(request):
     data=request.POST
+    name=data.get('name')
+    date=data.get('date')
     students=data.get('stuData')
+    templates=data.get('tempData')
+    labels=data.get('labelData')
     print(students)
+
+    assignment=Assignment()
+    assignment.name=name
+    assignment.date_assigned=date
+    #assignment.researcher='xingjian@111.com'
+    assignment.save()
+    #assignment.conversation_templates.add(templates)
+    assignment.students.add(students)
+    #assignment.subject_labels.add(labels)
+    #The researcher is not added because I don't know how to get the researcher information now.
     return HttpResponse(json.dumps({
         'success': 0,
     }))
 
-
-
-
-# def add_stu(request):
-#     print(1)
-#     if request.POST:
-#         print(2)
-#         stu=CustomUser.objects.get(email=request.POST['stu_name'])
-#         name=stu.first_name+" "+stu.last_name
-#         if stu.is_researcher:
-#             print('Add failed. This user is a researcher')
-#             messages.error(request, 'Add failed. This user is a researcher')
-#         if stu.is_staff:
-#             print('Add failed. This user is a staff')
-#             messages.error(request, 'Add failed. This user is a staff')
-#         if stu.is_active:
-#             print('Add failed. This user is a not an active user')
-#             messages.error(request, 'Add failed. This user is a not an active user')
-#         ctx ={}
-#         ctx['rlt'] = name
-#         print("sucess!")
-#         return render_to_response(request, "create_assignment.html", ctx)
-#     else:
-#         print(3)
-#         messages.error(request, 'POST is null!')
