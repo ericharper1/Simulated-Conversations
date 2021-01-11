@@ -1,140 +1,163 @@
-from django.views.generic import TemplateView
+from django.views.generic import DeleteView
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
-from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView
+from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
+from django_tables2 import TemplateColumn, tables, RequestConfig, A
+import re
+
+
+class FolderTemplateTable(tables.Table):
+    """
+    Table for showing the templates for a specific folder.
+    The "delete" button has been replaced with a "remove button to
+    remove a template from the folder.
+    """
+    buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
+                             extra_context={"in_folder": True})
+
+    class Meta:
+        attrs = {'class': 'table table-sm'}
+        model = ConversationTemplate
+        fields = ['name', 'description', 'creation_date']
+
+
+class AllTemplateTable(tables.Table):
+    """
+    Table for showing the templates for a specific folder.
+    Only used when all templates are displayed.
+    """
+    buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
+
+    class Meta:
+        attrs = {'class': 'table table-sm'}
+        model = ConversationTemplate
+        fields = ['name', 'description', 'creation_date']
+
+
+class FolderTable(tables.Table):
+    """
+    Table showing all folders (unique to a researcher in the future)
+    """
+    name = tables.columns.LinkColumn('templates:folder_view', args=[A('pk')])
+    buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_folder.html')
+
+    class Meta:
+        attrs = {'class': 'table table-sm'}
+        model = TemplateFolder
+        fields = ['name', 'buttons']
+
+
+def main_view(request, pk=None):
+    """
+    Main template manage view.
+    Main contents of the page are the template and folder tables.
+    """
+    previouspk =
+    folders = TemplateFolder.objects.all()
+    # if pk is not in the current or last url
+    if str(pk) in request.path:
+        current_folder = get_object_or_404(TemplateFolder, pk=pk)
+        templates = current_folder.templates.all()
+        template_table = FolderTemplateTable(templates)
+    else:
+        templates = ConversationTemplate.objects.all()
+        template_table = AllTemplateTable(templates)
+    folder_table = FolderTable(folders)
+
+    RequestConfig(request, paginate=False).configure(template_table)
+    RequestConfig(request, paginate=False).configure(folder_table)
+
+    print(pk)
+    print(context["previous_folder"])
+    context = {
+        'templateTable': template_table,
+        'folderTable': folder_table,
+        'previous_folder': previouspk,
+    }
+
+    return render(request, 'template_management/multitable.html', context)
 
 
 class FolderCreateView(BSModalCreateView):
+    """
+    A modal that appears on top of the main_view to create a folder
+    """
     template_name = 'folder_creation_modal.html'
     form_class = FolderCreationForm
     success_message = 'Success: Folder was created.'
-    success_url = reverse_lazy('templates:main')
 
-    def form_valid(self, form):
-        name = form.cleaned_data['name']
-        templates = form['templates'].value()
-        folder = TemplateFolder.objects.create_folder(name)
-        folder.templates.set(templates)
-        folder.save()
-        return redirect(reverse('templates:main'))
+    def get_success_url(self):
+        success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
+        return success_url
 
 
-class FolderUpdateView(BSModalUpdateView):
+class FolderEditView(BSModalUpdateView):
+    """
+    A modal that appears on top of the main_view to edit the contents of a folder
+    """
+    model = TemplateFolder
     template_name = 'folder_creation_modal.html'
     form_class = FolderCreationForm
     success_message = 'Success: Folder was created.'
+
+    def get_success_url(self):
+        success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
+        return success_url
+
+
+class FolderDeleteView(DeleteView):
+    """
+    Deletes a folder. Routes to the main_view (all templates showing)
+    if the current folder that is being viewed is deleted.
+    """
+    model = TemplateFolder
+    success_message = 'Success: Book was deleted.'
     success_url = reverse_lazy('templates:main')
 
-
-class TemplateManagementView(TemplateView):
-    context = {
-        "templates": ConversationTemplate.objects.all(),
-        "folders": TemplateFolder.objects.all(),
-        "current_folder": None,
-        "form": FolderCreationForm(),
-    }
-
-    def get(self, request, pk=None):
-        """
-        Reset the context to default (no folder selected, all templates showing)
-        if redirected from static views or if the current_folder is not in the
-        current path (redirected from post method in this class)
-        """
-        current_folder = self.context["current_folder"]
-        if current_folder is None or str(current_folder) not in request.path:
-            self.context.update({
-               "templates": ConversationTemplate.objects.all(),
-               "form": FolderCreationForm(),
-               "folders": TemplateFolder.objects.all(),
-               "current_folder": None,
-            })
-        return render(request, 'template_management/main_view.html', self.context)
-
-    def post(self, request, pk):
-        folder = get_object_or_404(TemplateFolder, pk=pk)
-        # Display content of folder if it was not currently selected/displayed
-        # If current folder is selected again return to main view
-        if self.context["current_folder"] != pk:
-            form_fields = {"name": folder.name, "templates": folder.templates.all()}
-            form = FolderCreationForm(initial=form_fields)
-            templates = folder.templates.all()
-            self.context.update({"templates": templates, "current_folder": pk, "form": form})
-            print(folder.name)
-            print(templates)
-            return render(request, 'template_management/main_view.html', self.context)
+    def get_success_url(self):
+        current_url = self.request.path
+        previous_url = self.request.META.get('HTTP_REFERER')
+        if "folder" not in current_url:
+            folder_id = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)
+            return reverse('templates:folder_view', args=[folder_id[0]])
         else:
-            return redirect("/template-management")
+            return reverse_lazy('templates:main')
 
 
-def create_folder(request):
+class TemplateDeleteView(BSModalDeleteView):
     """
-    Uses empty_form from context to give user a blank form to create a TemplateFolder object
+    Deletes a template. Confirmation modal pops up to make sure
+    the user wants to delete a template.
     """
-    form = FolderCreationForm(request.POST)
-    if request.method == "POST":
-        if form.is_valid():
-            name = form.cleaned_data['name']
-            templates = form['templates'].value()
-            folder = TemplateFolder.objects.create_folder(name)
-            folder.templates.set(templates)
-            folder.save()
-        return redirect('/template-management')
+    model = ConversationTemplate
+    template_name = 'template_management/template_delete_modal.html'
+    success_message = 'Success: Book was deleted.'
+    success_url = reverse_lazy('templates:main')
 
 
-def create_template(request, pk):
+def remove_template(request, pk):
     """
-    Route to template creation page
-    """
-
-
-def delete_folder(request, pk):
-    folder = get_object_or_404(TemplateFolder, pk=pk)
-
-    if request.method == 'POST':
-        folder.delete()
-
-    return redirect('/template-management')
-
-
-def delete_template(request, pk):
-    template = get_object_or_404(ConversationTemplate, pk=pk)
-
-    if request.method == 'POST':
-        template.delete()
-
-    return redirect('/template-management')
-
-
-def edit_folder(request, pk):
-    """
-    Populate FolderCreationForm with the current_folder's data to let the user
-    edit the name and templates associated to that folder.
-    This option is only shown when a folder is selected.
-    """
-    folder = get_object_or_404(TemplateFolder, pk=pk)
-    form_fields = {"name": folder.name, "templates": folder.templates.all()}
-    form = FolderCreationForm(request.POST, initial=form_fields)
-    if form.is_valid():
-        name = form.cleaned_data['name']
-        templates = form['templates'].value()
-        TemplateFolder.objects.filter(pk=pk).update(name=name)
-        folder.templates.set(templates)
-        return redirect(reverse('templates:template_management', args=[folder.id]))
-
-    return redirect(reverse("templates:main"))
-
-
-def remove_template(request, template_pk, folder_pk):
-    """
-    Remove the chosen template from the current_folder.
+    Remove the chosen template from the current folder in view.
     This does not delete the template.
     """
-    template = get_object_or_404(ConversationTemplate, pk=template_pk)
-    folder = get_object_or_404(TemplateFolder, pk=folder_pk)
-
     if request.method == 'POST':
+        previous_url = request.META.get('HTTP_REFERER')
+        folder_pk = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
+        template = get_object_or_404(ConversationTemplate, pk=pk)
+        folder = get_object_or_404(TemplateFolder, pk=folder_pk)
         folder.templates.remove(template)
 
-    return redirect(reverse('templates:template_management', args=[folder.id]))
+        return redirect('templates:folder_view', pk=folder_pk)
+
+
+def route_to_current_folder(previous_url):
+    """
+    If a folder is being viewed returns to the folder view, else to main view
+    """
+    if "folder" in previous_url:
+        folder_id = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
+        return reverse_lazy('templates:folder_view', args=[folder_id])
+    else:
+        return reverse_lazy('templates:main')

@@ -20,7 +20,7 @@ class TemplateFolder (models.Model):
 
     """
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=40)
     templates = models.ManyToManyField('conversation_templates.ConversationTemplate', related_name='folder', blank=True)
     objects = FolderManager()
 

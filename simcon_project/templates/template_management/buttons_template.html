@@ -1,0 +1,10 @@
+{% if in_folder %}
+    <form action="{% url 'templates:remove_template' record.id %}" method="post">
+        {% csrf_token %}
+        <input id="remove-template" class="btn btn-danger" type="submit" value="Remove">
+    </form>
+{% else %}
+    <button id="delete-template" class="bs-modal btn btn-danger" type="button" name="button"
+            data-form-url="{% url 'templates:delete_template' record.id %}">Delete</button>
+{% endif %}
+

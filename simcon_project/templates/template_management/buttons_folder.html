@@ -1,0 +1,6 @@
+<button id="edit-folder" class="bs-modal btn btn-primary" type="button" name="button"
+        data-form-url="{% url 'templates:edit_folder' record.id %}">Edit</button>
+<form method="post" action="{% url 'templates:delete_folder' record.id %}">
+    {% csrf_token %}
+    <input id="delete-folder" class="btn btn-danger" type="submit" value="Delete">
+</form>
