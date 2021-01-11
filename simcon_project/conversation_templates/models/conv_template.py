@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 import uuid
 
 
@@ -20,5 +21,11 @@ class ConversationTemplate (models.Model):
     description = models.CharField(max_length=4000)
     creation_date = models.DateTimeField(default=timezone.now)
     researcher = models.ForeignKey('users.Researcher', related_name='templates', default=0, on_delete=models.CASCADE)
+    # Used in back-end. Field to hold uuid for template nodes in order that they were accessed (ArrayField)
 
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("conversation_start", kwargs={"ct_id": self.id})

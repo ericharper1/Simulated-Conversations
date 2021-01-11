@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load embed_video_tags %}
 <html>
     <head>
         <meta charset="utf-8">
@@ -16,11 +17,17 @@
     </head>
     <body>
         <h1>Simulated Conversations</h1>
-        <h3>Template name</h3>
+        <h3>{{ ct.name }}</h3>
         <h3 style="text-align:right;">{{ user_email }}</h3>
-        <p>This is where the description of the video goes.</p>
-        <form action='{{ request.get_host }}/conversation/end' method='GET'>
-            <button type='submit'>Next scene</button>
+        {% video ctn.video_url 'medium' %}
+        <p>{{ ctn.description }}</p>
+        <form action="{{ ctn.get_absolute_url }}" method='POST'>
+            {% csrf_token %}
+            {% for field in choice_form.visible_fields %}
+                <label for="choice">{{ field.choice_text }}</label>
+                <input type="radio" name="choice" id="choice" value="yo">
+            {% endfor %}
+            <button type='submit' class="btn btn-primary btn-sm">Next scene</button>
         </form>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -28,6 +28,7 @@
             </table>
         {% endfor %}
         <form action='{{ request.get_host }}/student-view' method='GET'>
+            {% csrf_token %}
             <button type='submit'>Finish</button>
         </form>
         <!-- Optional JavaScript -->
