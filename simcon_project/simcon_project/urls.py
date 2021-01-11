@@ -47,6 +47,7 @@ urlpatterns = [
     path('researcher/response/', view_response, name="view-response"),
     path('researcher/response/update/<uuid:pk>/', update_overall_response_feedback, name='update-overall-response-feedback'),
     path('researcher/response/updatenode/<uuid:pk>/', update_node_response_feedback, name='update-node-response-feedback'),
+    path('create-assignment/',include('conversation_templates.urls'), name="CreateAssignmentView"),
 ]
 
 if settings.DEBUG:
