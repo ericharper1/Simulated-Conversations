@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-# from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -7,7 +7,9 @@ from users.forms import UpdateFeedback
 from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 
 
-def ViewResponse(request, pk=None):
+# @login_required
+# @permission_required('catalog.can_mark_returned', raise_exception=True)
+def ViewResponse(request, pk="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
     response = get_object_or_404(TemplateResponse, pk=pk)
 
     nodes = []
@@ -18,11 +20,11 @@ def ViewResponse(request, pk=None):
                                                           position_in_sequence=i))
         else:
             break
-    return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
+    return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response, 'media':MEDIA_ROOT})
 
 
-# @login_required
-# @permission_required('catalog.can_mark_returned', raise_exception=True)
+@login_required
+@permission_required('catalog.can_mark_returned', raise_exception=True)
 def UpdateOverallResponseFeedback(request, pk):
     """Function for updating feedback on a response"""
     feedback_instance = get_object_or_404(TemplateResponse, pk=pk)
@@ -55,8 +57,8 @@ def UpdateOverallResponseFeedback(request, pk):
     return render(request, 'update_response.html', context)
 
 
-# @login_required
-# @permission_required('catalog.can_mark_returned', raise_exception=True)
+@login_required
+@permission_required('catalog.can_mark_returned', raise_exception=True)
 def UpdateNodeResponseFeedback(request, pk):
     """Function for updating feedback on a response"""
     feedback_instance = get_object_or_404(TemplateNodeResponse, pk=pk)
