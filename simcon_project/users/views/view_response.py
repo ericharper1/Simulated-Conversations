@@ -20,7 +20,7 @@ def ViewResponse(request, pk="6b64f89a-176c-4b61-b9ac-29ede63e78b7"):
                                                           position_in_sequence=i))
         else:
             break
-    return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response, 'media':MEDIA_ROOT})
+    return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
 
 
 @login_required
