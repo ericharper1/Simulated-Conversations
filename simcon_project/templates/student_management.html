@@ -34,9 +34,8 @@
 
         <form action='/student-management/' method="post">
           {%csrf_token%}
-          <label for = "new_label"><small>Label Name:</small></label><br/>
-          <input id = "new_label" type="text" placeholder="Label Name" name="label_name"><br/>
-          <input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
+          {{ form2 }}
+          <br/><input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
         </form>
 
 
@@ -53,7 +52,7 @@
       </div>
 
       <div class="col-md-6">
-        <p>Add New User:</p>
+        <p>Add New Student:</p>
 
         <form action='/student-management/' method="post">
           {%csrf_token%}

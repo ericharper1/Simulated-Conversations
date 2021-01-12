@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models.custom_user import CustomUser, CustomUserManager
-from users.models import Student
+from users.models import Student, SubjectLabel
+
 
 class CustomUserCreationForm(UserCreationForm):
 
@@ -11,36 +12,20 @@ class CustomUserCreationForm(UserCreationForm):
         fields = UserCreationForm.Meta.fields + ('email',)
 
 
-class NewStudentCreationForm(CustomUserManager):
-
-    class Meta(CustomUserManager):
-        model = Student
-        model.email = 'email'#wrong not CustomUserManager need to find self ref
-        model.password = 'password'
-
-
-class SignUpForm(UserCreationForm):
-    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+class NewStudentCreationForm(UserCreationForm):
+    email = forms.EmailField(max_length=254, required=True)
 
     class Meta:
         model = Student
-        fields = ('email', 'first_name', 'last_name', 'password1', 'password2', )
-
-
-class SendForm(UserCreationForm):
-    student_email = forms.EmailField(max_length=254, required=True)
-
-    def clean_email(self):
-        data =self.clean_email('student_email')
-        return data
-
-    class Meta:
-        model = Student
-        fields = ('email',)
+        fields = ('email', 'first_name', 'last_name', 'password1', 'password2',)
 
 
 class SendEmail(forms.Form):
     student_email = forms.EmailField(max_length=254, required=True)
+
+
+class NewLabel(forms.Form):
+    label_name = forms.CharField(max_length=100)
 
 
 class CustomUserChangeForm(UserChangeForm):
