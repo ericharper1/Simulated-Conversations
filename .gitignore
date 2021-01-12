@@ -16,7 +16,8 @@ migrations
 
 # Python # 
 *.py[cod] 
-*$py.class 
+*$py.class
+pipfile
 
 # Distribution / packaging 
 .Python build/ 
