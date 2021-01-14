@@ -1,11 +1,10 @@
 from django.views.generic import DeleteView
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
 from django_tables2 import TemplateColumn, tables, RequestConfig, A
-import re
 
 
 class FolderTemplateTable(tables.Table):
