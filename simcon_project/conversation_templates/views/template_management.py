@@ -18,7 +18,7 @@ class FolderTemplateTable(tables.Table):
                              extra_context={"in_folder": True})
 
     class Meta:
-        attrs = {'class': 'table table-sm'}
+        attrs = {'class': 'table table-sm', 'id': 'template-table'}
         model = ConversationTemplate
         fields = ['name', 'description', 'creation_date']
 
@@ -31,7 +31,7 @@ class AllTemplateTable(tables.Table):
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
 
     class Meta:
-        attrs = {'class': 'table table-sm'}
+        attrs = {'class': 'table table-sm', 'id': 'template-table'}
         model = ConversationTemplate
         fields = ['name', 'description', 'creation_date']
 
@@ -40,51 +40,66 @@ class FolderTable(tables.Table):
     """
     Table showing all folders (unique to a researcher in the future)
     """
-    name = tables.columns.LinkColumn('templates:folder_view', args=[A('pk')])
-    buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_folder.html')
+    name = tables.columns.LinkColumn('management:folder_view', args=[A('pk')])
 
     class Meta:
-        attrs = {'class': 'table table-sm'}
+        attrs = {'class': 'table table-sm', 'id': 'folder-table'}
         model = TemplateFolder
-        fields = ['name', 'buttons']
+        fields = ['name']
 
 
-def main_view(request, pk=None):
+def main_view(request):
     """
-    Main template manage view.
-    Main contents of the page are the template and folder tables.
+    Main template management view.
+    Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
-    previouspk =
+    templates = ConversationTemplate.objects.all()
+    template_table = AllTemplateTable(templates)
+
     folders = TemplateFolder.objects.all()
-    # if pk is not in the current or last url
-    if str(pk) in request.path:
-        current_folder = get_object_or_404(TemplateFolder, pk=pk)
-        templates = current_folder.templates.all()
-        template_table = FolderTemplateTable(templates)
-    else:
-        templates = ConversationTemplate.objects.all()
-        template_table = AllTemplateTable(templates)
     folder_table = FolderTable(folders)
 
     RequestConfig(request, paginate=False).configure(template_table)
     RequestConfig(request, paginate=False).configure(folder_table)
 
-    print(pk)
-    print(context["previous_folder"])
     context = {
         'templateTable': template_table,
         'folderTable': folder_table,
-        'previous_folder': previouspk,
+        'folder_pk': None,
     }
 
-    return render(request, 'template_management/multitable.html', context)
+    return render(request, 'template_management/main_view.html', context)
+
+
+def folder_view(request, pk):
+    """
+    Main template management view.
+    Shows the all folders, but shows only templates belonging to the selected folder
+    """
+    current_folder = get_object_or_404(TemplateFolder, pk=pk)
+    templates = current_folder.templates.all()
+    template_table = FolderTemplateTable(templates)
+
+    folders = TemplateFolder.objects.all()
+    folder_table = FolderTable(folders)
+
+    RequestConfig(request, paginate=False).configure(template_table)
+    RequestConfig(request, paginate=False).configure(folder_table)
+
+    context = {
+        'templateTable': template_table,
+        'folderTable': folder_table,
+        'folder_pk': pk
+    }
+
+    return render(request, 'template_management/main_view.html', context)
 
 
 class FolderCreateView(BSModalCreateView):
     """
     A modal that appears on top of the main_view to create a folder
     """
-    template_name = 'folder_creation_modal.html'
+    template_name = 'template_management/folder_creation_modal.html'
     form_class = FolderCreationForm
     success_message = 'Success: Folder was created.'
 
@@ -98,9 +113,8 @@ class FolderEditView(BSModalUpdateView):
     A modal that appears on top of the main_view to edit the contents of a folder
     """
     model = TemplateFolder
-    template_name = 'folder_creation_modal.html'
+    template_name = 'template_management/folder_creation_modal.html'
     form_class = FolderCreationForm
-    success_message = 'Success: Folder was created.'
 
     def get_success_url(self):
         success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
@@ -114,16 +128,7 @@ class FolderDeleteView(DeleteView):
     """
     model = TemplateFolder
     success_message = 'Success: Book was deleted.'
-    success_url = reverse_lazy('templates:main')
-
-    def get_success_url(self):
-        current_url = self.request.path
-        previous_url = self.request.META.get('HTTP_REFERER')
-        if "folder" not in current_url:
-            folder_id = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)
-            return reverse('templates:folder_view', args=[folder_id[0]])
-        else:
-            return reverse_lazy('templates:main')
+    success_url = reverse_lazy('management:main')
 
 
 class TemplateDeleteView(BSModalDeleteView):
@@ -134,7 +139,7 @@ class TemplateDeleteView(BSModalDeleteView):
     model = ConversationTemplate
     template_name = 'template_management/template_delete_modal.html'
     success_message = 'Success: Book was deleted.'
-    success_url = reverse_lazy('templates:main')
+    success_url = reverse_lazy('management:main')
 
 
 def remove_template(request, pk):
@@ -143,21 +148,23 @@ def remove_template(request, pk):
     This does not delete the template.
     """
     if request.method == 'POST':
+
         previous_url = request.META.get('HTTP_REFERER')
         folder_pk = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
         template = get_object_or_404(ConversationTemplate, pk=pk)
         folder = get_object_or_404(TemplateFolder, pk=folder_pk)
         folder.templates.remove(template)
-
-        return redirect('templates:folder_view', pk=folder_pk)
+        back = request.POST.get('back', '/')
+        return redirect(back)
 
 
 def route_to_current_folder(previous_url):
     """
     If a folder is being viewed returns to the folder view, else to main view
+    Used to reroute generic editing views
     """
     if "folder" in previous_url:
         folder_id = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
-        return reverse_lazy('templates:folder_view', args=[folder_id])
+        return reverse_lazy('management:folder_view', args=[folder_id])
     else:
-        return reverse_lazy('templates:main')
+        return reverse_lazy('management:main')

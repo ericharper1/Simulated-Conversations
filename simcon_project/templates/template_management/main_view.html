@@ -1,120 +1,62 @@
-{% load bootstrap4 %}
+{% load render_table from django_tables2 %}
 {% load static %}
-
 <!doctype html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
-    crossorigin="anonymous">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+              integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+              crossorigin="anonymous">
 
-    <title>Template Management</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Template Management</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Optional JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-            crossorigin="anonymous"></script>
-    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
-</head>
-<body>
-    <h3>Folders</h3>
-    <!-- Folder Table --->
-    <table class="table">
-        <thead>
-            <th scope="col">Name</th>
-            <th scope="col"></th>
-            <th scope="col"></th>
-        </thead>
-        <tbody>
-        {% for folder in folders.all %}
-        <tr>
-            <td>
-                <form action="{% url 'templates:template_management' folder.id %}" method="post">
-                    {% csrf_token %}
-                    <input type="submit" value="{{ folder.name }}">
-                </form>
-            </td>
-            <td>
-                <button id="edit-folder" class="bs-modal btn btn-primary" type="button" name="button"
-                        data-form-url="{% url 'templates:edit_folder' folder.id %}">Edit Folder</button>
-            </td>
-            <td>
-                <form action="{% url 'templates:delete_folder' folder.id %}" method="post">
-                    {% csrf_token %}
-                    <input name="delete_folder_btn" type="submit" value="Delete">
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <!-- Optional JavaScript -->
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+                integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+                crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+                integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+                crossorigin="anonymous"></script>
+        <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+    </head>
+    <body>
+        {% render_table folderTable %}
+        <!-- Create Folder Button--->
+        <button id="create-folder" class="btn btn-primary" type="button" name="button">Create Folder</button>
+        <br>
+        <br>
+        {% if folder_pk %}
+            <!-- Line these buttons up later with css -->
+            <form method="post" action="{% url 'management:main' %}">
+                {% csrf_token %}
+                <input id="back-to-all" class="btn btn-success" type="submit" value="Back">
+            </form>
+            <button id="edit-folder" class="bs-modal btn btn-primary" type="button" name="button"
+                    data-form-url="{% url 'management:edit_folder' folder_pk %}">Edit</button>
+            <form method="post" action="{% url 'management:delete_folder' folder_pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="back" value="{{ request.path }}">
+                <button id="delete-folder" class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        {% endif %}
+        {% render_table templateTable %}
+        <button id="create-template" class="btn btn-primary">Create Template</button>
 
-    <!-- Create Folder Button--->
-    <button id="create-folder" class="btn btn-primary" type="button" name="button">Create Folder</button>
-
-    <br/> <!-- take this out once it's formatted --->
-    <br/> <!-- take this out once it's formatted --->
-
-    <h3>Templates</h3>
-    <!-- Edit Folder Button
-    {% if current_folder is not None %}
-    {% endif %}
-    -->
-
-    <!-- Template Table --->
-    <table class="table">
-        <thead>
-            <th scope="col">Name</th>
-            <th scope="col">Creation Date</th>
-            <th scope="col"></th>
-        </thead>
-        <tbody>
-        {% for template in templates.all %}
-            <tr>
-                <td>{{ template.name }}</td>
-                <td>{{ template.creation_date }}</td>
-                <td>
-                    {% if current_folder is None%}
-                    <button id="delete-template" class="bs-modal btn btn-primary" type="button" name="button"
-                            data-form-url="{% url 'templates:del_template' template.id %}">Delete</button>
-                    <!--
-                    <form action="{% url 'templates:del_template' template.id %}" method="get">
-                        {% csrf_token %}
-                        <input type="submit" value="Delete">
-                    </form>
-                    -->
-                    {% else %}
-                    <form action="{% url 'templates:remove_template' template_pk=template.id folder_pk=current_folder %}" method="post">
-                        {% csrf_token %}
-                        <input type="submit" value="Remove">
-                    </form>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <button>Create New Template</button> <!-- This should route to template creation page --->
-
-    <!-- Code needed for the modal to work properly.
+        <!-- Code needed for the modal to work properly.
              Content in folder_creation_modal.html is rendered between "#modal-content" div
         -->
         <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content"></div>
-          </div>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
         </div>
 
         <div class="modal fade" tabindex="-1" role="dialog" id="modal">
@@ -131,7 +73,7 @@
                 });
             });
             $("#create-folder").modalForm({
-                formURL: "{% url 'templates:create_folder' %}",
+                formURL: "{% url 'management:create_folder' %}",
                 modalID: "#create_modal"
             });
         });

@@ -26,14 +26,3 @@ class FolderCreationForm(BSModalModelForm):
         model = TemplateFolder
         fields = ['name', 'templates']
         widgets = {'templates': SelectTemplates}
-
-    def clean_name(self):
-        name = self.cleaned_data['name']
-
-        try:
-            if TemplateFolder.objects.get(name=name) is not None:
-                self.add_error("name", f"Folder named {name} already exists.")
-        except ObjectDoesNotExist:
-            pass
-
-        return name
