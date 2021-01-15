@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'django_tables2',
     'embed_video',
+    'django_tables2',
 
     # Our apps
     'users',
@@ -135,6 +136,7 @@ USE_TZ = True
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/redirect-from-login'
