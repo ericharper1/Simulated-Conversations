@@ -15,11 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView
+from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback
 from django.conf.urls import include
 from django.contrib.auth import views
 
-app_name = 'simcon'
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 urlpatterns = [
     path('', views.LoginView.as_view(), name="Login"),
     path('admin/doc/', include('django.contrib.admindocs.urls')),
@@ -29,4 +32,7 @@ urlpatterns = [
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('template-management/', include('conversation_templates.urls'), name="TemplateManagementView"),
+    path('view-response/', ViewResponse, name="ViewResponse"),
+    path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
+    path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
 ]

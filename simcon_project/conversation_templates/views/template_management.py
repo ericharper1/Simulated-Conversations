@@ -5,6 +5,7 @@ from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
 from django_tables2 import TemplateColumn, tables, RequestConfig, A
+import re
 
 
 class FolderTemplateTable(tables.Table):
