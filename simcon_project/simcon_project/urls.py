@@ -31,6 +31,7 @@ urlpatterns = [
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
+    path('template-management/', include('conversation_templates.urls'), name="TemplateManagementView"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
