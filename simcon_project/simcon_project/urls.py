@@ -28,5 +28,5 @@ urlpatterns = [
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('settings/', SettingsView, name="SettingsView"),
-    path('template-start/<str:name>', TemplateStartView, name="TemplateStartView"),
+    path('template-start/<str:name>/', TemplateStartView, name="TemplateStartView"),
 ]

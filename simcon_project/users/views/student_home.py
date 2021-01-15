@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from users.models import *
+from users.models import Assignment
+import django_tables2 as tables
 
 
 class StudentHomeTable(tables.Table):
@@ -10,6 +11,7 @@ class StudentHomeTable(tables.Table):
     date_assigned = tables.Column(verbose_name='Date Assigned')
     completion_date = tables.Column(accessor='conversation_templates__template_responses__completion_date',
                                     verbose_name='Last Response')
+
 
 @login_required
 def StudentView(request):
