@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from conversation_templates.models import TemplateResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
