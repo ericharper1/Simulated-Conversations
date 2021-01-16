@@ -6,4 +6,4 @@ def is_researcher(user):
 
 @user_passes_test(is_researcher)
 def CreateConversationTemplateView(request):
-    return render(request, 'conversation_templates/create_conversation_template.html')
+    return render(request, 'template_management/create_conversation_template.html')
