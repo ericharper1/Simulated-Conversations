@@ -36,5 +36,4 @@ urlpatterns = [
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
-    path('templates/new', CreateConversationTemplateView, name="CreateConversationTemplateView")
 ]
