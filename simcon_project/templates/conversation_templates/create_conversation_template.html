@@ -27,7 +27,7 @@
 <div class="container-fluid mt-4">
     <div class="row">
 
-        <!-- Nodes column -->
+        <!-- Step node column -->
         <div class="col" id="nodes-column">
             <div class="column-button-container">
                 <button class="btn btn-primary btn-sm mb-3 column-button" onclick="addStepNode()">ADD</button>
@@ -42,7 +42,7 @@
                 <button class="btn btn-primary btn-sm mb-3" onclick="test()">COMPLETE</button>
             </div>
 
-            <!-- Template node form (will change dynamically as different nodes are put in focus or are created) -->
+            <!-- Template node form (will change dynamically as different nodes are put in focus) -->
             <div class="card">
                 <div class="card-body">
                     <form>
@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-            <!-- General template info form (present at all times) -->
+            <!-- General template info form (present no matter which conversation node is in focus) -->
             <div class="card mt-5">
                 <div class="card-body">
                     <h5 class="card-title">Template</h5>
@@ -88,13 +88,13 @@
             </div>
         </div>
 
+
         <!-- Choices column -->
         <div class="col" id="choices-column">
             <div class="column-button-container">
                 <button class="btn btn-primary btn-sm mb-3 column-button" onclick="addChoice()">ADD</button>
             </div>
             <!-- Choice cards will be inserted here -->
-
         </div>
 
     </div>
