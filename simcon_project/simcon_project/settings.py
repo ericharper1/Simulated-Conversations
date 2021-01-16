@@ -35,8 +35,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admindocs',
 
     # Third-party apps
+    'bootstrap_modal_forms',
+    'django_tables2',
+    'embed_video',
+    'django_tables2',
 
     # Our apps
     'users',
@@ -51,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.admindocs.middleware.XViewMiddleware',
 ]
 
 ROOT_URLCONF = 'simcon_project.urls'
@@ -64,6 +70,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -131,6 +138,12 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_URL = '/static/'
+
 LOGIN_REDIRECT_URL = '/redirect-from-login'
 LOGOUT_REDIRECT_URL = 'Login'
 LOGIN_URL = 'Login'
+
+MEDIAFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/media')
+]
+MEDIA_URL = '/media/'

@@ -1,17 +1,16 @@
+{% load static %}
+{% load render_table from django_tables2 %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
-    <!-- prevent line breaks when using form fields -->
-    <style type="text/css">
-    form {display:inline; margin:0px; padding:0px;}
-    </style>
-    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'users/student_home.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
 
     <title>
     {% block title %}Simulated Conversations | Student{% endblock %}
@@ -21,15 +20,14 @@
   </head>
 
   <body>
-    <div class="container">
-      <h1> THIS IS THE STUDENT PAGE</h1>
-        {% block content %}
-        {% endblock %}
-    </div> <!-- /container -->
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-
-    <!-- Placed at the end of the document so the pages load faster -->
+    <div class="body-container">
+          {% render_table table %}
+        <footer>
+          <p>Copyright 2020 Portland State University</p>
+          <p>Team camel_case_best_case</p>
+        </footer>
+     </div><!-- /container -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
   </body>
 </html>
