@@ -4,6 +4,7 @@
 *.pyc
 __pycache__
 db.sqlite3
+migrations
 simcon_project/static/media
 
 # Backup files # 
@@ -15,7 +16,8 @@ simcon_project/static/media
 
 # Python # 
 *.py[cod] 
-*$py.class 
+*$py.class
+pipfile
 
 # Distribution / packaging 
 .Python build/ 
