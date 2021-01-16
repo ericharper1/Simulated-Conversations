@@ -27,6 +27,11 @@
                 <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="YYYY-MM-DD" required>
             </div>
 
+            <div class="form-group">
+                <label for="researcher_email">Researcher email:</label>
+                <input type="text" class="form-control col-lg-10" id="researcher_email" required>
+            </div>
+
             <!--add student -->
             <div class="form-group">
                 <label for="add_stu">Add student</label>
@@ -55,7 +60,7 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template ID." required>
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." required>
                     <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                 </div>
                 <br>
@@ -63,7 +68,7 @@
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>ID</th>
+                        <th>Date</th>
                         <th>Delete</th>
                     </tr>
                     </thead>
@@ -75,7 +80,7 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label ID." required>
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." required>
                     <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
                 </div>
                 <br>
@@ -83,7 +88,7 @@
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>ID</th>
+                        <th>Researcher</th>
                         <th>Delete</th>
                     </tr>
                     </thead>
@@ -97,6 +102,7 @@
   </body>
   <script>
       var students={{ student|safe }};
+      var researchers={{ researcher|safe }};
       var templates={{ template|safe }};
       var subLabels={{ subLabel|safe }};
       var addedStu=new Array();
@@ -129,8 +135,10 @@
                   }
               }
               else if(id==2){
-                  var index = addedTmp.indexOf(em);
-                  console.log(em + "  " + index);
+                  var name=this.parentNode.parentNode.cells[0].innerHTML;
+                  var tempKey=name+"--"+em;
+                  var index = addedTmp.indexOf(tempKey);
+                  console.log(tempKey + "  " + index);
                   if (index > -1) {
                       addedTmp.splice(index, 1);
                   }
@@ -157,16 +165,10 @@
           //console.log(students[0].fields);
           var find=false;   //Record find the corresponding student or not
           for(var i=0;i<students.length;i++){
-              var stuTmp=students[i].fields;
+              var stuTmp=students[i];
               if(stuTmp.email==stu){
                   find=true;
-                  if(stuTmp.is_researcher==1){
-                      window.alert("Add failed. This user is a researcher");
-                  }
-                  else if(stuTmp.is_staff==1){
-                      window.alert("Add failed. This user is a staff");
-                  }
-                  else if(stuTmp.is_active!=1){
+                  if(stuTmp.is_active!=1){
                       window.alert("Add failed. This user is a not an active user");
                   }
                   else{
@@ -187,46 +189,56 @@
           }
       }
 
-      function add_temp(tbl, id){
+      function add_temp(tbl, name){
           var find=false;
           for(var i=0;i<templates.length;i++){
               var tempTmp=templates[i].fields;
-              if(tempTmp.id==id){
+              if(tempTmp.name==name){
                   find=true;
-                  if(addedTmp.indexOf(id)>-1){
+                  var key=name+"--"+tempTmp.creation_date
+                  if(addedTmp.indexOf(key)>-1){
                       window.alert("Adding failed, the template is already in the table.");
                   }
                   else {
-                      var name = tempTmp.name;
-                      add2table(tbl1, name, id, 2);
-                      addedTmp.push(id);
+                      add2table(tbl1, name, tempTmp.creation_date, 2);
+                      addedTmp.push(key);
                   }
               }
           }
           if(find==false){
-              window.alert("Cannot find: "+id);
+              window.alert("Cannot find: "+name);
           }
       }
 
-      function add_label(tbl, id){
+      function add_label(tbl, name){
           var find=false;
           for(var i=0;i<subLabels.length;i++){
               var labelTmp=subLabels[i].fields;
-              if(labelTmp.id==id){
+              if(labelTmp.label_name==name){
                   find=true;
-                  if(addedLabel.indexOf(id)>-1){
+                  if(addedLabel.indexOf(name)>-1){
                       window.alert("Adding failed, the label is already in the table.");
                   }
                   else {
-                      var name = labelTmp.name;
-                      add2table(tbl2, name, id, 3);
-                      addedLabel.push(id);
+                      var researcher = labelTmp.researcher;
+                      add2table(tbl2, name, researcher, 3);
+                      addedLabel.push(name);
                   }
               }
           }
           if(find==false){
-              window.alert("Cannot find: "+id);
+              window.alert("Cannot find: "+name);
           }
+      }
+
+      function verify_researcher(email){
+          for(var i=0;i<researchers.length;i++){
+              var researcherTmp=researchers[i];
+              if(researcherTmp.email==email){
+                  return true;
+              }
+          }
+          return false;
       }
 
       //Pass the client data to django through ajax.
@@ -236,15 +248,23 @@
           });
           assign_name=document.getElementById("assign_name").value;
           assign_date=document.getElementById("assign_date").value;
+          researcher_email=document.getElementById("researcher_email").value;
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
+
+          if(!verify_researcher(researcher_email)){
+              window.alert(researcher_email+" is not a researcher!");
+              return;
+          }
+
           $.ajax({
               url:"{% url 'assignments:add_data' %}",
               type:'POST',
               data: {
                   'name': assign_name,
                   'date': assign_date,
+                  'researcher': researcher_email,
                   'stuData': stuJSON,
                   'tempData': tempJSON,
                   'labelData': labelJSON
