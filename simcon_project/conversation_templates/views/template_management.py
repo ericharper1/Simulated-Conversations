@@ -140,6 +140,7 @@ class TemplateDeleteView(BSModalDeleteView):
     template_name = 'template_management/template_delete_modal.html'
     success_message = 'Success: Book was deleted.'
     success_url = reverse_lazy('management:main')
+    context_object_name = "template_name"
 
 
 def remove_template(request, pk):

@@ -1,10 +1,11 @@
 from django.test import TestCase, RequestFactory
 from django.utils import timezone
 from django.shortcuts import reverse
-from users.models import Researcher
-from ..models import TemplateFolder, ConversationTemplate
+from datetime import date
+from users.models import Researcher, Student, Assignment, SubjectLabel
+from ..models import *
 from ..forms import FolderCreationForm
-from ..views.template_management import route_to_current_folder, remove_template, FolderEditView
+from ..views.template_management import route_to_current_folder, FolderEditView
 
 
 class TemplateManagementTests(TestCase):
@@ -77,14 +78,48 @@ class TemplateManagementTests(TestCase):
             "templates": self.template1})
         self.assertEqual(response.status_code, 200)
 
+    def test_delete_folder(self):
+        folder_count = TemplateFolder.objects.count()
+        response = self.client.post(reverse('management:delete_folder', args=[self.folder.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(TemplateFolder.objects.count(), folder_count - 1)
+
     def test_delete_template(self):
         template_count = ConversationTemplate.objects.count()
         response = self.client.post(reverse('management:delete_template', args=[self.template1.id]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ConversationTemplate.objects.count(), template_count - 1)
 
-    def test_delete_folder(self):
-        folder_count = TemplateFolder.objects.count()
-        response = self.client.post(reverse('management:delete_folder', args=[self.folder.id]))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(TemplateFolder.objects.count(), folder_count - 1)
+    def test_delete_template_cascades(self):
+        student = Student.objects.create_user(password='abc123', email='student@pdx.edu', added_by=self.researcher)
+        start_node = TemplateNode.objects.create(description='Node', parent_template=self.template1, start=True,
+                                                 video_url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        node1 = TemplateNode.objects.create(description='Node', parent_template=self.template1
+                                            , video_url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        node2 = TemplateNode.objects.create(description='Node', parent_template=self.template1
+                                            , video_url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        TemplateNodeChoice.objects.create(parent_template=start_node, destination_node=node1)
+        TemplateNodeChoice.objects.create(parent_template=start_node, destination_node=node2)
+        label = SubjectLabel.objects.create(label_name='label', researcher=self.researcher)
+        label.students.set([student])
+        assignment = Assignment.objects.create(name='assignment', date_assigned=date.today(),
+                                               researcher=self.researcher)
+        assignment.subject_labels.set([label])
+        assignment.conversation_templates.set([self.template1])
+        response = TemplateResponse.objects.create(student=student, template=self.template1, assignment=assignment
+                                                   , completion_date=timezone.now(), feedback='Not bad kid')
+        TemplateNodeResponse.objects.create(transcription='Hello', template_node=node1,
+                                            parent_template_response=response, position_in_sequence=0,
+                                            feedback='Nice try', audio_response='notanaudio.txt')
+
+        self.assertEqual(TemplateNode.objects.count(), 3)
+        self.assertEqual(TemplateNodeChoice.objects.count(), 2)
+        self.assertEqual(TemplateResponse.objects.count(), 1)
+        self.assertEqual(TemplateNodeResponse.objects.count(), 1)
+
+        self.client.post(reverse('management:delete_template', args=[self.template1.id]))
+
+        self.assertEqual(TemplateNode.objects.count(), 0)
+        self.assertEqual(TemplateNodeChoice.objects.count(), 0)
+        self.assertEqual(TemplateResponse.objects.count(), 0)
+        self.assertEqual(TemplateNodeResponse.objects.count(), 0)
