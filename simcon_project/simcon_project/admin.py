@@ -7,4 +7,3 @@ admin.site.register(TemplateNode)
 admin.site.register(TemplateNodeChoice)
 admin.site.register(TemplateResponse)
 admin.site.register(TemplateNodeResponse)
-
