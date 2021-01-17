@@ -4,7 +4,8 @@
 *.pyc
 __pycache__
 db.sqlite3
-media
+migrations
+simcon_project/static/media
 
 # Backup files # 
 *.bak 
@@ -15,7 +16,8 @@ media
 
 # Python # 
 *.py[cod] 
-*$py.class 
+*$py.class
+pipfile
 
 # Distribution / packaging 
 .Python build/ 
@@ -99,3 +101,8 @@ GitHub.sublime-settings
 # Visual Studio Code # 
 .vscode/
 .history
+
+# migrations
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py

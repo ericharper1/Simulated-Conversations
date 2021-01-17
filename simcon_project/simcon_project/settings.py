@@ -35,9 +35,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.admindocs',
 
     # Third-party apps
+    'bootstrap_modal_forms',
     'django_tables2',
+    'embed_video',
+
     # Our apps
     'users',
     'conversation_templates',
@@ -51,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.admindocs.middleware.XViewMiddleware',
 ]
 
 ROOT_URLCONF = 'simcon_project.urls'
@@ -64,6 +69,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -126,9 +132,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-# Static Directories  
 STATICFILES_DIRS = [
-  os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static')
 ]
 
 # Static URLS [These are used when in non production enviroments]
@@ -136,10 +141,8 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/redirect-from-login'
 
-# Uncomment when we move to production
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')  
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
 # Bootstrap Template for Django Tables 
 DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
+MEDIAFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/media')
+]
