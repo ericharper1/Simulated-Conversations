@@ -1,11 +1,9 @@
-from django.conf.urls import url
-from . import views
+from django.urls import path
+from django.urls import converters
+from .views import *
 
 urlpatterns = [
-    url(r'^start/(?P<ct_id>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})/$',
-        views.conversation_start, name='conversation_start'),
-    url(r'^step/(?P<ct_node_id>[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?4[0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12})/$',
-        views.conversation_step, name='conversation_step'),
-    url(r'^end/(?P<ct_response_id>[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?4[0-9a-fA-F]{3}-?[89abAB][0-9a-fA-F]{3}-?[0-9a-fA-F]{12})/$',
-        views.conversation_end, name='conversation_end'),
+    path('start/<uuid:ct_id>/', conversation_start, name='conversation_start'),
+    path('step/<uuid:ct_node_id>/', conversation_step, name='conversation_step'),
+    path('end/<uuid:ct_response_id>/', conversation_end, name='conversation_end'),
 ]
