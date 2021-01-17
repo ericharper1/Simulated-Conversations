@@ -1,130 +1,118 @@
 from django.shortcuts import render, redirect
-from django import forms
-from django.forms import inlineformset_factory
-from django.contrib.auth import get_user_model
+from django.http import HttpResponseNotFound, HttpResponse
+from django.forms import modelformset_factory
 from conversation_templates.models.conv_template import ConversationTemplate
 from conversation_templates.models.template_node import TemplateNode
-from conversation_templates.models.template_node_choice import TemplateNodeChoice
-# from conversation_templates.forms import TemplateNodeResponseCreateForm
-# from conversation_templates.forms import TemplateNodeChoiceForm
+from conversation_templates.models.template_node_response import TemplateNodeResponse
+from conversation_templates.models.template_response import TemplateResponse
+from conversation_templates.forms import TemplateNodeChoiceForm
+from users.models.student import Student
+from users.models.assignment import Assignment
+from datetime import datetime
 
 # Globals
 ct_templates_dir = 'conversation'
-user = get_user_model()
 
 
 # Views
 def conversation_start(request, ct_id):
     ctx = {}
-    ct = ConversationTemplate.objects.get(id=ct_id)
-    ctn = TemplateNode.objects.get(parent_template=ct, start=True)
+    ct = ConversationTemplate.objects.get(id=ct_id)  # Get current Conversation Template
+    ct_node = TemplateNode.objects.get(parent_template=ct, start=True)  # Get first node
+    print(request.session.get('ct_response_id'))  # Should be None at this point
+    # Create context object
     ctx.update({'ct': ct})
-    ctx.update({'ctn': ctn})
+    ctx.update({'ct_node': ct_node})
     t = '{}/conversation_start.html'.format(ct_templates_dir)
     return render(request, t, ctx)
 
 
-def conversation_step(request, ctn_id):  # a08b1b1a-e3fe-4c5b-9639-66a4f895c103
+def conversation_step(request, ct_node_id):  # Conversation Template(testing): a08b1b1a-e3fe-4c5b-9639-66a4f895c103
     ctx = {}
-    ctn = TemplateNode.objects.get(id=ctn_id)  # get conversation template node from choice
-    formset = None
+    ct_node = TemplateNode.objects.get(id=ct_node_id)  # get conversation template node from url
+    # POST request
     if request.method == 'POST':
-        # choice_form = TemplateNodeChoiceForm(data=request.POST)
-        # if choice_form.is_valid():
-        print('selected choice: ' + str(request.POST))
-        print('Yes')
-            # print(choice_form.cleaned_data())
-        # else:
-        #     print('No')
-            # print(choice_form.errors['choices'])
-    else:
-        ctn = TemplateNode.objects.get(id=ctn_id)  # get conversation template node from url
-        choice_form_set = inlineformset_factory(
-            TemplateNode,
-            TemplateNodeChoice,
-            fk_name='parent_template',
-            fields=('choice_text',),
-        )
-        formset = choice_form_set(instance=ctn)
+        choice_form = TemplateNodeChoiceForm(request.POST, ct_node=ct_node)
+        if choice_form.is_valid():
+            choice = choice_form.cleaned_data['choices']
+            ct_response_id = request.session.get('ct_response_id')
+            if not ct_response_id:
+                return HttpResponse('<h1>Conversation Template Response does not exist for current session.</h1>')
+            ct_response = TemplateResponse.objects.get(id=ct_response_id)  # grab template response
+            # Create node response for current node
+            ct_node_response = TemplateNodeResponse.objects.create(
+                transcription='',
+                template_node=ct_node,
+                parent_template_response=ct_response,
+                selected_choice=choice,
+                position_in_sequence=ct_response.node_responses.count() + 1,
+            )
+            # Grab next node or direct to conversation end
+            response_object = choice.destination_node
+            if not response_object:
+                response_object = ct_response
+            return redirect(response_object)
+        else:
+            # Need better 404 message
+            return HttpResponseNotFound('Form was not valid')
 
-    ct = ctn.parent_template
-    end = False
-    if ctn.start:  # logic for beginning or ending a conversation
-        pass
-    elif ctn.terminal:
-        end = True
+    # GET request
+    ct_node = TemplateNode.objects.get(id=ct_node_id)  # get conversation template node from url
+    choice_form = TemplateNodeChoiceForm(ct_node=ct_node)  # populate form with choices
+    ct = ct_node.parent_template
+    if ct_node.start and request.session.get('ct_response_id') is None:  # also check if we already made a response - user could have refreshed the page.
+        ct_response = TemplateResponse.objects.create(
+            student=Student.objects.get(email='student2@email.com'),  # Grab static student - testing
+            template=ct,
+            assignment=Assignment.objects.get(id='317319e0-53c6-4018-8edd-94f8c04e5968')  # Grab static assignment - testing
+        )
+        request.session['ct_response_id'] = str(ct_response.id)  # persist the template response
+    print(request.session.get('ct_response_id'))
     ctx.update({
-        "ct": ct,
-        "ctn": ctn,
-        "choice_form": formset,
-        "end": end,
+        'ct': ct,
+        'ct_node': ct_node,
+        'choice_form': choice_form,
     })
     t = '{}/conversation_step.html'.format(ct_templates_dir)
     return render(request, t, ctx)
 
-# def conversation_step(request, ctn_id):  # a08b1b1a-e3fe-4c5b-9639-66a4f895c103
-#     ctx = {}
-#     ctn = TemplateNode.objects.get(id=ctn_id)  # get conversation template node from choice
-#     cntc = TemplateNodeChoice.objects.get(id='ffe72335-9e17-41f1-bef5-357a191ed75a')
-#     print(cntc)
-#     print(type(request.POST.get('choices')))
-#
-#     if request.method == 'POST':
-#         choice_form = TemplateNodeChoiceForm(data=request.POST)
-#         if choice_form.is_valid():
-#             print('Yes')
-#             print(choice_form.cleaned_data())
-#         # process data in form cleaned
-#             # dest_ctn_id = choice_form.cleaned_data()
-#             # ctn = TemplateNode.objects.get(id=dest_ctn_id)  # get conversation template node from choice
-#         else:
-#             print('No')
-#             print(choice_form.errors['choices'])
-#     else:
-#         ctn = TemplateNode.objects.get(id=ctn_id)  # get conversation template node from url
-#         ctn_choices = TemplateNodeChoice.objects.filter(parent_template=ctn)
-#         choices = []
-#         for choice in ctn_choices:
-#             choices.append((str(choice.id), choice.choice_text))
-#         print(choices)
-#         choice_form = TemplateNodeChoiceForm()
-#         choice_form.fields["choices"].choices = choices
-#         print(choice_form)
-#
-#     ct = ctn.parent_template
-#     end = False
-#     if ctn.start:  # logic for beginning or ending a conversation
-#         pass
-#     elif ctn.terminal:
-#         end = True
-#     ctx.update({
-#         "ct": ct,
-#         "ctn": ctn,
-#         "choice_form": choice_form,
-#         "end": end,
-#     })
-#     t = '{}/conversation_step.html'.format(ct_templates_dir)
-#     return render(request, t, ctx)
 
-
-def conversation_end(request):
+def conversation_end(request, ct_response_id):
     ctx = {}
-    # for testing
-    ct_list = [
-        {
-            'description': 'scene1',
-            'transcription': 'response1'
-        },
-        {
-            'description': 'scene2',
-            'transcription': 'response2'
-        },
-        {
-            'description': 'scene3',
-            'transcription': 'response3'
-        }
-    ]
+    ct_response = TemplateResponse.objects.get(id=ct_response_id)
+    trans_formset = modelformset_factory(TemplateNodeResponse, fields=('transcription',), extra=0)
 
-    ctx.update({'ct_list': ct_list})
+    # POST request
+    if request.method == 'POST':
+        print('caught post request')
+        trans_form = trans_formset(request.POST)
+        if trans_form.is_valid():
+            trans_form.save()
+
+    # GET request
+    if 'ct_response_id' in request.session:
+        del request.session['ct_response_id']  # Don't need template response anymore
+        request.session.modified = True  # Saves session update
+    # should conversation be considered finished after last node, or upon finishing transcriptions on final page?
+    # Set completion date if not already set - user might refresh the page
+    if ct_response.completion_date is None:
+        ct_response.completion_date = datetime.now()
+        ct_response.save()
+    ct = ct_response.template
+    student = ct_response.student
+    # ct_node_responses = ct_response.node_responses  # not working?
+    ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response)
+    print(ct_node_responses)
+    trans_form = trans_formset(
+        queryset=TemplateNodeResponse.objects.filter(parent_template_response=ct_response)
+        .order_by('position_in_sequence')
+    )
+    ctx.update({
+        'ct': ct,
+        'student': student,
+        'trans_form': trans_form,
+        'ct_response': ct_response,
+        'ct_node_responses': ct_node_responses,
+    })
     t = '{}/conversation_end.html'.format(ct_templates_dir)
     return render(request, t, ctx)

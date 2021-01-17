@@ -16,20 +16,21 @@
     </head>
     <body>
         <h1>Simulated Conversations</h1>
-        <h3>Template name</h3>
+        <h3>{{ ct }}</h3>
         <h3 style="text-align:right;">{{ user_email }}</h3>
-        <p>This is where the description of the template goes.</p>
-        {% for ct in ct_list %}
-            <table>
-                <tr>
-                <td>Description: {{ ct.description }}</td>
-                <td>Transcription: {{ ct.transcription }}</td>
-                </tr>
-            </table>
-        {% endfor %}
-        <form action='{{ request.get_host }}/student-view' method='GET'>
+        <p>{{ ct.description }}</p>
+{#        {% for response in ct_node_responses %}#}
+{#            <table>#}
+{#                <tr>#}
+{#                <td>Description: {{ response.selected_choice.choice_text }}</td>#}
+{#                <td>Transcription: {{ response.transcription }}</td>#}
+{#                </tr>#}
+{#            </table>#}
+{#        {% endfor %}#}
+        <form action="{{ ct_response.get_absolute_url }}" method="POST">
             {% csrf_token %}
-            <button type='submit'>Finish</button>
+            {{ trans_form.as_p }}
+            <button type="submit">Finish</button>
         </form>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->

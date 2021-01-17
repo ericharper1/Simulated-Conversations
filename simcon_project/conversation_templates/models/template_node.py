@@ -11,11 +11,9 @@ class TemplateNode (models.Model):
     start = models.BooleanField(default=False)
     terminal = models.BooleanField(default=False)
     parent_template = models.ForeignKey('conversation_templates.ConversationTemplate', default=0, related_name='template_nodes', on_delete=models.CASCADE)
-    # For compatibility with forms. Field to hold pointers to destination template nodes (ManyToManyField)
-    # To replace choice in tnc model. Field to hold list of text choices (ArrayField) Form: (SimpleArrayField)
 
     def __str__(self):
         return self.description
 
     def get_absolute_url(self):
-        return reverse("conversation_step", kwargs={"ctn_id": self.id})
+        return reverse('conversation_step', kwargs={'ct_node_id': self.id})
