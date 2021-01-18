@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import *
+from conversation_templates.views import *
 
-app_name = 'management'
+
 urlpatterns = [
     path('', main_view, name="main"),
     path('folder/<uuid:pk>', folder_view, name="folder_view"),
@@ -10,7 +10,4 @@ urlpatterns = [
     path('folder/edit/<uuid:pk>', FolderEditView.as_view(), name='edit_folder'),
     path('templates/delete/<uuid:pk>', TemplateDeleteView.as_view(), name="delete_template"),
     path('folder/remove/<uuid:pk>', remove_template, name="remove_template"),
-    path('start/<uuid:ct_id>/', conversation_start, name='conversation_start'),
-    path('step/<uuid:ct_node_id>/', conversation_step, name='conversation_step'),
-    path('end/<uuid:ct_response_id>/', conversation_end, name='conversation_end'),
 ]

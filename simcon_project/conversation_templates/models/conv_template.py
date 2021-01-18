@@ -4,7 +4,7 @@ from django.urls import reverse
 import uuid
 
 
-class ConversationTemplate (models.Model):
+class ConversationTemplate(models.Model):
     """
     Contains information related to an entire conversation template.
     

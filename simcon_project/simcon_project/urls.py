@@ -33,9 +33,9 @@ urlpatterns = [
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('settings/', SettingsView, name="SettingsView"),
     path('template-start/<str:name>/', TemplateStartView, name="TemplateStartView"),
-    path('template-management/', include('conversation_templates.urls'), name="TemplateManagementView"),
+    path('template-management/', include('conversation_templates.urls.templates_urls'), name="TemplateManagementView"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
-    path('conversation/', include('conversation_templates.urls')),
+    path('conversation/', include('conversation_templates.urls.conv_urls')),
 ]

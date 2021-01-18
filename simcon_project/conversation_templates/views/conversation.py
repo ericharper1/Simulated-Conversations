@@ -9,12 +9,14 @@ from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models.student import Student
 from users.models.assignment import Assignment
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 
 # Globals
 ct_templates_dir = 'conversation'
 
 
 # Views
+@login_required
 def conversation_start(request, ct_id):
     ctx = {}
     ct = ConversationTemplate.objects.get(id=ct_id)  # Get current Conversation Template
@@ -27,7 +29,8 @@ def conversation_start(request, ct_id):
     return render(request, t, ctx)
 
 
-def conversation_step(request, ct_node_id):  # Conversation Template(testing): a08b1b1a-e3fe-4c5b-9639-66a4f895c103
+@login_required()
+def conversation_step(request, ct_node_id):  # Conversation Template(testing): b59cfc4c-b6ab-488b-bcef-3c69d137c64b
     ctx = {}
     ct_node = TemplateNode.objects.get(id=ct_node_id)  # get conversation template node from url
     # POST request
@@ -46,6 +49,8 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): a
                 parent_template_response=ct_response,
                 selected_choice=choice,
                 position_in_sequence=ct_response.node_responses.count() + 1,
+                feedback='',  # won't have feedback until after convo is finished
+                audio_response=None
             )
             # Grab next node or direct to conversation end
             response_object = choice.destination_node
@@ -54,6 +59,7 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): a
             return redirect(response_object)
         else:
             # Need better 404 message
+            # this should also never trigger
             return HttpResponseNotFound('Form was not valid')
 
     # GET request
@@ -62,9 +68,10 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): a
     ct = ct_node.parent_template
     if ct_node.start and request.session.get('ct_response_id') is None:  # also check if we already made a response - user could have refreshed the page.
         ct_response = TemplateResponse.objects.create(
-            student=Student.objects.get(email='student2@email.com'),  # Grab static student - testing
+            student=Student.objects.get(email=request.user),  # Grab static student - testing
             template=ct,
-            assignment=Assignment.objects.get(id='317319e0-53c6-4018-8edd-94f8c04e5968')  # Grab static assignment - testing
+            assignment=Assignment.objects.get(id='6f3090fa-84a4-408d-99f9-5bbd5fccfbb3'),  # Grab static assignment - testing
+            feedback=''
         )
         request.session['ct_response_id'] = str(ct_response.id)  # persist the template response
     print(request.session.get('ct_response_id'))
@@ -77,6 +84,7 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): a
     return render(request, t, ctx)
 
 
+@login_required()
 def conversation_end(request, ct_response_id):
     ctx = {}
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
