@@ -1,30 +1,44 @@
 from django.shortcuts import render, redirect
-from django.db import models
-from users.models import Student, subject_label, CustomUser
-from django.contrib.auth import login, authenticate
+from users.models import Student
+from django.contrib.auth import login
 from users.forms import NewStudentCreationForm
-from django.views.generic import CreateView
+from django.contrib import messages
 
-class temp(CreateView):
-        template_name = "user_registration.html"
-        form_class = NewStudentCreationForm
-        success_url = "student-view/"
 
-def UserRegistration(request):
+def UserRegistration(request, uidb64, token):
+        print(uidb64)
         if request.method == "POST":
                 form = NewStudentCreationForm(request.POST)
-                print(request.POST)
                 if form.is_valid():
-                        print("!")
-                        email = form.cleaned_data.get('email')
-                        password = form.cleaned_data.get('password1')
-                        Student.objects.create_user(email, password)
-                        user = authenticate(email=email, password=password)
-                        login(request, user)
-                        return render(request, 'user_registration.html', {"form": NewStudentCreationForm()})
+                        password1 = form.cleaned_data.get('password1')
+                        password2 = form.cleaned_data.get('password2')
 
+                        if password1 == password2:
+                                email = form.cleaned_data.get('email')
+
+                                if Student.objects.filter(email=email, registered=False):
+                                        user = Student.objects.get(email=email, registered=False)
+                                        user.set_password(form.cleaned_data.get('password1'))
+                                        user.first_name = form.cleaned_data.get('first_name')
+                                        user.last_name = form.cleaned_data.get('last_name')
+                                        user.registered = True
+                                        user.save()
+                                        login(request, user)
+                                        return redirect('student_home.html')
+                                else:
+                                        if Student.objects.filter(email=email, registered=True):
+                                                messages.error(request, 'Account already created', fail_silently=False)
+                                        else:
+                                                messages.error(request, 'Invalid email address, please enter the email address '
+                                                                'that you received the email at.', fail_silently=False)
+                                        return render(request, 'user_registration.html',
+                                                      {"form": NewStudentCreationForm()})
+
+                        else:
+                                messages.error(request, 'passwords do not match', fail_silently=False)
+                                return render(request, 'user_registration.html', {"form": NewStudentCreationForm()})
                 else:
-                        print(":(")
+                        messages.error(request, 'Please fill out form completely', fail_silently=False)
                         return render(request, 'user_registration.html', {"form": NewStudentCreationForm()})
 
         else:

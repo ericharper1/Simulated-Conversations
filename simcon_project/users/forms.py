@@ -12,12 +12,12 @@ class CustomUserCreationForm(UserCreationForm):
         fields = UserCreationForm.Meta.fields + ('email',)
 
 
-class NewStudentCreationForm(UserCreationForm):
+class NewStudentCreationForm(forms.Form):
     email = forms.EmailField(max_length=254, required=True)
-
-    class Meta:
-        model = Student
-        fields = ('email', 'first_name', 'last_name', 'password1', 'password2',)
+    first_name = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True)
+    password1 = forms.CharField(max_length=100, required=True)
+    password2 = forms.CharField(max_length=100, required=True)
 
 
 class SendEmail(forms.Form):

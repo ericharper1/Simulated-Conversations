@@ -134,10 +134,11 @@ STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/redirect-from-login'
 
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+SENDGRID_API_KEY = os.getenv('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')
+EMAIL_HOST = 'smtp.sendgrid.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'TEST.DUMMY.SIM.CON@gmail.com'
-EMAIL_HOST_PASSWORD = 'SimconTest'
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

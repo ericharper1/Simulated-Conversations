@@ -47,6 +47,15 @@
           <button type="submit" class="btn btn-success">Submit</button><br/><br/>
         </form>
       </div>
+    {% for message in messages %}
+
+                    <div class="alert alert-warning">
+                        <a class="close" href="#" data-dismiss="alert">×</a>
+
+                        {{ message }}
+
+                    </div>
+            {% endfor %}
   </div>
   </body>
 </html>
