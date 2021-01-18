@@ -1,3 +1,4 @@
+{% load render_table from django_tables2 %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,19 +18,26 @@
     <body>
         <h1>Simulated Conversations</h1>
         <h3>{{ ct }}</h3>
-        <h3 style="text-align:right;">{{ user_email }}</h3>
+        <h3 style="text-align:right;">{{ request.user }}</h3>
         <p>{{ ct.description }}</p>
+        {%  render_table ct_node_table %}
 {#        {% for response in ct_node_responses %}#}
 {#            <table>#}
 {#                <tr>#}
 {#                <td>Description: {{ response.selected_choice.choice_text }}</td>#}
-{#                <td>Transcription: {{ response.transcription }}</td>#}
 {#                </tr>#}
 {#            </table>#}
 {#        {% endfor %}#}
+
         <form action="{{ ct_response.get_absolute_url }}" method="POST">
             {% csrf_token %}
-            {{ trans_form.as_p }}
+            {{ formset.as_p }}
+            {% for dict in formset.errors %}
+                {% for error in dict.values %}
+                    {{ error }}
+                {% endfor %}
+            {% endfor %}
+            {{ formset.errors }}
             <button type="submit">Finish</button>
         </form>
         <!-- Optional JavaScript -->

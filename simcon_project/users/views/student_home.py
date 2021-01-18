@@ -26,8 +26,6 @@ def student_view(request):
             'conversation_templates__id',
             'id'
     )
-    print(contents)
     template_table = StudentHomeTable(contents)
     template_table.paginate(page=request.GET.get("page", 1), per_page=10)
-    # must pass context as a dictionary
     return render(request, 'student_view.html', {'table': template_table})

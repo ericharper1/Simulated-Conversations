@@ -18,7 +18,7 @@
     <body>
         <h1>Simulated Conversations</h1>
         <h3>{{ ct.name }}</h3>
-        <h3 style="text-align:right;">{{ user_email }}</h3>
+        <h3 style="text-align:right;">{{ request.user }}</h3>
         {% video ct_node.video_url 'medium' %}
         <p>{{ ct_node.description }}</p>
         <form action="{{ ct_node.get_absolute_url }}" method="POST">

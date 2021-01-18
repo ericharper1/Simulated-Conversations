@@ -10,13 +10,18 @@ from users.models.student import Student
 from users.models.assignment import Assignment
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
+import django_tables2 as tables
 
 # Globals
 ct_templates_dir = 'conversation'
 
 
+class NodeDescriptionTable(tables.Table):
+    node_description = tables.Column()
+
+
 # Views
-@login_required(login_url="/accounts/login/")
+@login_required(login_url='/accounts/login/')
 def conversation_start(request, ct_id, assign_id):
     ctx = {}
     ct = ConversationTemplate.objects.get(id=ct_id)  # Get current Conversation Template
@@ -30,7 +35,7 @@ def conversation_start(request, ct_id, assign_id):
     return render(request, t, ctx)
 
 
-@login_required(login_url="/accounts/login/")
+@login_required(login_url='/accounts/login/')
 def conversation_step(request, ct_node_id):  # Conversation Template(testing): b59cfc4c-b6ab-488b-bcef-3c69d137c64b
     ctx = {}
     ct_node = TemplateNode.objects.get(id=ct_node_id)  # get conversation template node from url
@@ -85,7 +90,7 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): b
     return render(request, t, ctx)
 
 
-@login_required(login_url="/accounts/login/")
+@login_required(login_url='/accounts/login/')
 def conversation_end(request, ct_response_id):
     ctx = {}
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
@@ -94,9 +99,9 @@ def conversation_end(request, ct_response_id):
     # POST request
     if request.method == 'POST':
         print('caught post request')
-        trans_form = trans_formset(request.POST)
-        if trans_form.is_valid():
-            trans_form.save()
+        formset = trans_formset(request.POST)
+        if formset.is_valid():
+            formset.save()
 
     # GET request
     if 'ct_response_id' in request.session:
@@ -111,19 +116,19 @@ def conversation_end(request, ct_response_id):
         ct_response.completion_date = datetime.now()
         ct_response.save()
     ct = ct_response.template
-    student = ct_response.student
-    # ct_node_responses = ct_response.node_responses  # not working?
-    ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response)
-    print(ct_node_responses)
-    trans_form = trans_formset(
-        queryset=ct_node_responses
+    ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response)\
         .order_by('position_in_sequence')
-    )
+    formset = trans_formset(queryset=ct_node_responses)
+    # Get table contents
+    table_contents = []
+    for response in ct_node_responses:
+        table_contents.append({'node_description': response.template_node.description})
+    ct_node_table = NodeDescriptionTable(table_contents)
     ctx.update({
         'ct': ct,
-        'student': student,
-        'trans_form': trans_form,
+        'formset': formset,
         'ct_response': ct_response,
+        'ct_node_table': ct_node_table,
         'ct_node_responses': ct_node_responses,
     })
     t = '{}/conversation_end.html'.format(ct_templates_dir)
