@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, SettingsView, TemplateStartView
+from users.views import RedirectFromLogin, student_view, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, SettingsView
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -29,13 +29,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
-    path('student-view/', StudentView, name="StudentView"),
+    path('student-view/', student_view, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('settings/', SettingsView, name="SettingsView"),
-    path('template-start/<str:name>/', TemplateStartView, name="TemplateStartView"),
     path('template-management/', include('conversation_templates.urls.templates_urls'), name="TemplateManagementView"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
-    path('conversation/', include('conversation_templates.urls.conv_urls')),
+    path('conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
 ]

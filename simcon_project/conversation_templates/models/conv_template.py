@@ -25,5 +25,5 @@ class ConversationTemplate(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("conversation_start", kwargs={"ct_id": self.id})
+    # def get_absolute_url(self):
+    #     return reverse("conversation-start", kwargs={"ct_id": self.id})

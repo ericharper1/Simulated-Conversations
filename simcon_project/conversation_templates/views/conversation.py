@@ -16,20 +16,21 @@ ct_templates_dir = 'conversation'
 
 
 # Views
-@login_required
-def conversation_start(request, ct_id):
+@login_required(login_url="/accounts/login/")
+def conversation_start(request, ct_id, assign_id):
     ctx = {}
     ct = ConversationTemplate.objects.get(id=ct_id)  # Get current Conversation Template
     ct_node = TemplateNode.objects.get(parent_template=ct, start=True)  # Get first node
     print(request.session.get('ct_response_id'))  # Should be None at this point
     # Create context object
+    request.session['assign_id'] = assign_id
     ctx.update({'ct': ct})
     ctx.update({'ct_node': ct_node})
     t = '{}/conversation_start.html'.format(ct_templates_dir)
     return render(request, t, ctx)
 
 
-@login_required()
+@login_required(login_url="/accounts/login/")
 def conversation_step(request, ct_node_id):  # Conversation Template(testing): b59cfc4c-b6ab-488b-bcef-3c69d137c64b
     ctx = {}
     ct_node = TemplateNode.objects.get(id=ct_node_id)  # get conversation template node from url
@@ -49,8 +50,8 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): b
                 parent_template_response=ct_response,
                 selected_choice=choice,
                 position_in_sequence=ct_response.node_responses.count() + 1,
-                feedback='',  # won't have feedback until after convo is finished
-                audio_response=None
+                # feedback='',  # won't have feedback until after convo is finished
+                audio_response=None  # Don't have audio feature yet
             )
             # Grab next node or direct to conversation end
             response_object = choice.destination_node
@@ -70,8 +71,8 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): b
         ct_response = TemplateResponse.objects.create(
             student=Student.objects.get(email=request.user),  # Grab static student - testing
             template=ct,
-            assignment=Assignment.objects.get(id='6f3090fa-84a4-408d-99f9-5bbd5fccfbb3'),  # Grab static assignment - testing
-            feedback=''
+            assignment=Assignment.objects.get(id=request.session.get('assign_id')),  # Grab static assignment - testing
+            # feedback=''
         )
         request.session['ct_response_id'] = str(ct_response.id)  # persist the template response
     print(request.session.get('ct_response_id'))
@@ -84,7 +85,7 @@ def conversation_step(request, ct_node_id):  # Conversation Template(testing): b
     return render(request, t, ctx)
 
 
-@login_required()
+@login_required(login_url="/accounts/login/")
 def conversation_end(request, ct_response_id):
     ctx = {}
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
@@ -101,6 +102,9 @@ def conversation_end(request, ct_response_id):
     if 'ct_response_id' in request.session:
         del request.session['ct_response_id']  # Don't need template response anymore
         request.session.modified = True  # Saves session update
+    if 'assign_id' in request.session:
+        del request.session['assign_id']  # Don't need template response anymore
+        request.session.modified = True  # Saves session update
     # should conversation be considered finished after last node, or upon finishing transcriptions on final page?
     # Set completion date if not already set - user might refresh the page
     if ct_response.completion_date is None:
@@ -112,7 +116,7 @@ def conversation_end(request, ct_response_id):
     ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response)
     print(ct_node_responses)
     trans_form = trans_formset(
-        queryset=TemplateNodeResponse.objects.filter(parent_template_response=ct_response)
+        queryset=ct_node_responses
         .order_by('position_in_sequence')
     )
     ctx.update({

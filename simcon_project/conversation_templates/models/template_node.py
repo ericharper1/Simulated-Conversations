@@ -21,4 +21,4 @@ class TemplateNode(models.Model):
         return self.description
 
     def get_absolute_url(self):
-        return reverse('conversation_step', kwargs={'ct_node_id': self.id})
+        return reverse('conversation-step', kwargs={'ct_node_id': self.id})

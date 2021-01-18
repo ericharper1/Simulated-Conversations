@@ -5,7 +5,10 @@ import django_tables2 as tables
 
 
 class StudentHomeTable(tables.Table):
-    name = tables.Column(linkify={"viewname": "TemplateStartView", "args": [tables.A("conversation_templates__name")]},
+    name = tables.Column(linkify=("conversation-start",
+                                  {"ct_id": tables.A("conversation_templates__id"),
+                                   "assign_id": tables.A("id")
+                                   }),
                          accessor='conversation_templates__name',
                          verbose_name='Template Name')
     date_assigned = tables.Column(verbose_name='Date Assigned')
@@ -13,14 +16,17 @@ class StudentHomeTable(tables.Table):
                                     verbose_name='Last Response')
 
 
-@login_required
-def StudentView(request):
+@login_required(login_url="/accounts/login/")
+def student_view(request):
     contents = Assignment.objects.filter(students=request.user.id)\
         .values(
             'conversation_templates__name',
             'date_assigned',
             'conversation_templates__template_responses__completion_date',
-            'conversation_templates__id')
+            'conversation_templates__id',
+            'id'
+    )
+    print(contents)
     template_table = StudentHomeTable(contents)
     template_table.paginate(page=request.GET.get("page", 1), per_page=10)
     # must pass context as a dictionary

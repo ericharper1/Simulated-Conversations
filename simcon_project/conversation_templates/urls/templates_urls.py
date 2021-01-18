@@ -1,7 +1,7 @@
 from django.urls import path
 from conversation_templates.views import *
 
-
+app_name = 'management'
 urlpatterns = [
     path('', main_view, name="main"),
     path('folder/<uuid:pk>', folder_view, name="folder_view"),

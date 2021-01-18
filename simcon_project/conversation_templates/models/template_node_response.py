@@ -9,7 +9,7 @@ class TemplateNodeResponse(models.Model):
     parent_template_response = models.ForeignKey('conversation_templates.TemplateResponse', default=0, related_name='node_responses', on_delete=models.CASCADE)
     selected_choice = models.ForeignKey('conversation_templates.TemplateNodeChoice', default=0, related_name='node_response', on_delete=models.DO_NOTHING)
     position_in_sequence = models.IntegerField()
-    feedback = models.CharField(max_length=1000, default=None)
+    feedback = models.CharField(max_length=1000, default=None, null=True, blank=True)
     audio_response = models.FileField(upload_to='audio/%Y/%m/%d', default=None)
 
     def __str__(self):
