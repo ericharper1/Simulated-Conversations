@@ -3,5 +3,5 @@ from django.contrib.auth.decorators import login_required
 
 
 @login_required
-def ResearcherView(request):
-    return render(request, 'researcher_view.html')
+def SettingsView(request):
+    return render(request, 'settings_view.html')

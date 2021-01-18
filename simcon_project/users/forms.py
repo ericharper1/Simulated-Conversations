@@ -1,15 +1,16 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models.custom_user import CustomUser, CustomUserManager
+from .models import CustomUser, CustomUserManager
 from users.models import Student, SubjectLabel
+
 
 
 class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm.Meta):
-        #model = CustomUser
-        fields = UserCreationForm.Meta.fields + ('email',)
+        model = CustomUser
+        fields = ('email',)
 
 
 class NewStudentCreationForm(forms.Form):
@@ -33,3 +34,9 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ('email',)
+
+
+class UpdateFeedback(forms.Form):
+
+    feedback = forms.CharField(help_text="Enter new Feedback")
+
