@@ -1,7 +1,6 @@
 from django import forms
 from .models.template_node_choice import TemplateNodeChoice
 from .models import TemplateFolder
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 

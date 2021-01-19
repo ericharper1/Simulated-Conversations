@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseNotFound
 from django.forms import modelformset_factory
 from conversation_templates.models.conv_template import ConversationTemplate
 from conversation_templates.models.template_node import TemplateNode
@@ -56,7 +56,7 @@ def conversation_step(request, ct_node_id):
             ct_response_id = request.session.get('ct_response_id')
             if ct_response_id is None:
                 # For debugging, will remove once in production
-                return HttpResponse('<h1>Conversation Template Response does not exist for current session.</h1>')
+                return HttpResponseNotFound('Conversation Template Response does not exist for current session.')
             ct_response = TemplateResponse.objects.get(id=ct_response_id)
             TemplateNodeResponse.objects.create(
                 transcription='',

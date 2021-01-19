@@ -1,5 +1,5 @@
 from django.db import models
-import uuid  # don't think this is needed
+import uuid
 from json import JSONEncoder
 from uuid import UUID
 
