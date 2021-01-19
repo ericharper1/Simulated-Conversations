@@ -128,6 +128,7 @@ class TemplateManagementTests(TestCase):
             assignment1.conversation_templates.get(name=self.template1.name)
             assignment2.conversation_templates.get(name=self.template1.name)
         self.assertNotIn(str(assignment2.conversation_templates.all()), self.template1.name)
+
         self.assertEqual(TemplateNode.objects.count(), 0)
         self.assertEqual(TemplateNodeChoice.objects.count(), 0)
         self.assertEqual(TemplateResponse.objects.count(), 0)
