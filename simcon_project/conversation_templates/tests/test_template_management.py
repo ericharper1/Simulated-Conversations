@@ -102,11 +102,15 @@ class TemplateManagementTests(TestCase):
         TemplateNodeChoice.objects.create(parent_template=start_node, destination_node=node2)
         label = SubjectLabel.objects.create(label_name='label', researcher=self.researcher)
         label.students.set([student])
-        assignment = Assignment.objects.create(name='assignment', date_assigned=date.today(),
+        assignment1 = Assignment.objects.create(name='assignment', date_assigned=date.today(),
                                                researcher=self.researcher)
-        assignment.subject_labels.set([label])
-        assignment.conversation_templates.set([self.template1])
-        response = TemplateResponse.objects.create(student=student, template=self.template1, assignment=assignment
+        assignment1.subject_labels.set([label])
+        assignment1.conversation_templates.set([self.template1])
+        assignment2 = Assignment.objects.create(name='assignment2', date_assigned=date.today(),
+                                                researcher=self.researcher)
+        assignment2.subject_labels.set([label])
+        assignment2.conversation_templates.set([self.template1, self.template2])
+        response = TemplateResponse.objects.create(student=student, template=self.template1, assignment=assignment1
                                                    , completion_date=timezone.now(), feedback='Not bad kid')
         TemplateNodeResponse.objects.create(transcription='Hello', template_node=node1,
                                             parent_template_response=response, position_in_sequence=0,
@@ -116,9 +120,14 @@ class TemplateManagementTests(TestCase):
         self.assertEqual(TemplateNodeChoice.objects.count(), 2)
         self.assertEqual(TemplateResponse.objects.count(), 1)
         self.assertEqual(TemplateNodeResponse.objects.count(), 1)
+        self.assertEqual(self.template1.name, assignment1.conversation_templates.get(name=self.template1.name).name)
 
         self.client.post(reverse('management:delete_template', args=[self.template1.id]))
 
+        with self.assertRaises(ConversationTemplate.DoesNotExist):
+            assignment1.conversation_templates.get(name=self.template1.name)
+            assignment2.conversation_templates.get(name=self.template1.name)
+        self.assertNotIn(str(assignment2.conversation_templates.all()), self.template1.name)
         self.assertEqual(TemplateNode.objects.count(), 0)
         self.assertEqual(TemplateNodeChoice.objects.count(), 0)
         self.assertEqual(TemplateResponse.objects.count(), 0)
