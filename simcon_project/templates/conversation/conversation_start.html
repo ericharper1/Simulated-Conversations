@@ -19,7 +19,7 @@
         <h3>{{ ct.name }}</h3>
         <h3 style="text-align:right;">{{ request.user }}</h3>
         <p>{{ ct.description }}</p>
-        <form action="{{ request.get_host }}/student-view" method="GET">
+        <form action="{% url "StudentView" %}" method="GET">
             <button type="submit">Cancel</button>
         </form>
         <form action="{{ ct_node.get_absolute_url }}" method="GET">

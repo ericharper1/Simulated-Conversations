@@ -30,6 +30,9 @@ class FolderCreationForm(BSModalModelForm):
 
 
 class TemplateNodeChoiceForm(forms.Form):
+    """
+    Form to display choices related to a TemplateNode
+    """
     choices = forms.ModelChoiceField(
         queryset=None,
         widget=forms.RadioSelect,

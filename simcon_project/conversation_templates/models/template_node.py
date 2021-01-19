@@ -6,9 +6,14 @@ import uuid
 
 class TemplateNode(models.Model):
     """
-    Stores description and video for a node in a conversation, and has
-    fields to signify if node is the first or the last in a conversation.
-    Related to :model:`conversation_templates.ConversationTemplate`.
+    Contains information for a step in a conversation
+    Fields:
+    id: Primary key identifier for TemplateNode object
+    description: Context for step in the conversation
+    video_url: URL for Youtube, or Vimeo video that provides context for step in the conversation
+    start: Denotes the starting point of a conversation
+    terminal: Denotes an ending point of a conversation
+    parent_template: ConversationTemplate object that a TemplateNode belongs to
     """
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     description = models.CharField(max_length=4000)

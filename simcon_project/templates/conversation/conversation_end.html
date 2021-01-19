@@ -21,25 +21,14 @@
         <h3 style="text-align:right;">{{ request.user }}</h3>
         <p>{{ ct.description }}</p>
         {%  render_table ct_node_table %}
-{#        {% for response in ct_node_responses %}#}
-{#            <table>#}
-{#                <tr>#}
-{#                <td>Description: {{ response.selected_choice.choice_text }}</td>#}
-{#                </tr>#}
-{#            </table>#}
-{#        {% endfor %}#}
-
         <form action="{{ ct_response.get_absolute_url }}" method="POST">
             {% csrf_token %}
             {{ formset.as_p }}
-            {% for dict in formset.errors %}
-                {% for error in dict.values %}
-                    {{ error }}
-                {% endfor %}
-            {% endfor %}
-            {{ formset.errors }}
             <button type="submit">Finish</button>
         </form>
+        {% if formset_error %}
+            <p><strong>{{ formset_error }}</strong></p>
+        {% endif %}
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

@@ -4,6 +4,16 @@ import uuid
 
 
 class TemplateResponse(models.Model):
+    """
+    Contains information for a Student response to a ConversationTemplate object
+    Fields:
+    id: Primary key id for TemplateResponse object
+    completion_date: UTC date that Student completed conversation
+    student: Student that submitted TemplateResponse object
+    template: ConversationTemplate object that TemplateResponse relates to
+    assignment: Assignment object that ConversationTemplate belongs to
+    feedback: General feedback left by a Researcher for a Student
+    """
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     completion_date = models.DateTimeField(default=None, null=True)
     student = models.ForeignKey('users.Student', related_name='template_responses', default=0, on_delete=models.CASCADE)
