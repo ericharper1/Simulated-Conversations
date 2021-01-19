@@ -169,6 +169,34 @@ class TemplateDeleteView(BSModalDeleteView):
         super().post(request, *args, **kwargs)
         return redirect(reverse('management:main'))
 
+    def get(self, request, *args, **kwargs):
+        """
+        Override post to send template name and name of assignment that
+        will be removed as context to the template
+        """
+        super().get(request, *args, **kwargs)
+        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
+        assignments = this_template.assignments.all()
+        to_delete = []
+        for assignment in assignments:
+            if assignment.conversation_templates.all().count() == 1:
+                to_delete.append(assignment.name)
+        context = {"template_name": this_template.name, "assignments": to_delete}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Override post to remove assignment if the template being deleted
+        is the only one in the assignment.
+        """
+        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
+        assignments = this_template.assignments.all()
+        for assignment in assignments:
+            if assignment.conversation_templates.all().count() == 1:
+                assignment.delete()
+        super().post(request, *args, **kwargs)
+        return redirect(reverse('management:main'))
+
 
 def RemoveTemplate(request, pk):
     """
