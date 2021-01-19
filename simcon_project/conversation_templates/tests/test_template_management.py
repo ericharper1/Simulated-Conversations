@@ -5,7 +5,7 @@ from datetime import date
 from users.models import Researcher, Student, Assignment, SubjectLabel
 from ..models import *
 from ..forms import FolderCreationForm
-from ..views.template_management import route_to_current_folder, FolderEditView
+from ..views.template_management import RouteToCurrentFolder, FolderEditView
 
 
 class TemplateManagementTests(TestCase):
@@ -45,12 +45,12 @@ class TemplateManagementTests(TestCase):
 
     def test_route_to_existing_url_with_folder(self):
         request = self.factory.get(reverse('management:folder_view', args=[self.folder.id]))
-        response = route_to_current_folder(request.get_full_path())
+        response = RouteToCurrentFolder(request.get_full_path())
         self.assertEqual(response, reverse('management:folder_view', args=[self.folder.id]))
 
     def test_route_to_existing_url_no_folder(self):
         request = self.factory.get(reverse('management:main'))
-        response = route_to_current_folder(request.get_full_path())
+        response = RouteToCurrentFolder(request.get_full_path())
         self.assertEqual(response, reverse('management:main'))
 
     def test_main_view(self):
@@ -128,6 +128,7 @@ class TemplateManagementTests(TestCase):
             assignment1.conversation_templates.get(name=self.template1.name)
             assignment2.conversation_templates.get(name=self.template1.name)
         self.assertNotIn(str(assignment2.conversation_templates.all()), self.template1.name)
+
         self.assertEqual(TemplateNode.objects.count(), 0)
         self.assertEqual(TemplateNodeChoice.objects.count(), 0)
         self.assertEqual(TemplateResponse.objects.count(), 0)
