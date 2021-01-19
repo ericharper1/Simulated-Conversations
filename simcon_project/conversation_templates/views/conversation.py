@@ -127,8 +127,6 @@ def conversation_end(request, ct_response_id):
             return redirect('StudentView')
         else:
             # return page with errors
-            print('formset not valid.')
-            print(formset.errors)
             ctx.update({'formset_error': '*Transcription fields are required.'})
             return render(request, t, ctx)
 
