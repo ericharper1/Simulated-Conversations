@@ -24,15 +24,25 @@
     <div class="container">
       <h1> This is the Settings Page</h1>
         {% block content %}
-          <h1> CHANGE PASSWORD</h1>
-          <form method="post">
+          {% if messages %}
+          <ul class="messages">
+              {% for message in messages %}
+              <li {% if message.tags %} class="{{ message.tags }}"{% endif %}> {{ message }}</li>
+              {% endfor %}
+          </ul>
+          {% endif %}
+          <form id="change_password_form" method="post">
             {% csrf_token %}
             {{ change_password_form }}
-            {% if add_researcher_form %}
-              {{ add_researcher_form }}
-            {% endif %}
-            <button type="submit">Save changes</button>
+            <button type="submit" form="change_password_form">Save changes</button>
           </form>
+          {% if add_researcher_form %}
+            <form id="add_researcher_form" method="post">
+              {% csrf_token %}
+              {{ add_researcher_form }}
+              <button type="submit" form="add_researcher_form">Send Registration Email</button>
+            </form>
+          {% endif %}
         {% endblock %}
     </div> <!-- /container -->
 

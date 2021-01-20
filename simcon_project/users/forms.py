@@ -27,4 +27,4 @@ class AddResearcherForm(ModelForm):
 
     class Meta:
         model = Researcher
-        fields = ['first_name', 'last_name', 'email',]
+        fields = ['first_name', 'last_name', 'email']
