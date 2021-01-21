@@ -1,3 +1,4 @@
+//TODO: Validation... field length limits, one start node, maybe all paths lead to terminal?
 // Variables used to keep track of state that will eventually get sent to the backend
 let templateName = ""           // Holds template's name
 let templateDescription = ""    // Holds template's description
@@ -11,17 +12,28 @@ let currentNodeInFocus = null   // Used to keep track of what node is currently 
 // Holds all the information about a single step node
 class StepNode {
     constructor() {
-        // Items used for manipulations on the client side
+        // Items used only for manipulations on the client side
         this.index = 0                      // Used to keep track of node's index in the nodes map (redundant but convenient)
         this.nodeName = ""                  // Node's name
         this.lastChoiceIndex = 0            // Used to keep track of the last choice index used (used as key in responseChoices map below)
 
-        // Items to be propagated ot the backend
+        // Items to be propagated to the backend
         this.responseChoices = new Map()    // Array of choices for this node
         this.videoUrl = ""                  // Stores non-embeddable video url (url as user provides it)
         this.nodeDescription = ""           // Node's description
         this.isFirst = false                // True if node is first
         this.isTerminal = false             // True if node is terminal
+    }
+
+    // Used when submitting to the backend (when JSON.stringify() is called)
+    toJSON() {
+        return {
+            videoURL: this.videoUrl,
+            description: this.nodeDescription,
+            isFirst: this.isFirst,
+            isTerminal: this.isTerminal,
+            responseChoices: Array.from(this.responseChoices.values())
+        }
     }
 }
 
@@ -36,10 +48,57 @@ class Choice {
 }
 
 /**
+ * Submits constructed nodes objects to the backend effectively creating a new form.
+ */
+function submit() {
+
+    saveValuesIfNeeded()
+
+    // Retrieves csrftoken
+    let csrftoken = null
+    const cookieName = 'csrftoken'
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, cookieName.length + 1) === (cookieName + '=')) {
+                csrftoken = decodeURIComponent(cookie.substring(cookieName.length + 1));
+                break;
+            }
+        }
+    }
+
+    let postBody = JSON.stringify({
+        nodes: Array.from(nodes),
+        templateName: templateName,
+        templateDescription: templateDescription
+    })
+
+    // Make POST request
+    fetch(window.location.href, {
+        method: 'POST',
+        credentials: 'include',
+        mode: 'same-origin',
+        body: postBody,
+        headers: new Headers({
+           'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        })
+    }).then(function(response) {
+        if(response.ok) {
+            //TODO: handle
+        } else throw new Error(response.status)
+    }).catch(function (error) {
+        //TODO: handle
+    })
+}
+
+/**
  * Called on page load. Sets the listeners and initializes page content.
  */
 function loadState() {
-    $(document).ready()
+    $(document).ready() //TODO: figure out if calling like this blocks until ready
 
     addStepNode()
     updateNodeInFocus(1)
@@ -242,7 +301,7 @@ function addChoice(choiceIndex = -1, choiceDescription = "", selectedValue = 0) 
  * Marks one choice as 'selected' if 'selectedValue' parameter is not 0
  *
  * @param selectedValue index of the selected destination (0 if none selected)
- * @returns {string}
+ * @returns {string} HTML literal wtih the options to be inserted inside an 'insert' element
  */
 function generateSelectOptions(selectedValue = 0) {
     let literalToReturn
