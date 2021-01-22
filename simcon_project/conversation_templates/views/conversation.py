@@ -1,13 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.forms import modelformset_factory
-from conversation_templates.models.conv_template import ConversationTemplate
-from conversation_templates.models.template_node import TemplateNode
-from conversation_templates.models.template_node_response import TemplateNodeResponse
-from conversation_templates.models.template_response import TemplateResponse
+from conversation_templates.models import ConversationTemplate, TemplateNode, TemplateNodeResponse, TemplateResponse
 from conversation_templates.forms import TemplateNodeChoiceForm
-from users.models.student import Student
-from users.models.assignment import Assignment
+from users.models import Student, Assignment
 from datetime import datetime
 from django.contrib.auth.decorators import login_required
 import django_tables2 as tables
