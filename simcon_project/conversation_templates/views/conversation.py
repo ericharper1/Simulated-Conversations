@@ -28,7 +28,7 @@ def conversation_start(request, ct_id, assign_id):
     ctx = {}
     ct = ConversationTemplate.objects.get(id=ct_id)
     ct_node = TemplateNode.objects.get(parent_template=ct, start=True)
-    request.session['assign_id'] = assign_id
+    request.session['assign_id'] = assign_id  # Persisting assigment id with the user's current session
     ctx.update({'ct': ct})
     ctx.update({'ct_node': ct_node})
     t = '{}/conversation_start.html'.format(ct_templates_dir)
@@ -96,12 +96,14 @@ def conversation_end(request, ct_response_id):
     ctx = {}
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
     ct = ct_response.template
+    # Create a formset for transcriptions
     trans_formset = modelformset_factory(TemplateNodeResponse, fields=('transcription',), extra=0)
     t = '{}/conversation_end.html'.format(ct_templates_dir)
     ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response) \
         .order_by('position_in_sequence')
     formset = trans_formset(queryset=ct_node_responses)
     table_contents = []
+    # Create a dict to send to table creation method
     for response in ct_node_responses:
         table_contents.append({'node_description': response.template_node.description})
     ct_node_table = NodeDescriptionTable(table_contents)
@@ -127,6 +129,7 @@ def conversation_end(request, ct_response_id):
             return render(request, t, ctx)
 
     # GET request
+    # Delete session values so we don't have garbage data when user starts another conversation
     if 'ct_response_id' in request.session:
         del request.session['ct_response_id']
         request.session.modified = True
