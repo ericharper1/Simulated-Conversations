@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser, CustomUserManager
+from .models import CustomUser
 from users.models import Student, SubjectLabel
+import django_tables2 as tables
 
 
 
@@ -19,6 +20,16 @@ class NewStudentCreationForm(forms.Form):
     last_name = forms.CharField(max_length=100, required=True)
     password1 = forms.CharField(max_length=100, required=True)
     password2 = forms.CharField(max_length=100, required=True)
+
+
+class StudentTable(tables.Table):
+    class Meta:
+        model = Student
+
+
+class LabelTable(tables.Table):
+    class Meta:
+        model = SubjectLabel
 
 
 class SendEmail(forms.Form):

@@ -1,3 +1,4 @@
+{% load render_table from django_tables2 %}
 <!DOCTYPE html>
 <div lang="en">
   <head>
@@ -37,18 +38,7 @@
           {{ form2 }}
           <br/><input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
         </form>
-
-
-        <table class="table table-bordered">
-          <thread>
-            <tr>
-              <th scope="col">Label Name</th>
-              <th scope="col"># of Students</th>
-              <th scope="col"></th>
-            </tr>
-          </thread>
-        </table>
-
+        {% render_table lbl_table %}
       </div>
 
       <div class="col-md-6">
@@ -59,17 +49,7 @@
           {{ form }}
           <br/><input type="submit" class="btn btn-success" value="Add Student"><br/><br/>
         </form>
-
-
-        <table class="table table-bordered">
-          <thread>
-            <tr>
-              <th scope="col">Full Name</th>
-              <th scope="col">Email</th>
-              <th scope="col"></th>
-            </tr>
-          </thread>
-        </table>
+          {% render_table stu_table %}
 
       </div>
 

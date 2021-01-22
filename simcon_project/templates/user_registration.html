@@ -31,20 +31,23 @@
       <div class="col-md-6">
 
         <form method="post">
-          {%csrf_token%}
-          <p>Confirm Email:</p>
-          {{form.email}}<br/><br/>
-          <p>Full Name:</p>
-          <small>First Name:</small><br/>
-          {{form.first_name}}<br/>
-          <small>Last Name:</small><br/>
-          {{ form.last_name }}<br/><br/>
-          <p>Set Password:</p>
-          <small>Password:</small><br/>
-          {{form.password1}}<br/>
-          <small>Repeat Password:</small><br/>
-          {{form.password2}}<br/>
-          <button type="submit" class="btn btn-success">Submit</button><br/><br/>
+            {%csrf_token%}
+            <p>Confirm Email:</p>
+            {{form.email}}<br/><br/>
+
+            <p>Full Name:</p>
+            <small>First Name:</small><br/>
+            {{form.first_name}}<br/>
+            <small>Last Name:</small><br/>
+            {{ form.last_name }}<br/><br/>
+
+            <p>Set Password:</p>
+            <small>Password:</small><br/>
+            {{form.password1}}<br/>
+            <small>Repeat Password:</small><br/>
+            {{form.password2}}<br/>
+
+            <button type="submit" class="btn btn-success">Submit</button><br/><br/>
         </form>
       </div>
     {% for message in messages %}

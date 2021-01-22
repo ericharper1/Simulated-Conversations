@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse,
-  UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, SettingsView, TemplateStartView,\
+from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse,\
+    UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, SettingsView, TemplateStartView,\
   StudentManagement, UserRegistration
 from django.conf.urls import include
 from django.contrib.auth import views
@@ -39,6 +39,6 @@ urlpatterns = [
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
-    path('student-management/', StudentManagement, name="StudentManagement"),
-    path('user-registration/<uidb64>/<token>', UserRegistration, name="UserRegistration"),
+    path('student-management/<str:name>', StudentManagement, name="StudentManagement"),
+    path('user-registration/<uidb64>/<token>/', UserRegistration, name="UserRegistration"),
 ]
