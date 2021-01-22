@@ -17,7 +17,7 @@ class StudentHomeTable(tables.Table):
 
 
 @login_required(login_url="/accounts/login/")
-def student_view(request):
+def StudentView(request):
     contents = Assignment.objects.filter(students=request.user.id)\
         .values(
             'conversation_templates__name',
