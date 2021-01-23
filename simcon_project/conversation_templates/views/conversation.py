@@ -55,7 +55,6 @@ def conversation_step(request, ct_node_id):
                 return HttpResponseNotFound('Conversation Template Response does not exist for current session.')
             ct_response = TemplateResponse.objects.get(id=ct_response_id)
             TemplateNodeResponse.objects.create(
-                transcription='',
                 template_node=ct_node,
                 parent_template_response=ct_response,
                 selected_choice=choice,
