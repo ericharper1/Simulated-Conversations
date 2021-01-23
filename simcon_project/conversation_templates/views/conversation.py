@@ -5,7 +5,8 @@ from conversation_templates.models import ConversationTemplate, TemplateNode, Te
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
 from datetime import datetime
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from users.views.student_home import is_student
 import django_tables2 as tables
 
 # Globals
@@ -20,7 +21,7 @@ class NodeDescriptionTable(tables.Table):
 
 
 # Views
-@login_required(login_url='/accounts/login/')
+@user_passes_test(is_student)
 def conversation_start(request, ct_id, assign_id):
     """
     Renders entry page for a conversation. Student can choose to start the conversation or go back.
@@ -35,7 +36,7 @@ def conversation_start(request, ct_id, assign_id):
     return render(request, t, ctx)
 
 
-@login_required(login_url='/accounts/login/')
+@user_passes_test(is_student)
 def conversation_step(request, ct_node_id):
     """
     Renders each step in a conversation where a Student can watch the video, record a response,
@@ -90,7 +91,7 @@ def conversation_step(request, ct_node_id):
     return render(request, t, ctx)
 
 
-@login_required(login_url='/accounts/login/')
+@user_passes_test(is_student)
 def conversation_end(request, ct_response_id):
     ctx = {}
     ct_response = TemplateResponse.objects.get(id=ct_response_id)

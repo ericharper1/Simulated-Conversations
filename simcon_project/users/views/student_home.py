@@ -1,7 +1,11 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from users.models import Assignment
+from django.contrib.auth.decorators import user_passes_test
 import django_tables2 as tables
+
+
+def is_student(user):
+    return user.is_authenticated and not user.get_is_researcher()
 
 
 class StudentHomeTable(tables.Table):
@@ -16,7 +20,7 @@ class StudentHomeTable(tables.Table):
                                     verbose_name='Last Response')
 
 
-@login_required(login_url="/accounts/login/")
+@user_passes_test(is_student)
 def StudentView(request):
     contents = Assignment.objects.filter(students=request.user.id)\
         .values(
