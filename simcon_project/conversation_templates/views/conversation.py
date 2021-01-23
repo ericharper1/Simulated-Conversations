@@ -62,11 +62,10 @@ def conversation_step(request, ct_node_id):
                 position_in_sequence=ct_response.node_responses.count() + 1,
                 audio_response=None  # Don't have audio feature yet
             )
-            # Grab next node or direct to conversation end
-            response_object = choice.destination_node
-            if not response_object:
-                response_object = ct_response
-            return redirect(response_object)
+            # End conversation or go to next node
+            if ct_node.terminal:
+                return redirect(ct_response)
+            return redirect(choice.destination_node)
         else:
             # For debugging, will be removed or changed before deploying to production
             return HttpResponseNotFound('An invalid choice was selected')
