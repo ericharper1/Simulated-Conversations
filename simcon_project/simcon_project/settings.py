@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     # Third-party apps
     'bootstrap_modal_forms',
     'django_tables2',
-    'embed_video',
 
     # Our apps
     'users',
