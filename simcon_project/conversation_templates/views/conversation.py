@@ -5,6 +5,7 @@ from conversation_templates.models import ConversationTemplate, TemplateNode, Te
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
 from datetime import datetime
+# from dateutil.tz import tzlocal
 from django.contrib.auth.decorators import user_passes_test
 from users.views.student_home import is_student
 import django_tables2 as tables
@@ -119,6 +120,7 @@ def conversation_end(request, ct_response_id):
         if formset.is_valid():
             formset.save()
             if ct_response.completion_date is None:
+                # ct_response.completion_date = datetime.now(tzlocal())
                 ct_response.completion_date = datetime.now()
                 ct_response.save()
             return redirect('StudentView')

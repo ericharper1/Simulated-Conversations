@@ -24,7 +24,7 @@
         <form action="{{ ct_response.get_absolute_url }}" method="POST">
             {% csrf_token %}
             {{ formset.as_p }}
-            <button type="submit">Finish</button>
+            <button type="submit" class="btn btn-primary btn-sm">Finish</button>
         </form>
         {% if formset_error %}
             <p><strong>{{ formset_error }}</strong></p>
@@ -36,7 +36,4 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     </body>
     {% block extrahead %} {% endblock %}
-    <footer>
-        <p>Team camel_case_best_case</p>
-    </footer>
 </html>

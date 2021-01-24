@@ -24,7 +24,11 @@
         <form action="{{ ct_node.get_absolute_url }}" method="POST">
             {% csrf_token %}
             {{ choice_form }}
-            <button type="submit" class="btn btn-primary btn-sm">Next scene</button>
+            {% if ct_node.terminal %}
+                <button type="submit" class="btn btn-primary btn-sm">End Conversation</button>
+            {% else %}
+                <button type="submit" class="btn btn-primary btn-sm">Next Scene</button>
+            {% endif %}
         </form>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -33,7 +37,4 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
     </body>
     {% block extrahead %} {% endblock %}
-    <footer>
-        <p>Team camel_case_best_case</p>
-    </footer>
 </html>
