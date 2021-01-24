@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'bootstrap_modal_forms',
-    'bootstrap4',
     'django_tables2',
     'embed_video',
     'django_cleanup.apps.CleanupConfig',
