@@ -1,5 +1,8 @@
 {% load static %}
 {% load render_table from django_tables2 %}
+{% extends "student_base.html" %}
+{% block nav-studentssettingsView %}{% endblock %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -21,10 +24,10 @@
 
     {% block extrahead %} {% endblock %}
   </head>
-
   <body>
     <div class="container">
       <h1> This is the Settings Page</h1>
+    </div>
         {% block content %}
           {% if messages %}
           <ul class="messages">
@@ -62,3 +65,5 @@
     <!-- Placed at the end of the document so the pages load faster -->
   </body>
 </html>
+{% endblock %}
+
