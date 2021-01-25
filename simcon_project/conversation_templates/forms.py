@@ -1,5 +1,6 @@
 from django import forms
 from .models import TemplateFolder
+from .models import ConversationTemplate
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from bootstrap_modal_forms.forms import BSModalModelForm
 
@@ -20,6 +21,10 @@ class FolderCreationForm(BSModalModelForm):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Only show templates unique to each user in the form.
+        if self.request.user:
+            templates = ConversationTemplate.objects.filter(researcher=self.request.user.id)
+            self.fields['templates'].queryset = templates.all()
         self.fields['name'].required = True
 
     class Meta:

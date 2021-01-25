@@ -10,8 +10,16 @@
   </div>
 
   <div class="modal-body">
-    <p>Are you sure you want to delete
-      <strong>{{ template.name }}</strong>?</p>
+    <p>Are you sure you want to delete <strong>{{ template_name }}</strong>?</p>
+    <p>All responses related to this template will be deleted permanently.</p>
+    {% if assignments %}
+    <p>The following assignments will be removed:</p>
+    <ul>
+      {% for assignment in assignments %}
+      <li>{{ assignment }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
   </div>
 
   <div class="modal-footer">
