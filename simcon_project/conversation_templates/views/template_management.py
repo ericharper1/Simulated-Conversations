@@ -55,7 +55,7 @@ def is_researcher(user):
 
 
 @user_passes_test(is_researcher)
-def MainView(request):
+def main_view(request):
     """
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
@@ -79,7 +79,7 @@ def MainView(request):
 
 
 @user_passes_test(is_researcher)
-def FolderView(request, pk):
+def folder_view(request, pk):
     """
     Main template management view.
     Shows the all folders, but shows only templates belonging to the selected folder
@@ -112,7 +112,7 @@ class FolderCreateView(BSModalCreateView):
     success_message = 'Success: Folder was created.'
 
     def get_success_url(self):
-        success_url = RouteToCurrentFolder(self.request.META.get('HTTP_REFERER'))
+        success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
         return success_url
 
     def form_valid(self, form):
@@ -130,7 +130,7 @@ class FolderEditView(BSModalUpdateView):
     form_class = FolderCreationForm
 
     def get_success_url(self):
-        success_url = RouteToCurrentFolder(self.request.META.get('HTTP_REFERER'))
+        success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
         return success_url
 
 
@@ -183,7 +183,7 @@ class TemplateDeleteView(BSModalDeleteView):
         return redirect(reverse('management:main'))
 
 
-def RemoveTemplate(request, pk):
+def remove_template(request, pk):
     """
     Remove the chosen template from the current folder in view.
     This does not delete the template.
@@ -199,7 +199,7 @@ def RemoveTemplate(request, pk):
         return redirect(back)
 
 
-def RouteToCurrentFolder(previous_url):
+def route_to_current_folder(previous_url):
     """
     If a folder is being viewed returns to the folder view, else to main view
     Used to reroute generic editing views

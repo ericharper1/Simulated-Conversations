@@ -5,7 +5,7 @@ from datetime import date
 from users.models import Researcher, Student, Assignment, SubjectLabel
 from ..models import *
 from ..forms import FolderCreationForm
-from ..views.template_management import RouteToCurrentFolder, FolderEditView
+from ..views.template_management import route_to_current_folder, FolderEditView
 
 
 class TemplateManagementTests(TestCase):
@@ -45,12 +45,12 @@ class TemplateManagementTests(TestCase):
 
     def test_route_to_existing_url_with_folder(self):
         request = self.factory.get(reverse('management:folder_view', args=[self.folder.id]))
-        response = RouteToCurrentFolder(request.get_full_path())
+        response = route_to_current_folder(request.get_full_path())
         self.assertEqual(response, reverse('management:folder_view', args=[self.folder.id]))
 
     def test_route_to_existing_url_no_folder(self):
         request = self.factory.get(reverse('management:main'))
-        response = RouteToCurrentFolder(request.get_full_path())
+        response = route_to_current_folder(request.get_full_path())
         self.assertEqual(response, reverse('management:main'))
 
     def test_main_view(self):
