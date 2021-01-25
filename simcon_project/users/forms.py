@@ -23,6 +23,13 @@ class UpdateFeedback(forms.Form):
     feedback = forms.CharField(help_text="Enter new Feedback")
 
 
+class DeleteResearchersForm(ModelForm):
+
+    class Meta:
+        model = Researcher
+        fields = ('email',)
+
+
 class AddResearcherForm(ModelForm):
 
     class Meta:

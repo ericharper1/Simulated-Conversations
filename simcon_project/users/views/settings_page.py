@@ -6,10 +6,29 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
-from users.forms import AddResearcherForm
+import django_tables2 as tables
+from users.forms import AddResearcherForm, DeleteResearchersForm
 from users.models import Researcher
+
+
+class ResearcherTable(tables.Table):
+    """
+    Table of researchers showing their names and emails.
+    first_name is the first name of the researcher.
+    last_name is the last name of the researcher.
+    email_address is the email address of the researcher used for account creation.
+    """
+    """
+    class Meta:
+        model = Researcher
+        fields = ('first_name', 'last_name', 'email')
+    """
+    first_name = tables.Column(accessor='first_name')
+    last_name = tables.Column(accessor='last_name')
+    email_address = tables.Column(accessor='email')
+    delete = tables.TemplateColumn('<input type="checkbox" value="{{ record.email }}" />', verbose_name='Delete?')
 
 
 @login_required
@@ -34,10 +53,14 @@ def StandardSettingsView(request):
     :return:
     """
     change_password_form = ChangePassword(request)
+    researchers_table = None
+    delete_researchers_form = None
     add_researcher_form = None
 
     return render(request, 'settings_view.html', {
         'change_password_form': change_password_form,
+        'researchers_table': researchers_table,
+        'delete_researchers_form': delete_researchers_form,
         'add_researcher_form': add_researcher_form
     })
 
@@ -50,10 +73,14 @@ def AdminSettingsView(request):
     :return:
     """
     change_password_form = ChangePassword(request)
+    researchers_table = GetCurrentResearchers(request)
+    delete_researchers_form = DeleteSelectedResearchers(request)
     add_researcher_form = AddResearcher(request)
 
     return render(request, 'settings_view.html', {
         'change_password_form': change_password_form,
+        'researchers_table': researchers_table,
+        'delete_researchers_form': delete_researchers_form,
         'add_researcher_form': add_researcher_form
     })
 
@@ -80,13 +107,49 @@ def ChangePassword(request):
 
 
 @login_required
+def GetCurrentResearchers(request):
+    """
+    Queries database for all researchers and creates django_table showing their names and emails.
+    :param request:
+    :return:
+    """
+    researchers = Researcher.objects.all()
+    researchers_table = ResearcherTable(researchers)
+    researchers_table.paginate(page=request.GET.get("page", 1), per_page=10)
+    return researchers_table
+
+
+@login_required
+def DeleteSelectedResearchers(request):
+    """
+    If any researchers are selected in researchers_table, this will ask the user to confirm that they
+    want to remove them from the database. It displays count of researchers selected during confirmation.
+    :param request:
+    :return:
+    """
+    if request.method == 'POST':
+        delete_researchers_form = DeleteResearchersForm(request.POST)
+        if delete_researchers_form.is_valid():
+            email_address = delete_researchers_form.cleaned_data.get('email')
+            print(email_address)
+            user = Researcher.objects.filter(email=email_address).delete()
+            return DeleteResearchersForm()
+        else:
+            messages.error(request, 'No researchers have been selected.')
+            return DeleteResearchersForm()
+    else:
+        return DeleteResearchersForm()
+
+
+
+@login_required
 def AddResearcher(request):
     """
-    Displays and validates the AddResearcher form. If AddResearcher form is valid, an account registration email is
+    Creates and validates the AddResearcher form. If AddResearcher form is valid, an account registration email is
         generated and sent to the email address specified in the form. That email will contain a link
         for the user to register their account.
     :param request:
-    :return:
+    :return: the form to add new researchers.
     """
     if request.method == 'POST':
         add_researcher_form = AddResearcherForm(request.POST)

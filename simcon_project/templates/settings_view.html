@@ -1,3 +1,5 @@
+{% load static %}
+{% load render_table from django_tables2 %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -36,6 +38,15 @@
             {{ change_password_form }}
             <button type="submit" form="change_password_form">Save changes</button>
           </form>
+          <br>
+          {% if delete_researchers_form %}
+            <form id="delete_researchers_form" method="post">
+              {% csrf_token %}
+              {% render_table researchers_table %}
+              <button type="submit" form="delete_researchers_form">Delete Selected Researchers</button>
+            </form>
+          {% endif %}
+          <br>
           {% if add_researcher_form %}
             <form id="add_researcher_form" method="post">
               {% csrf_token %}
@@ -48,7 +59,6 @@
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
-
     <!-- Placed at the end of the document so the pages load faster -->
   </body>
 </html>
