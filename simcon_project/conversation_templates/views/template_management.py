@@ -1,8 +1,10 @@
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import user_passes_test
 from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
+from users.models import Researcher
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
 from django_tables2 import TemplateColumn, tables, RequestConfig, A
 import re
@@ -48,15 +50,20 @@ class FolderTable(tables.Table):
         fields = ['name']
 
 
+def is_researcher(user):
+    return user.is_authenticated and user.is_researcher
+
+
+@user_passes_test(is_researcher)
 def MainView(request):
     """
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
-    templates = ConversationTemplate.objects.all()
+    templates = get_templates(request.user)
     template_table = AllTemplateTable(templates)
 
-    folders = TemplateFolder.objects.all()
+    folders = TemplateFolder.objects.filter(researcher=request.user.id)
     folder_table = FolderTable(folders)
 
     RequestConfig(request, paginate=False).configure(template_table)
@@ -71,6 +78,7 @@ def MainView(request):
     return render(request, 'template_management/main_view.html', context)
 
 
+@user_passes_test(is_researcher)
 def FolderView(request, pk):
     """
     Main template management view.
@@ -80,7 +88,7 @@ def FolderView(request, pk):
     templates = current_folder.templates.all()
     template_table = FolderTemplateTable(templates)
 
-    folders = TemplateFolder.objects.all()
+    folders = TemplateFolder.objects.filter(researcher=request.user.id)
     folder_table = FolderTable(folders)
 
     RequestConfig(request, paginate=False).configure(template_table)
@@ -106,6 +114,11 @@ class FolderCreateView(BSModalCreateView):
     def get_success_url(self):
         success_url = RouteToCurrentFolder(self.request.META.get('HTTP_REFERER'))
         return success_url
+
+    def form_valid(self, form):
+        researcher = Researcher.objects.get(pk=self.request.user.id)
+        form.instance.researcher = researcher
+        return super().form_valid(form)
 
 
 class FolderEditView(BSModalUpdateView):
@@ -196,3 +209,8 @@ def RouteToCurrentFolder(previous_url):
         return reverse_lazy('management:folder_view', args=[folder_id])
     else:
         return reverse_lazy('management:main')
+
+
+def get_templates(user):
+    researcher = get_object_or_404(Researcher, email=user)
+    return ConversationTemplate.objects.filter(researcher=researcher)
