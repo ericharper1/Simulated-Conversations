@@ -1,6 +1,5 @@
 from django import forms
-from .models.template_node_choice import TemplateNodeChoice
-from .models import TemplateFolder
+from .models import TemplateFolder, TemplateNodeChoice
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 

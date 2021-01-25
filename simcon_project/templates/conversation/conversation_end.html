@@ -21,14 +21,37 @@
         <h3 style="text-align:right;">{{ request.user }}</h3>
         <p>{{ ct.description }}</p>
         {%  render_table ct_node_table %}
-        <form action="{{ ct_response.get_absolute_url }}" method="POST">
+        <div id="error"></div>
+        <form action="{{ ct_response.get_absolute_url }}" method="POST" id="trans-form">
             {% csrf_token %}
-            {{ formset.as_p }}
+            {% for response in ct_node_responses %}
+                <div>
+                    <label for="{{ response.id }}">Transcription: </label>
+                    <input type="text" name="{{ response.id }}" id="{{ response.id }}"><br>
+                </div>
+            {% endfor %}
             <button type="submit" class="btn btn-primary btn-sm">Finish</button>
         </form>
-        {% if formset_error %}
-            <p><strong>{{ formset_error }}</strong></p>
-        {% endif %}
+        <script>
+            const form = document.getElementById('trans-form')
+            const errorElement = document.getElementById('error')
+
+            form.addEventListener('submit', (e) => {
+                let messages = []
+                let transcription = ''
+                {% for response in ct_node_responses %}
+                    transcription = document.getElementById("{{ response.id }}")
+                    if (transcription.value.length > 1000) {
+                        messages.push('Transcription is too long')
+                    }
+                {% endfor %}
+                if (messages.length > 0) {
+                    console.log(messages.length)
+                    e.preventDefault()
+                    errorElement.innerText = messages.join(', ')
+                }
+            })
+        </script>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>

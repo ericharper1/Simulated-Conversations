@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
-from django.forms import modelformset_factory
 from conversation_templates.models import ConversationTemplate, TemplateNode, TemplateNodeResponse, TemplateResponse
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
@@ -28,12 +27,14 @@ def conversation_start(request, ct_id, assign_id):
     Renders entry page for a conversation. Student can choose to start the conversation or go back.
     """
     ctx = {}
+    t = '{}/conversation_start.html'.format(ct_templates_dir)
     ct = ConversationTemplate.objects.get(id=ct_id)
     ct_node = TemplateNode.objects.get(parent_template=ct, start=True)
     request.session['assign_id'] = assign_id  # Persisting assigment id with the user's current session
-    ctx.update({'ct': ct})
-    ctx.update({'ct_node': ct_node})
-    t = '{}/conversation_start.html'.format(ct_templates_dir)
+    ctx.update({
+        'ct': ct,
+        'ct_node': ct_node,
+    })
     return render(request, t, ctx)
 
 
@@ -44,6 +45,7 @@ def conversation_step(request, ct_node_id):
     and select a choice.
     """
     ctx = {}
+    t = '{}/conversation_step.html'.format(ct_templates_dir)
     ct_node = TemplateNode.objects.get(id=ct_node_id)
 
     # POST request
@@ -87,47 +89,35 @@ def conversation_step(request, ct_node_id):
         'ct_node': ct_node,
         'choice_form': choice_form,
     })
-    t = '{}/conversation_step.html'.format(ct_templates_dir)
     return render(request, t, ctx)
 
 
 @user_passes_test(is_student)
 def conversation_end(request, ct_response_id):
     ctx = {}
+    t = '{}/conversation_end.html'.format(ct_templates_dir)
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
     ct = ct_response.template
-    # Create a formset for transcriptions
-    trans_formset = modelformset_factory(TemplateNodeResponse, fields=('transcription',), extra=0)
-    t = '{}/conversation_end.html'.format(ct_templates_dir)
+
     ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response) \
         .order_by('position_in_sequence')
-    formset = trans_formset(queryset=ct_node_responses)
-    table_contents = []
+
     # Create a dict to send to table creation method
+    table_contents = []
     for response in ct_node_responses:
         table_contents.append({'node_description': response.template_node.description})
     ct_node_table = NodeDescriptionTable(table_contents)
-    ctx.update({
-        'ct': ct,
-        'formset': formset,
-        'ct_response': ct_response,
-        'ct_node_table': ct_node_table,
-    })
 
     # POST request
     if request.method == 'POST':
-        formset = trans_formset(request.POST)
-        if formset.is_valid():
-            formset.save()
-            if ct_response.completion_date is None:
-                # ct_response.completion_date = datetime.now(tzlocal())
-                ct_response.completion_date = datetime.now()
-                ct_response.save()
-            return redirect('StudentView')
-        else:
-            # return page with errors
-            ctx.update({'formset_error': '*Transcription fields are required.'})
-            return render(request, t, ctx)
+        for response in ct_node_responses:
+            response.transcription = request.POST.get(str(response.id), '')
+            response.save()
+        if ct_response.completion_date is None:
+            # ct_response.completion_date = datetime.now(tzlocal())
+            ct_response.completion_date = datetime.now()
+            ct_response.save()
+        return redirect('StudentView')
 
     # GET request
     # Delete session values so we don't have garbage data when user starts another conversation
@@ -137,4 +127,10 @@ def conversation_end(request, ct_response_id):
     if 'assign_id' in request.session:
         del request.session['assign_id']
         request.session.modified = True
+    ctx.update({
+        'ct': ct,
+        'ct_response': ct_response,
+        'ct_node_table': ct_node_table,
+        'ct_node_responses': ct_node_responses
+    })
     return render(request, t, ctx)
