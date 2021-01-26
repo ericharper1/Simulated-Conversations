@@ -27,34 +27,30 @@
   </head>
   <body>
     <div class="container">
-      <h1> This is the Settings Page</h1>
-          {% if messages %}
-          <ul class="messages">
-              {% for message in messages %}
-              <li {% if message.tags %} class="{{ message.tags }}"{% endif %}> {{ message }}</li>
-              {% endfor %}
-          </ul>
-          {% endif %}
+      <h1>Settings</h1>
+        {% for message in messages %}
+            <div class="alert alert-warning">
+                <a class="close" href="#" data-dismiss="alert">×</a>
+                {{ message }}
+            </div>
+        {% endfor %}
           <form id="change_password_form" method="post">
             {% csrf_token %}
             {{ change_password_form }}
-            <button type="submit" form="change_password_form">Save changes</button>
+            <button type="submit" form="change_password_form" name="change_password">Save changes</button>
           </form>
           <br>
-          {% if delete_researchers_form %}
-            <form id="delete_researchers_form" method="post">
-              {% csrf_token %}
-              {% render_table researchers_table %}
-            </form>
-          {% endif %}
-          <br>
-          {% if add_researcher_form %}
+        {% if researchers_table %}
+            {% render_table researchers_table %}
+        {% endif %}
+        <br>
+        {% if add_researcher_form %}
             <form id="add_researcher_form" method="post">
               {% csrf_token %}
               {{ add_researcher_form }}
-              <button type="submit" form="add_researcher_form">Send Registration Email</button>
+              <button type="submit" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
             </form>
-          {% endif %}
+        {% endif %}
     </div> <!-- /container -->
 
     <!-- Bootstrap core JavaScript

@@ -14,7 +14,7 @@ def StudentSettingsView(request):
     """
     change_password_form = ChangePassword(request)
 
-    return render(request, 'StudentSettingsView.html', {
+    return render(request, 'student_settings_view.html', {
         'change_password_form': change_password_form,
     })
 

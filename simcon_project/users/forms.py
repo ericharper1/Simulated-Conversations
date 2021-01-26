@@ -23,11 +23,12 @@ class UpdateFeedback(forms.Form):
     feedback = forms.CharField(help_text="Enter new Feedback")
 
 
-class DeleteResearchersForm(ModelForm):
-
-    class Meta:
-        model = Researcher
-        fields = ('email',)
+class NewResearcherCreationForm(forms.Form):
+    email = forms.EmailField(max_length=254, required=True)
+    first_name = forms.CharField(max_length=100, required=True)
+    last_name = forms.CharField(max_length=100, required=True)
+    password1 = forms.CharField(max_length=100, required=True)
+    password2 = forms.CharField(max_length=100, required=True)
 
 
 class AddResearcherForm(ModelForm):

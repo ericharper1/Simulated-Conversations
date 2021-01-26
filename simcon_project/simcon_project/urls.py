@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, \
-    UpdateNodeResponseFeedback, TemplateStartView, ResearcherUserView, StudentSettingsView, StudentUserView
+    UpdateNodeResponseFeedback, TemplateStartView, ResearcherUserView, StudentSettingsView, StudentUserView, \
+    ResearcherRegistration
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -30,6 +31,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
+    path('researcher-registration/<uidb64>/<token>/', ResearcherRegistration, name="ResearcherRegistration"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('researcher-view/template-management/', include('conversation_templates.urls'), name="TemplateManagementView"),
     path('user-view/', ResearcherUserView, name="ResearcherUserView"),
