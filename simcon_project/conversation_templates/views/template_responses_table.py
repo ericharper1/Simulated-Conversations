@@ -1,9 +1,14 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django_tables2 import tables, RequestConfig, SingleTableView
 from django_tables2.export.views import TableExport
 from conversation_templates.models import ConversationTemplate, TemplateResponse
 from conversation_templates.forms import SelectTemplateForm
+
+
+def is_researcher(user):
+    return user.is_authenticated and user.is_researcher
 
 
 class ResponseTable(tables.Table):
@@ -15,10 +20,13 @@ class ResponseTable(tables.Table):
         fields = ['first', 'last', 'completion_date']
 
 
-class TemplateResponsesView(SingleTableView):
+class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTableView):
     model = TemplateResponse
     table_class = ResponseTable
     template_name = "template_all_responses_view.html"
+
+    def test_func(self):
+        return self.request.user.is_authenticated and self.request.user.is_researcher
 
     def get(self, request, pk):
         """
@@ -27,6 +35,8 @@ class TemplateResponsesView(SingleTableView):
         Columns: student.first_name, student.last_name, template_response.completion_date,
                  and template_node_responses with template_node.description as headers (this is
                  dynamically created since each template has different number of nodes")
+
+        TODO: make sure incomplete responses aren't shown
         """
         template = ConversationTemplate.objects.get(pk=pk)
         descriptions = []  # Description of template node used for column header
@@ -71,5 +81,5 @@ class TemplateResponsesView(SingleTableView):
 
     def post(self, request, pk):
         # Note: keep pk even if it isn't used since the url requires it.
-        # Route to selected template_responses_table from the choicefield
+        # Redirect to selected template_responses_table from the choicefield
         return redirect(reverse('TemplateResponsesView', args=[request.POST['templates']]))
