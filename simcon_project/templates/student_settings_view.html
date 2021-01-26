@@ -1,5 +1,5 @@
 {% extends "student_base.html" %}
-{% block nav-settingsView %}{% endblock %}
+{% block nav-studentssettingsView %}{% endblock %}
 {% load static %}
 {% load render_table from django_tables2 %}
 {% block content %}
@@ -28,13 +28,12 @@
   <body>
     <div class="container">
       <h1> This is the Settings Page</h1>
-          {% if messages %}
-          <ul class="messages">
-              {% for message in messages %}
-              <li {% if message.tags %} class="{{ message.tags }}"{% endif %}> {{ message }}</li>
-              {% endfor %}
-          </ul>
-          {% endif %}
+            {% for message in messages %}
+                <div class="alert alert-warning">
+                    <a class="close" href="#" data-dismiss="alert">×</a>
+                    {{ message }}
+                </div>
+            {% endfor %}
           <form id="change_password_form" method="post">
             {% csrf_token %}
             {{ change_password_form }}
