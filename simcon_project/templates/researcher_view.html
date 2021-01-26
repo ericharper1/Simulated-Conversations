@@ -20,10 +20,23 @@
     </title>
   </head>
   <body>
-    <div style="display: inline-block">
+  <div>
+    <form method="GET" action="">
+      <button type="submit" style="float: right;"> Search </button>
+      <input type="text" name="searchParam" placeholder="Search" style="float: right;">
+    </form>
+    <br> <br>
+  </div>
+<div style="display: inline-block">
 
 <div class="table-container" style="display: inline-block; float: left;"> 
+  {% if searchResponses %}               
+     {% for searchResponse in searchResponses %}               
+        <li>{{ searchResponse.completion_date }} - {{ searchResponse.student }} - {{ searchResponse.template }} - {{ searchResponse.assignment }} - {{ searchResponse.feedback }}  </li>           
+     {% endfor %} 
+{% else %}
   {% render_table responseTable %}
+{% endif %}
 </div>
 <div class="delete-buttons" style="display: inline-block">
   <br>
