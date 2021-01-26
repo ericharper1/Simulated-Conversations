@@ -16,4 +16,5 @@ class TemplateNode(models.Model):
     terminal = models.BooleanField(default=False)
     parent_template = models.ForeignKey('conversation_templates.ConversationTemplate', default=0, related_name='template_nodes', on_delete=models.CASCADE)
 
-    
+    def __str__(self):
+        return f"{self.parent_template}: {self.description}"
