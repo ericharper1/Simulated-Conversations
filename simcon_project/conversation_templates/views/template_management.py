@@ -1,8 +1,10 @@
 from django.views.generic import DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import user_passes_test
 from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
+from users.models import Researcher
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
 from django_tables2 import TemplateColumn, tables, RequestConfig, A
 import re
@@ -49,15 +51,20 @@ class FolderTable(tables.Table):
         fields = ['name']
 
 
+def is_researcher(user):
+    return user.is_authenticated and user.is_researcher
+
+
+@user_passes_test(is_researcher)
 def main_view(request):
     """
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
-    templates = ConversationTemplate.objects.all()
+    templates = get_templates(request.user)
     template_table = AllTemplateTable(templates)
 
-    folders = TemplateFolder.objects.all()
+    folders = TemplateFolder.objects.filter(researcher=request.user.id)
     folder_table = FolderTable(folders)
 
     RequestConfig(request, paginate=False).configure(template_table)
@@ -72,6 +79,7 @@ def main_view(request):
     return render(request, 'template_management/main_view.html', context)
 
 
+@user_passes_test(is_researcher)
 def folder_view(request, pk):
     """
     Main template management view.
@@ -81,7 +89,7 @@ def folder_view(request, pk):
     templates = current_folder.templates.all()
     template_table = FolderTemplateTable(templates)
 
-    folders = TemplateFolder.objects.all()
+    folders = TemplateFolder.objects.filter(researcher=request.user.id)
     folder_table = FolderTable(folders)
 
     RequestConfig(request, paginate=False).configure(template_table)
@@ -107,6 +115,11 @@ class FolderCreateView(BSModalCreateView):
     def get_success_url(self):
         success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
         return success_url
+
+    def form_valid(self, form):
+        researcher = Researcher.objects.get(pk=self.request.user.id)
+        form.instance.researcher = researcher
+        return super().form_valid(form)
 
 
 class FolderEditView(BSModalUpdateView):
@@ -142,6 +155,34 @@ class TemplateDeleteView(BSModalDeleteView):
     success_message = 'Success: Book was deleted.'
     success_url = reverse_lazy('management:main')
 
+    def get(self, request, *args, **kwargs):
+        """
+        Override post to send template name and name of assignment that
+        will be removed as context to the template
+        """
+        super().get(request, *args, **kwargs)
+        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
+        assignments = this_template.assignments.all()
+        to_delete = []
+        for assignment in assignments:
+            if assignment.conversation_templates.all().count() == 1:
+                to_delete.append(assignment.name)
+        context = {"template_name": this_template.name, "assignments": to_delete}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Override post to remove assignment if the template being deleted
+        is the only one in the assignment.
+        """
+        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
+        assignments = this_template.assignments.all()
+        for assignment in assignments:
+            if assignment.conversation_templates.all().count() == 1:
+                assignment.delete()
+        super().post(request, *args, **kwargs)
+        return redirect(reverse('management:main'))
+
 
 def remove_template(request, pk):
     """
@@ -168,3 +209,8 @@ def route_to_current_folder(previous_url):
         return reverse_lazy('management:folder_view', args=[folder_id])
     else:
         return reverse_lazy('management:main')
+
+
+def get_templates(user):
+    researcher = get_object_or_404(Researcher, email=user)
+    return ConversationTemplate.objects.filter(researcher=researcher)
