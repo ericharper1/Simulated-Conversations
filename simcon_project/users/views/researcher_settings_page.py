@@ -21,6 +21,7 @@ class ResearcherTable(tables.Table):
     first_name is the first name of the researcher.
     last_name is the last name of the researcher.
     email_address is the email address of the researcher used for account creation.
+    delete is a button to display a modal to delete the researcher from the database
     """
     first_name = tables.Column(accessor='first_name')
     last_name = tables.Column(accessor='last_name')
