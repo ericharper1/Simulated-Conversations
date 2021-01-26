@@ -29,7 +29,7 @@ class AllTemplateTable(tables.Table):
     Only used when all templates are displayed.
     """
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
-    name = tables.columns.LinkColumn('management:folder_view', args=[A('pk')])
+    name = tables.columns.LinkColumn('TemplateResponsesView', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
