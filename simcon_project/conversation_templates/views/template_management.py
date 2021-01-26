@@ -18,6 +18,7 @@ class FolderTemplateTable(tables.Table):
     """
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
                              extra_context={"in_folder": True})
+    name = tables.columns.LinkColumn('TemplateResponsesView', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
