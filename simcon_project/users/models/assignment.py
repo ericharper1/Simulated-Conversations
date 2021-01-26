@@ -10,7 +10,7 @@ class Assignment(models.Model):
     students = models.ManyToManyField('users.Student', related_name='assignments')
     researcher = models.ForeignKey('users.Researcher', default=0, related_name='assignments', on_delete=models.CASCADE)
     # labels are not part of MVP
-    subject_labels = models.ManyToManyField('users.SubjectLabel', related_name='assignments')
+    subject_labels = models.ManyToManyField('users.SubjectLabel', related_name='assignments', blank=True)
 
     def get_name(self):
         return self.name

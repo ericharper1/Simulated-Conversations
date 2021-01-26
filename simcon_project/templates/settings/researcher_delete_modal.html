@@ -1,0 +1,30 @@
+{% block content %}
+<form method="post" action="">
+  {% csrf_token %}
+
+  <div class="modal-header">
+    <h3 class="modal-title">Delete Researcher</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <p>Are you sure you want to delete <strong>{{ template_name }}</strong>?</p>
+    <p>All responses related to this template will be deleted permanently.</p>
+    {% if assignments %}
+    <p>The following assignments will be removed:</p>
+    <ul>
+      {% for assignment in assignments %}
+      <li>{{ assignment }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </div>
+
+</form>
+{% endblock %}
