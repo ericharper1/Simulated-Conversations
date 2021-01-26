@@ -10,16 +10,14 @@
   </div>
 
   <div class="modal-body">
-    <p>Are you sure you want to delete <strong>{{ template_name }}</strong>?</p>
-    <p>All responses related to this template will be deleted permanently.</p>
-    {% if assignments %}
-    <p>The following assignments will be removed:</p>
+    <p>Are you sure you want to delete <strong>{{ email }}</strong> and their associated data?</p>
+    <p>This will permanently remove the following:</p>
     <ul>
-      {% for assignment in assignments %}
-      <li>{{ assignment }}</li>
-      {% endfor %}
+      <li>All assignments they created</li>
+      <li>All templates they created</li>
+      <li>All students they added</li>
+      <li>All responses completed by those students</li>
     </ul>
-    {% endif %}
   </div>
 
   <div class="modal-footer">

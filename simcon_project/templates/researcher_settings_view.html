@@ -1,7 +1,7 @@
 {% extends "researcher_base.html" %}
+{% block nav-settingsView %}{% endblock %}
 {% load static %}
 {% load render_table from django_tables2 %}
-{% block nav-settingsView %}{% endblock %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
@@ -21,13 +21,13 @@
     <title>
     {% block title %}Simulated Conversations | Settings{% endblock %}
     </title>
+      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
 
     {% block extrahead %} {% endblock %}
   </head>
   <body>
     <div class="container">
       <h1> This is the Settings Page</h1>
-    </div>
           {% if messages %}
           <ul class="messages">
               {% for message in messages %}
@@ -60,6 +60,30 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+<!-- Code needed for the modal to work properly.
+             Content in folder_creation_modal.html is rendered between "#modal-content" div
+        -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $(".bs-modal").each(function () {
+                $(this).modalForm({
+                    formURL: $(this).data('form-url')
+                });
+            });
+        });
+        </script>
   </body>
 </html>
 {% endblock %}

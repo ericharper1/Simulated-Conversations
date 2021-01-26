@@ -1,0 +1,7 @@
+<!--
+    Delete researcher button for admin-specific researcher-settings view
+ -->
+{% block content %}
+    <button id="delete-template" class="bs-modal btn btn-danger" type="button" name="button"
+            data-form-url="{% url 'settings:delete_researcher' record.id %}">Delete</button>
+{% endblock %}

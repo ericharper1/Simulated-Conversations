@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse_lazy
 import django_tables2 as tables
@@ -22,33 +22,38 @@ class ResearcherTable(tables.Table):
     last_name is the last name of the researcher.
     email_address is the email address of the researcher used for account creation.
     """
-    """
-    class Meta:
-        model = Researcher
-        fields = ('first_name', 'last_name', 'email')
-    """
     first_name = tables.Column(accessor='first_name')
     last_name = tables.Column(accessor='last_name')
     email_address = tables.Column(accessor='email')
-    html_delete_button = '<a href="{% url \'settings:delete_researcher\'  email=  %}"><span ' \
-                         'class="glyphicon ' \
-                         'glyphicon-trash"></span></a>'
-    delete = tables.Column(verbose_name='Delete?',
-                           linkify={'viewname': 'settings:delete_researcher',
-                                    'args': [tables.A('record__id')],
-                                    'text': "<span class=\"glyphicon glyphicon-trash\">"
-                                    })
+    """
+    commented out lines to use smaller trash icon if we want to later.
+    html_delete_button = '<a href="{% url \'settings:delete_researcher\' record.id %}" class="delete-icon" ' \
+                         'data-form-url="{% url \'settings:delete_researcher\' record.id %}">' \
+                         '<span class="glyphicon glyphicon-trash"></span></a>'
+    delete = tables.TemplateColumn(html_delete_button, verbose_name='')
+    """
+    delete = tables.TemplateColumn(verbose_name='', template_name='settings/buttons_template.html')
 
 
 class ResearcherDeleteView(BSModalDeleteView):
     """
-    Deletes a template. Confirmation modal pops up to make sure
-    the user wants to delete a template.
+    Deletes a researcher. Confirmation modal pops up to make sure
+    the user wants to delete the researcher.
     """
     model = Researcher
     template_name = 'settings/researcher_delete_modal.html'
-    success_message = 'Success: Book was deleted.'
+    success_message = 'Success: Researcher was deleted.'
     success_url = reverse_lazy('settings:main')
+
+    def get(self, request, *args, **kwargs):
+        """
+        Override post to send email address of researcher that
+        will be removed as context to the template
+        """
+        super().get(request, *args, **kwargs)
+        researcher = Researcher.objects.get(pk=self.kwargs['pk'])
+        context = {"researcher": researcher}
+        return render(request, self.template_name, context)
 
 
 def is_researcher(user):
