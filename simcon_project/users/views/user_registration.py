@@ -8,7 +8,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 
 
-def UserRegistration(request, uidb64, token):
+def UserRegistration(request, uidb64):
         if request.method == "POST":
                 form = NewStudentCreationForm(request.POST)
 
@@ -21,9 +21,8 @@ def UserRegistration(request, uidb64, token):
 
                                 if Student.objects.filter(email=email, registered=False):
                                         user = Student.objects.get(email=email, registered=False)
-                                        #print(default_token_generator.check_token(user, token))
 
-                                        if (uidb64 == urlsafe_base64_encode(force_bytes(user.pk))): #& default_token_generator.check_token(user, token):
+                                        if uidb64 == urlsafe_base64_encode(force_bytes(user.pk)):
                                                 user = Student.objects.get(email=email, registered=False)
                                                 user.set_password(form.cleaned_data.get('password1'))
                                                 user.first_name = form.cleaned_data.get('first_name')

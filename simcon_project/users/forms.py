@@ -33,6 +33,7 @@ class LabelTable(tables.Table):
 
 
 class SendEmail(forms.Form):
+    new = forms.BooleanField(required=False)
     student_email = forms.EmailField(max_length=254, required=True)
 
 

@@ -40,5 +40,6 @@ urlpatterns = [
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
     path('student-management/<str:name>', StudentManagement, name="StudentManagement"),
-    path('user-registration/<uidb64>/<token>/', UserRegistration, name="UserRegistration"),
+    path('student-management/', StudentManagement, name="StudentManagement"),
+    path('user-registration/<uidb64>/', UserRegistration, name="UserRegistration"),
 ]

@@ -8,6 +8,8 @@ from users.models import Student, Researcher
 from django.core.mail import send_mail
 from users.models import SubjectLabel
 import django_tables2 as tables
+from django_tables2.config import RequestConfig
+from django.contrib import messages
 
 
 class StudentList(tables.Table):
@@ -27,69 +29,79 @@ class AllStudentList(tables.Table):
 class LabelList(tables.Table):
     label_name = tables.Column(linkify={"viewname": "StudentManagement", "args": [tables.A("label_name")]},
                                accessor='label_name', verbose_name='Label Name')
-    students = tables.Column(verbose_name='# of Students')
+    #students = tables.Column(verbose_name='# of Students')
 
 
 def StudentManagement(request, name):
-    if not SubjectLabel.objects.filter(label_name=name):
-        name = 'All_Students'
+    added_by = Researcher.objects.get(email=request.user)
+    print(name)
+    #print(Student.objects.filter(added_by=added_by))
 
-    lbl_contents = SubjectLabel.objects.filter().values(
-        'label_name',
-        'students')
-    label_table = LabelList(lbl_contents)
-    label_table.paginate(page=request.GET.get("page", 1), per_page=10)
+    if not SubjectLabel.objects.filter(label_name=name, researcher=added_by):
+        name = "All Students"
 
-    if name != 'All_Students':
-        stu_contents = SubjectLabel.objects.filter(label_name=name).values(
+    if not SubjectLabel.objects.filter(label_name='All Students', researcher=added_by):
+        test = SubjectLabel().create_label('All Students', added_by)
+        all_students = Student.objects.filter(added_by=added_by)
+        for stud in all_students:
+            test.students.add(stud)
+
+    lbl_contents = SubjectLabel.objects.filter(researcher=added_by).values(
+        'label_name')
+     #   'students')
+    label_table = LabelList(lbl_contents, prefix="1-")
+    RequestConfig(request, paginate={"per_page": 10}).configure(label_table)
+
+    stu_contents = SubjectLabel.objects.filter(label_name=name).values(
             'students__first_name',
             'students__last_name',
             'students__email',
             'students__registered')
-        student_table = StudentList(stu_contents)
-        student_table.paginate(page=request.GET.get("page", 1), per_page=10)
-
-    else:
-        stu_contents = Student.objects.filter(is_active=True, ).values(
-            'first_name',
-            'last_name',
-            'email',
-            'registered')
-        student_table = AllStudentList(stu_contents)
-        student_table.paginate(page=request.GET.get("page", 1), per_page=10)
+    student_table = StudentList(stu_contents, prefix="2-")
+    RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
 
     if request.method == "POST":
         if request.POST.get('student_email'):
             form = SendEmail(request.POST)
 
             if form.is_valid():
+                new = form.cleaned_data.get('new')
                 email = form.cleaned_data.get('student_email')
-                first_name = ""
-                last_name = ""
-                password = ""
-                added_by = Researcher.objects.get(email=request.user)
-                user = Student.objects.create(email=email, first_name=first_name, last_name=last_name, password=password, added_by=added_by, )
-                user.set_unusable_password()
+                if new:
+                    first_name = ""
+                    last_name = ""
+                    password = ""
+                    user = Student.objects.create(email=email, first_name=first_name, last_name=last_name, password=password, added_by=added_by, )
+                    user.set_unusable_password()
 
-                current_site = get_current_site(request)
-                subject = 'Activate Your Simulated conversations account'
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-                site = current_site.domain
+                    label = SubjectLabel.objects.get(label_name=name, researcher=added_by)
+                    label.students.add(user)
+                    current_site = get_current_site(request)
+                    subject = 'Activate Your Simulated conversations account'
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
+                    token = default_token_generator.make_token(user)
+                    site = current_site.domain
 
-                message = 'Hi, \nPlease register here: \nhttp://' + site + '/user-registration/'\
-                          + uid + '/' + token + '\n'
-                send_mail(subject, message, 'simulated.conversation@mail.com', [email], fail_silently=False)
+                    message = 'Hi, \nPlease register here: \nhttp://' + site + '/user-registration/'\
+                              + uid + '\n'
+                    send_mail(subject, message, 'simulated.conversation@mail.com', [email], fail_silently=False)
+
+                else:
+                    user = Student.objects.get(email=email)
+                    print(name)
+                    label = SubjectLabel.objects.get(label_name=name, researcher=added_by)
+                    label.students.add(user)
 
         if request.POST.get('label_name'):
             savefldr = NewLabel(request.POST)
             if savefldr.is_valid():
-
-                researcher = Researcher.objects.get(email=request.user)
                 label_name = savefldr.cleaned_data.get("label_name")
 
-                test = SubjectLabel().create_label(label_name, researcher)
+                if not SubjectLabel.objects.filter(label_name=label_name, researcher=added_by):
+                    SubjectLabel().create_label(label_name, added_by)
+                else:
+                    messages.error(request, 'Label name already exists',
+                                   fail_silently=False)
 
-                test.students.add(Student.objects.get(email='test1@gmail.com'))
-
-    return render(request, 'student_management.html', {"form": SendEmail(), "form2": NewLabel(), 'stu_table': student_table, 'lbl_table': label_table})
+    return render(request, 'student_management.html',  {"name":name, "form": SendEmail(), "form2": NewLabel(),
+                                                        'stu_table': student_table, 'lbl_table': label_table})

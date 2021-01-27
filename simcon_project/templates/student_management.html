@@ -33,24 +33,31 @@
         <p>Add New Label:</p>
 
 
-        <form action='/student-management/' method="post">
+        <form action='/student-management/{{ name }}' method="post">
           {%csrf_token%}
           {{ form2 }}
           <br/><input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
         </form>
-        {% render_table lbl_table %}
+              {% for message in messages %}
+
+                    <div class="alert alert-warning">
+                        <a class="close" href="#" data-dismiss="alert">×</a>
+
+                        {{ message }}
+
+                    </div>
+            {% endfor %}
+          {% render_table lbl_table %}
       </div>
 
       <div class="col-md-6">
-        <p>Add New Student:</p>
-
-        <form action='/student-management/' method="post">
+        <p>Add Student to label:</p>
+        <form action='/student-management/{{ name }}' method="post">
           {%csrf_token%}
           {{ form }}
           <br/><input type="submit" class="btn btn-success" value="Add Student"><br/><br/>
         </form>
           {% render_table stu_table %}
-
       </div>
 
    </div>
