@@ -14,6 +14,15 @@
         <style type="text/css">
             form {display:inline; margin:0px; padding:0px;}
         </style>
+        <script type="text/javascript">
+            window.onunload = function () { null };
+            function preventBack() {
+                window.history.forward();
+            }
+                Promise.resolve('hello').then(function() {
+                    return setTimeout("preventBack()", 0);
+                }).then(console.log.bind(console))
+        </script>
     </head>
     <body>
         <h1>Simulated Conversations</h1>
@@ -35,46 +44,6 @@
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-        <script>
-            navigator.mediaDevices.getUserMedia({ audio: true })
-              .then(stream => {
-                const mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.start();
-                const audioChunks = [];
-
-                mediaRecorder.addEventListener("dataavailable", event => {
-                  audioChunks.push(event.data);
-                });
-                setTimeout(() => {
-                    mediaRecorder.stop();
-                }, 3000);
-              });
-{#            $(document).ready(function () {#}
-{#                $("#choice-form").submit(function () {#}
-{#                    $(".btn").attr("disabled", true);#}
-{#                    return true#}
-{#                });#}
-        </script>
-{#        <script>#}
-{#            let radios = document.getElement('choices');#}
-{#            let disable_page;#}
-{#            console.log('outside')#}
-{#            console.log(radios)#}
-{#            for (let i = 0; i < radios.length; i++) {#}
-{#                if (radios[i].checked) {#}
-{#                // get value, set checked flag or do whatever you need to#}
-{#                    console.log('found it')#}
-{#                    disable_page = true;#}
-{#                }#}
-{#            }#}
-{#            if (disable_page == true) {#}
-{#                let form = document.getElementById("choice-form");#}
-{#                let elements = form.elements;#}
-{#                for (let i = 0, len = elements.length; i < len; ++i) {#}
-{#                    elements[i].disabled = true;#}
-{#                }#}
-{#            }#}
-{#        </script>#}
     </body>
     {% block extrahead %} {% endblock %}
 </html>

@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.http import HttpResponseNotFound
-from django.core.exceptions import ObjectDoesNotExist
 from conversation_templates.models import ConversationTemplate, TemplateNode, TemplateNodeResponse, TemplateResponse
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
@@ -22,7 +21,6 @@ class NodeDescriptionTable(tables.Table):
 
 def if_visited(request, ct_node_id):
     page_dict = request.session.get('page_dict')
-    # If no page entries
     if not page_dict:
         return False
     if page_dict.get(str(ct_node_id)):
@@ -167,9 +165,6 @@ def conversation_end(request, ct_response_id):
         return redirect('StudentView')
 
     # GET request
-    # Delete session values so we don't have garbage data when user starts another conversation
-    # flush_session_data(request)
-
     ctx.update({
         'ct': ct,
         'ct_response': ct_response,

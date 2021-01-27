@@ -37,18 +37,22 @@
             const errorElement = document.getElementById('error')
 
             form.addEventListener('submit', (e) => {
-                let messages = []
-                let transcription = ''
+                let message = '';
+                let transcription = '';
                 {% for response in ct_node_responses %}
-                    transcription = document.getElementById("{{ response.id }}")
+                    transcription = document.getElementById("{{ response.id }}");
                     if (transcription.value.length > 1000) {
-                        messages.push('Transcription is too long')
+                        message = 'Transcription is too long';
+                        document.getElementById("{{ response.id }}").style.borderColor = "red";
+                    }
+                    else {
+                        document.getElementById("{{ response.id }}").style.borderColor = "green";
                     }
                 {% endfor %}
-                if (messages.length > 0) {
-                    console.log(messages.length)
-                    e.preventDefault()
-                    errorElement.innerText = messages.join(', ')
+
+                if (message !== '') {
+                    e.preventDefault();
+                    errorElement.innerText = message;
                 }
             })
         </script>
