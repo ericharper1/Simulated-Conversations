@@ -126,6 +126,8 @@ def AddResearcher(request):
     Creates and validates the AddResearcher form. If AddResearcher form is valid, an account registration email is
         generated and sent to the email address specified in the form. That email will contain a link
         for the user to register their account.
+        First and last names for brand new researchers will both be "N/A". These are overwritten once the researcher
+        has completed account creation by following the link sent to them.
     :param request:
     :return: the form to add new researchers.
     """
@@ -133,7 +135,8 @@ def AddResearcher(request):
         add_researcher_form = AddResearcherForm(request.POST)
         if add_researcher_form.is_valid():
             email_address = add_researcher_form.cleaned_data.get('email')
-            user = Researcher.objects.create(email=email_address, is_researcher=True)
+            user = Researcher.objects.create(email=email_address, first_name='N/A', last_name='N/A',
+                                             is_researcher=True)
             user.set_unusable_password()
             current_site = get_current_site(request)
             subject = 'Activate Your Simulated Conversations account'
