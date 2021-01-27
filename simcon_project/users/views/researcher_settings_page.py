@@ -133,10 +133,7 @@ def AddResearcher(request):
         add_researcher_form = AddResearcherForm(request.POST)
         if add_researcher_form.is_valid():
             email_address = add_researcher_form.cleaned_data.get('email')
-            first_name = add_researcher_form.cleaned_data.get('first_name')
-            last_name = add_researcher_form.cleaned_data.get('last_name')
-            user = Researcher.objects.create(email=email_address, first_name=first_name, last_name=last_name,
-                                             is_researcher=True)
+            user = Researcher.objects.create(email=email_address, is_researcher=True)
             user.set_unusable_password()
             current_site = get_current_site(request)
             subject = 'Activate Your Simulated Conversations account'
