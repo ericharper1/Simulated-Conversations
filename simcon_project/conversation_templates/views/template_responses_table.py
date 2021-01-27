@@ -39,13 +39,11 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
         TODO: make sure incomplete responses aren't shown
         """
         template = ConversationTemplate.objects.get(pk=pk)
-        descriptions = []  # Description of template node used for column header
         extra_columns = []  # List of tuples of description and column object to pass to table
         table_data = []  # List of dictionaries to populate table. 1 dictionary = 1 column
 
         for node in template.template_nodes.all():
-            descriptions.append(node.description)
-            extra_columns.append((node.description, tables.columns.Column()))
+            extra_columns.append((node.description, tables.columns.Column(orderable=False)))
 
         # Populate the table with data for each response
         for response in template.template_responses.all().order_by('-completion_date'):
@@ -55,8 +53,8 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
                 "completion_date": response.completion_date,
             }
 
-            for idx, node in enumerate(response.node_responses.all()):
-                column_data.update({descriptions[idx]: node.transcription})
+            for node in response.node_responses.all():
+                column_data.update({node.template_node.description: node.transcription})
 
             table_data.append(column_data)
 
