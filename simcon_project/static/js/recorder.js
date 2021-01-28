@@ -81,6 +81,8 @@ function stopRecording() {
 
 	document.getElementById("choice-form").style.display = "block";
 	document.getElementById("embedded-video").style.display = "none";
+	document.getElementById("recordButton").style.display = "none";
+	document.getElementById("stopButton").style.display = "none";
 
 	//tell the recorder to stop the recording
 	rec.stop();
@@ -89,7 +91,9 @@ function stopRecording() {
 	gumStream.getAudioTracks()[0].stop();
 
 	//create the wav blob and pass it on to createDownloadLink
-	rec.exportWAV(createDownloadLink);
+	var blob = rec.exportWAV(createDownloadLink);
+	//  var blob = rec.exportWAV(createDownloadLink);
+	//  sendData(blob)
 }
 
 function createDownloadLink(blob) {
@@ -141,3 +145,12 @@ function createDownloadLink(blob) {
 	//add the p element to the page
 	recording.appendChild(p);
 }
+
+// function sendData(blob) {
+//     let csrftoken = getCookie('csrftoken');
+//     let response=fetch("/voice_request", {
+//     method: "POST",
+//     body: blob,
+//     headers: { "X-CSRFToken": csrftoken },
+// 	})
+// }
