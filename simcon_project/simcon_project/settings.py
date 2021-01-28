@@ -138,7 +138,9 @@ STATICFILES_DIRS = [
 
 # Static URLS [These are used when in non production enviroments]
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = 'media/'
 LOGIN_REDIRECT_URL = '/redirect-from-login'
 LOGOUT_REDIRECT_URL = 'Login'
 LOGIN_URL = 'Login'

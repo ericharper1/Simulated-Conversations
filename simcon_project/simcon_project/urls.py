@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url
 from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, ResearcherSettingsView, ResearcherUserView, StudentSettingsView,StudentUserView
 from django.conf.urls import include
 from django.contrib.auth import views
@@ -41,3 +42,13 @@ urlpatterns = [
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
     path('conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
 ]
+
+# if settings.DEBUG:
+#     urlpatterns += [
+#         url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+#             'document_root': settings.MEDIA_ROOT,
+#         }),
+#         url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {
+#             'document_root': settings.STATIC_ROOT,
+#         }),
+#     ]
