@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models.functions import Lower
-from .models import TemplateFolder
+from .models import TemplateFolder, TemplateNodeChoice
 from .models import ConversationTemplate
 from bootstrap_modal_forms.forms import BSModalModelForm
 
@@ -52,3 +52,18 @@ class SelectTemplateForm(forms.Form):
             for template in templates:
                 template_list.append((template.id, template.name))
             self.fields['templates'] = forms.ChoiceField(choices=template_list)
+
+
+class TemplateNodeChoiceForm(forms.Form):
+    """
+    Form to display choices related to a TemplateNode
+    """
+    choices = forms.ModelChoiceField(
+        queryset=None,
+        widget=forms.RadioSelect,
+    )
+
+    def __init__(self, *args, **kwargs):
+        ct_node = kwargs.pop('ct_node', None)
+        super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
+        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)

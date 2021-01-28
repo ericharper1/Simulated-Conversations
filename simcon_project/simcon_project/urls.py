@@ -15,14 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, ResearcherSettingsView, TemplateStartView, ResearcherUserView, StudentSettingsView,StudentUserView
-from conversation_templates.views import TemplateResponsesView
+from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, ResearcherSettingsView, ResearcherUserView, StudentSettingsView,StudentUserView
 from django.conf.urls import include
 from django.contrib.auth import views
-
-from django.conf import settings
-from django.conf.urls.static import static
-
 
 urlpatterns = [
     path('', views.LoginView.as_view(), name="Login"),
@@ -33,13 +28,12 @@ urlpatterns = [
     path('student-view/', StudentView, name="StudentView"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
     path('user-view/', ResearcherUserView, name="ResearcherUserView"),
-    path('studentuser-view/', StudentUserView, name="StudentUserView"),    
+    path('studentuser-view/', StudentUserView, name="StudentUserView"),
     path('settings/', ResearcherSettingsView, name="ResearcherSettingsView"),
     path('student-settings/', StudentSettingsView, name="StudentSettingsView"),
-    path('template-start/<str:name>/', TemplateStartView, name="TemplateStartView"),
-    path('template-responses/<uuid:pk>', TemplateResponsesView.as_view(), name="TemplateResponsesView"),
-    path('researcher-view/template-management/', include('conversation_templates.urls'), name="TemplateManagementView"),
+    path('researcher-view/template-management/', include('conversation_templates.urls.templates_urls'), name="TemplateManagementView"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
+    path('conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
 ]
