@@ -52,7 +52,7 @@ def StudentManagement(request, name="All Students"):
             'students__email',
             'students__registered')
     student_table = StudentList(stu_contents, prefix="2-")
-    RequestConfig(request, paginate={"per_page": 10}).cconfigure(student_table)
+    RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
 
     #if researcher presses a submit button
     if request.method == "POST":
