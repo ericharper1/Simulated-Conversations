@@ -38,15 +38,7 @@
           {{ form2 }}
           <br/><input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
         </form>
-              {% for message in messages %}
 
-                    <div class="alert alert-warning">
-                        <a class="close" href="#" data-dismiss="alert">×</a>
-
-                        {{ message }}
-
-                    </div>
-            {% endfor %}
           {% render_table lbl_table %}
       </div>
 
@@ -59,7 +51,15 @@
         </form>
           {% render_table stu_table %}
       </div>
+              {% for message in messages %}
 
+                    <div class="alert alert-warning">
+                        <a class="close" href="#" data-dismiss="alert">×</a>
+
+                        {{ message }}
+
+                    </div>
+            {% endfor %}
    </div>
 
   </body>

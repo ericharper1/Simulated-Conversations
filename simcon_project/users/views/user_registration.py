@@ -5,7 +5,6 @@ from users.forms import NewStudentCreationForm
 from django.contrib import messages
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.contrib.auth.tokens import default_token_generator
 
 
 def UserRegistration(request, uidb64):
@@ -19,9 +18,12 @@ def UserRegistration(request, uidb64):
                         if password1 == password2:
                                 email = form.cleaned_data.get('email')
 
+                                #if the user is created and not registered
                                 if Student.objects.filter(email=email, registered=False):
+                                        #find the students account
                                         user = Student.objects.get(email=email, registered=False)
 
+                                        #if the uid from the email matches the students uid, then edit user with input
                                         if uidb64 == urlsafe_base64_encode(force_bytes(user.pk)):
                                                 user = Student.objects.get(email=email, registered=False)
                                                 user.set_password(form.cleaned_data.get('password1'))
@@ -30,7 +32,7 @@ def UserRegistration(request, uidb64):
                                                 user.registered = True
                                                 user.save()
                                                 login(request, user)
-                                                return redirect('/student-view/')
+                                                return redirect('/student-view/')  #sends to the student view after completion
                                         else:
                                                 messages.error(request, 'Please use link provided in email, and make '
                                                                         'sure to enter that email in confirm email',
