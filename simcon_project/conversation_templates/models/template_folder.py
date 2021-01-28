@@ -2,13 +2,13 @@ from django.db import models
 import uuid
 
 
-class FolderManager (models.Manager):
+class FolderManager(models.Manager):
     def create_folder(self, name):
         folder = self.create(name=name)
         return folder
 
 
-class TemplateFolder (models.Model):
+class TemplateFolder(models.Model):
     """
     A Folder containing (only) templates
 
