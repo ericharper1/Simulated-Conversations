@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models.custom_user import CustomUser, CustomUserManager
+from .models import CustomUser
 from users.models import Student, SubjectLabel
 
 
@@ -33,3 +33,9 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = CustomUser
         fields = ('email',)
+
+
+class UpdateFeedback(forms.Form):
+
+    feedback = forms.CharField(help_text="Enter new Feedback")
+

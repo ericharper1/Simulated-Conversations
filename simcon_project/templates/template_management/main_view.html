@@ -1,0 +1,65 @@
+<!doctype html>
+{% extends "researcher_base.html" %}
+{% block nav-templateView %}{% endblock %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block content %}
+<html>
+    <head>
+        <title>Template Management</title>
+        <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+    </head>
+    <body>
+        {% render_table folderTable %}
+        <!-- Create Folder Button--->
+        <button id="create-folder" class="btn btn-primary" type="button" name="button">Create Folder</button>
+        <br>
+        <br>
+        {% if folder_pk %}
+            <!-- Line these buttons up later with css -->
+            <form method="post" action="{% url 'management:main' %}">
+                {% csrf_token %}
+                <input id="back-to-all" class="btn btn-success" type="submit" value="Back">
+            </form>
+            <button id="edit-folder" class="bs-modal btn btn-primary" type="button" name="button"
+                    data-form-url="{% url 'management:edit_folder' folder_pk %}">Edit</button>
+            <form method="post" action="{% url 'management:delete_folder' folder_pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="back" value="{{ request.path }}">
+                <button id="delete-folder" class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        {% endif %}
+        {% render_table templateTable %}
+        <button id="create-template" class="btn btn-primary">Create Template</button>
+
+        <!-- Code needed for the modal to work properly.
+             Content in folder_creation_modal.html is rendered between "#modal-content" div
+        -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $(".bs-modal").each(function () {
+                $(this).modalForm({
+                    formURL: $(this).data('form-url')
+                });
+            });
+            $("#create-folder").modalForm({
+                formURL: "{% url 'management:create_folder' %}",
+                modalID: "#create_modal"
+            });
+        });
+        </script>
+    </body>
+{% endblock %}
+</html>

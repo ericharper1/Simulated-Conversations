@@ -3,7 +3,7 @@ from django.utils import timezone
 import uuid
 
 
-class ConversationTemplate (models.Model):
+class ConversationTemplate(models.Model):
     """
     Contains information related to an entire conversation template.
     
@@ -21,4 +21,5 @@ class ConversationTemplate (models.Model):
     creation_date = models.DateTimeField(default=timezone.now)
     researcher = models.ForeignKey('users.Researcher', related_name='templates', default=0, on_delete=models.CASCADE)
 
-
+    def __str__(self):
+        return self.name
