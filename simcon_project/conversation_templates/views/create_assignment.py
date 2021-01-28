@@ -1,16 +1,14 @@
 from django.shortcuts import render
-from users.models import SubjectLabel
-from users.models import Assignment
-from users.models import Student
-from users.models import Researcher
+from users.models import SubjectLabel, Assignment, Student, Researcher
 from conversation_templates.models import ConversationTemplate
 from django.views.generic import TemplateView
-import json
 from django.core import serializers
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
+import json
+import datetime
 
 
 class CreateAssignmentView(TemplateView):
@@ -50,13 +48,9 @@ def sendMail(subject, msg, recipient, researcher):
 
 #Determine if data is empty.
 def isNull(data):
-    if len(data)!=0:
-        if len(data)==1:
-            if data[0]!='':
-                return False
-            return True
-        return False
-    return True
+    if len(data)==0 or (len(data)==1 and data[0]==''):
+        return True
+    return False
 
 def add_data(request):
     #Error signs and error messages.
@@ -77,6 +71,13 @@ def add_data(request):
     templates=decode(templates)
     labels=decode(labels)
 
+    #Verify date
+    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
+    dateTmp=datetime.datetime.strptime(date, "%Y-%m-%d")
+    if dateTmp<=today:
+        success=1
+        errMsg=errMsg+'The assigned date cannot be today or before today.\n\n'
+
     #Save the data that can be directly assigned to assignment.
     assignment=Assignment()
     assignment.name=name
@@ -95,7 +96,7 @@ def add_data(request):
     if stuIsNull:
         if labelIsNull:
             success=1
-            errMsg='One of the students or labels must not be empty.'
+            errMsg=errMsg+'One of the students or labels must not be empty.\n\n'
     else:
         for stu in students:
             stuTmp=Student.objects.get(email=stu)
@@ -104,7 +105,7 @@ def add_data(request):
     #Assign template information to assignment
     if tempIsNull:
         success=1
-        errMsg='Template must not be empty.'
+        errMsg=errMsg+'Template must not be empty.\n\n'
     else:
         for temp in templates:
             tempList=temp.split('--')
@@ -113,7 +114,7 @@ def add_data(request):
             tempTmp=ConversationTemplate.objects.get(name=tempName,creation_date=tempDate)
             assignment.conversation_templates.add(tempTmp)
 
-    ##Assign label information to assignment
+    #Assign label information to assignment
     if not labelIsNull:
         for label in labels:
             labelTmp=SubjectLabel.objects.get(label_name=label)
@@ -124,16 +125,13 @@ def add_data(request):
     tz = get_localzone()
     sched = BackgroundScheduler(timezone=tz, job_defaults=job_defaults)
 
-    subject='You received a new assignment.'
+    subject='Simulated Conversation Assignment Update'
     msg='You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
     schedId='Assignment--'+name
     #run_date='2021-01-22 18:35:00'
     sched.add_job(sendMail, trigger='date', id=schedId, run_date=date, args=(subject, msg, students, researcher))
     sched.start()
 
-    # print(success)
-    # print(errMsg)
-    # print(repr(stuIsNull)+"  "+repr(labelIsNull)+"  "+repr(tempIsNull))
     return HttpResponse(json.dumps({
         'success': success,
         'msg': errMsg,
