@@ -18,6 +18,7 @@ from django.urls import path
 from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse,\
     UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, TemplateStartView,\
   StudentManagement, UserRegistration, ResearcherUserView, StudentUserView, ResearcherSettingsView, StudentSettingsView
+
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -37,7 +38,6 @@ urlpatterns = [
     path('studentuser-view/', StudentUserView, name="StudentUserView"),
     path('settings/', ResearcherSettingsView, name="ResearcherSettingsView"),
     path('student-settings/', StudentSettingsView, name="StudentSettingsView"),
-    path('template-start/<str:name>/', TemplateStartView, name="TemplateStartView"),
     path('researcher-view/template-management/', include('conversation_templates.urls'), name="TemplateManagementView"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
@@ -45,4 +45,5 @@ urlpatterns = [
     path('student-management/<str:name>', StudentManagement, name="StudentManagement"),
     path('student-management/', StudentManagement, name="StudentManagement"),
     path('user-registration/<uidb64>/', UserRegistration, name="UserRegistration"),
+    path('conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
 ]
