@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'django_tables2',
     'embed_video',
-    'django_tables2',
 
     # Our apps
     'users',
     'conversation_templates',
+
 ]
 
 MIDDLEWARE = [
