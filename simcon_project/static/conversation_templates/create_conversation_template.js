@@ -1,11 +1,24 @@
-//TODO: Validation... field length limits, one start node, maybe all paths lead to terminal?
+// TODO: Reloading the page or leaving should warn.
+//  Update URL stuff to be django
+//  delete ;
+//  " or '
+
+// Character count max values from models
+let CHOICE_DESCRIPTION_CHAR_MAX = 500
+let TEMPLATE_NAME_CHAR_MAX = 100
+let TEMPLATE_DESCRIPTION_CHAR_MAX = 4000
+let TEMPLATE_NODE_DESCRIPTION_CHAR_MAX = 4000
+
+// Error message(s) used in multiple places
+let NO_DESTINATION_FOR_CHOICE_ERROR = "No destination selected"
+
 // Variables used to keep track of state that will eventually get sent to the backend
 let templateName = ""           // Holds template's name
 let templateDescription = ""    // Holds template's description
 let nodes = new Map()           // Map from counter to node. Used to keep track of all the created nodes
 
 // Variables used purely for client side purposes
-let unsaved = false             // Indicates if the user made any changes to an INPUT field
+let validating = false          // Indicates if validation is turned on or not
 let lastUsedNodeIndex = 0       // Counter to be iterated and used as key in nodes map when a new node is created
 let currentNodeInFocus = null   // Used to keep track of what node is currently being worked on
 
@@ -48,89 +61,136 @@ class Choice {
 }
 
 /**
- * Submits constructed nodes objects to the backend effectively creating a new form.
+ * Submits constructed nodes objects to the backend
  */
 function submit() {
+    // Checks that everything is valid before submission
+    let everythingIsValid = true
+    nodes.forEach((node) => {
+        if(!nodeIsValid(node)){
+            everythingIsValid = false
+        }
+    })
 
-    saveValuesIfNeeded()
-
-    // Retrieves csrftoken
-    let csrftoken = null
-    const cookieName = 'csrftoken'
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, cookieName.length + 1) === (cookieName + '=')) {
-                csrftoken = decodeURIComponent(cookie.substring(cookieName.length + 1));
-                break;
+    if(everythingIsValid) {
+        // Retrieves csrftoken
+        let csrftoken = null
+        const cookieName = 'csrftoken'
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, cookieName.length + 1) === (cookieName + '=')) {
+                    csrftoken = decodeURIComponent(cookie.substring(cookieName.length + 1));
+                    break;
+                }
             }
         }
-    }
 
-    let postBody = JSON.stringify({
-        nodes: Array.from(nodes),
-        templateName: templateName,
-        templateDescription: templateDescription
-    })
-
-    // Make POST request
-    fetch(window.location.href, {
-        method: 'POST',
-        credentials: 'include',
-        mode: 'same-origin',
-        body: postBody,
-        headers: new Headers({
-           'X-CSRFToken': csrftoken,
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest'
+        const postBody = JSON.stringify({
+            nodes: Array.from(nodes),
+            templateName: templateName,
+            templateDescription: templateDescription
         })
-    }).then(function(response) {
-        if(response.ok) {
-            //TODO: handle
-        } else throw new Error(response.status)
-    }).catch(function (error) {
-        //TODO: handle
-    })
+
+        // Make POST request
+        fetch(window.location.href, {
+            method: 'POST',
+            credentials: 'include',
+            mode: 'same-origin',
+            body: postBody,
+            headers: new Headers({
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest'
+            })
+        }).then(function(response) {
+            if(response.ok) {
+                //TODO: think of potential cuases and handle properly
+            } else throw new Error(response.status)
+        }).catch(function (error) {
+            alert("Something went wrong while submitting the form\nError: " + error)
+            //TODO: think of potential cuases and handle properly if needed
+        })
+    } else { // If the input was invalid turn on validation and validate everything
+        validating = true
+        getValidateToggle().checked = true
+        alert("The form is invalid")
+        updateValidityIndicatorOnAllStepNodes()
+        validateAllVisibleFields()
+    }
 }
 
 /**
  * Called on page load. Sets the listeners and initializes page content.
  */
 function loadState() {
-    $(document).ready() //TODO: figure out if calling like this blocks until ready
+    $(document).ready(() => {
+        addStepNode()
+        updateNodeInFocus(1)
+        currentNodeInFocus.isFirst = true
+        getFirstStepToggle().checked = true
 
-    addStepNode()
-    updateNodeInFocus(1)
+        // Enable tooltips (bootstrap)
+        $('[data-toggle="tooltip"]').tooltip();
 
-    // When an input is changed, change unsaved indicator to true so that the page is saved if another node is put in focus
-    $(document).on("change", ":input", function () {
-        unsaved = true
-    })
+        // When an input is changed, properly handle that input
+        $(document).on("input", "input, textarea, select", function (event) {
+            let element = event.target
+            let elementID = element.id
 
-    // When step node name is updated, update the state variable and name on the associated step node card
-    $(document).on("input", "#node-name-input", function () {
-        $("#step-" + currentNodeInFocus.index + " .card-title").text(getNodeNameInput())
-    })
+            switch (elementID) {
+                case "video-url-input":
+                    handleURLInput()
+                    break
+                case "node-name-input":
+                    handleNodeNameInput()
+                    break
+                case "node-description-input":
+                    handleNodeDescriptionInput()
+                    break
+                case "is-first-node-check":
+                    handleIsFirstNodeCheck()
+                    break
+                case "is-terminal-node-check":
+                    handleIsTerminalNodeCheck()
+                    break
+                case "template-name-input":
+                    handleTemplateNameInput()
+                    break
+                case "template-description-input":
+                    handleTemplateDescriptionInput()
+                    break
+                case "validate-check-input":
+                    handleValidateToggle()
+                    break
+                default:    // Can't match ids of choice card inputs since they are indexed ie. choiceDescriptionInput-0
+                    if(elementID.split('-')[0] == "choiceDescriptionInput") {
+                        handleChoiceDescriptionInput(Number(elementID.split('-')[1]))
+                    } else {
+                        handleChoiceDestinationSelect(Number(elementID.split('-')[1]))
+                    }
+            }
 
-    // When a step node card is clicked, that card's context has to be focused
-    $(document).on("click", ".step-node-card", function () {
-        let clickedNodeId = parseInt($(this).attr('id').split('-')[1])
+            if(validating) updateNodeValidityIndicator(currentNodeInFocus)
+        })
 
-        if(!(nodes.get(clickedNodeId) === currentNodeInFocus)) {
-            updateNodeInFocus(clickedNodeId)
-        }
-    })
+        // When a step node card is clicked, that card's context has to be focused
+        $(document).on("click", ".step-node-card", function () {
+            let clickedNodeId = parseInt($(this).attr('id').split('-')[1])
+            if(!(nodes.get(clickedNodeId) === currentNodeInFocus)) updateNodeInFocus(clickedNodeId)
+        })
 
-    // Every step node card has a 'Delete' link
-    // If click propagation is not stopped, the parent card's onclick event defined above is also triggered when Delete is clicked
-    $(document).on("click", ".remove-step-node", function (event) {
-        event.stopPropagation()
-    })
+        // Every step node card has a 'Delete' link
+        // If click propagation is not stopped, the parent card's onclick event defined above is also triggered when Delete is clicked
+        $(document).on("click", ".remove-step-node", function (event) {
+            event.stopPropagation()
+        })
 
-    // When user updates the video url, updates the embedded video
-    $("#video-url-input").blur(() => {
-        setEmbeddedVideoUrl(getVideoUrlInput())
+        // When user updates the video url, updates the embedded video
+        $("#video-url-input").blur(() => {
+            setEmbeddedVideoUrl(getVideoUrlInput().value.trim())
+        })
     })
 }
 
@@ -140,50 +200,28 @@ function loadState() {
  * @param nodeIndex index of the node to be put in focus
  */
 function updateNodeInFocus(nodeIndex) {
-    saveValuesIfNeeded()
-
+    // Highlight currently selected node and make all others unhighlighted
     if(currentNodeInFocus !== null) $("#step-"+currentNodeInFocus.index).css("background-color", "white")
     $("#step-"+nodeIndex).css("background-color", " \t#E8E8E8")
 
     currentNodeInFocus = nodes.get(nodeIndex)
 
+    // Update choice cards
     document.querySelectorAll('.choice-card').forEach(e => e.remove())
     let currentNodeResponseChoices = currentNodeInFocus.responseChoices
     currentNodeResponseChoices.forEach((value, key) => {
         addChoice(key, value.description, value.destinationIndex)
     })
 
-    setNodeNameInput(currentNodeInFocus.nodeName)
-    setNodeDescriptionInput(currentNodeInFocus.nodeDescription)
-    setFirstStepToggle(currentNodeInFocus.isFirst)
-    setTerminalToggle(currentNodeInFocus.isTerminal)
-    setVideoUrlInput(currentNodeInFocus.videoUrl)
+    // Update the various input/toggle fields
+    getNodeNameInput().value = currentNodeInFocus.nodeName
+    getNodeDescriptionInput().value = currentNodeInFocus.nodeDescription
+    getFirstStepToggle().checked = currentNodeInFocus.isFirst
+    getTerminalStepToggle().checked = currentNodeInFocus.isTerminal
+    getVideoUrlInput().value = currentNodeInFocus.videoUrl
     setEmbeddedVideoUrl(currentNodeInFocus.videoUrl)
-}
 
-/**
- * Called to save state. Checks if there is state to save before saving.
- */
-function saveValuesIfNeeded() {
-    if(unsaved) {
-        templateName = getTemplateNameInput()
-        templateDescription = getTemplateDescriptionInput()
-
-        currentNodeInFocus.videoUrl = getVideoUrlInput()
-        currentNodeInFocus.nodeName = getNodeNameInput()
-        currentNodeInFocus.nodeDescription = getNodeDescriptionInput()
-        currentNodeInFocus.isFirst = getFirstStepToggle()
-        currentNodeInFocus.isTerminal = getTerminalToggle()
-
-        document.querySelectorAll('.choice-card').forEach(choice => {
-            let currentChoiceId = parseInt(choice.getAttribute('id').split('-')[1])
-            let description = choice.getElementsByTagName('textarea')[0].value
-            let destination = parseInt(choice.getElementsByTagName('select')[0].value)
-            currentNodeInFocus.responseChoices.set(currentChoiceId, new Choice(description, destination))
-        })
-
-        unsaved = false
-    }
+    if(validating) validateAllVisibleFields()
 }
 
 /**
@@ -204,12 +242,14 @@ function addStepNode() {
         <div class="card mb-3 step-node-card" id="step-${lastUsedNodeIndex}">
             <div class="card-body">
                 <h6 class="card-title">${lastUsedNodeIndex}</h6>
-           <!-- <h6 class="card-subtitle mb-2 text-muted">{{ val }}</h6> TODO:Later can be used to display * to indicate changes required-->
-                <a href="javascript:removeStep(${lastUsedNodeIndex})" class="card-link remove-step-node">Delete</a>
+                <h6 class="card-subtitle mb-2 text-muted invalid-indicator" id="invalid-indicator-${lastUsedNodeIndex}">*</h6>
+                <a href="javascript:removeStepNode(${lastUsedNodeIndex})" class="card-link remove-step-node">Delete</a>
             </div>
         </div>
     `
     $("#nodes-column .column-button-container:first-child").after(stepNodeCard)
+
+    if(validating) updateNodeValidityIndicator(nodes.get(lastUsedNodeIndex))
 }
 
 /**
@@ -223,15 +263,14 @@ function addStepNode() {
  *
  * @param nodeIndex
  */
-function removeStep(nodeIndex) {
-
+function removeStepNode(nodeIndex) {
     // Delete the relevant step node card
     let card = document.getElementById("step-" + nodeIndex)
     card.parentElement.removeChild(card)
     nodes.delete(nodeIndex)
 
     // Update the choices of stored steps to point to 0 if they point to removed step
-    nodes.forEach((stepValue, stepIndex) => {
+    nodes.forEach((stepValue) => {
         let choicesOriginal = stepValue.responseChoices
         let choicesCopy = new Map(choicesOriginal)
         choicesCopy.forEach((choiceValue, choiceIndex) => {
@@ -247,6 +286,9 @@ function removeStep(nodeIndex) {
         for(const select of selects) {
             if(select.value == nodeIndex) {
                 select.value = 0
+                if(validating) {
+                    setElementAsInvalid(select, NO_DESTINATION_FOR_CHOICE_ERROR)
+                }
             }
             select.removeChild(select.querySelector("[value='" + nodeIndex +"']"))
         }
@@ -255,10 +297,43 @@ function removeStep(nodeIndex) {
             lastUsedNodeIndex = 0
             addStepNode()
             updateNodeInFocus(1)
+            currentNodeInFocus.isFirst = true
+            getFirstStepToggle().checked = true
         } else { // If there are nodes left to which we can switch focus
             updateNodeInFocus(Array.from(nodes.keys()).reduce((lastKey, currKey) => nodes.get(currKey) !== undefined ? currKey : lastKey))
         }
     }
+    if(validating) validateIsFirstNodeCheck()
+}
+
+/**
+ * Used to generate possible destination options when creating choice cards
+ * Marks one choice as 'selected' if 'selectedValue' parameter is not 0
+ *
+ * @param selectedValue index of the selected destination (0 if none selected)
+ * @returns {string} HTML literal with the options to be inserted inside an 'insert' element
+ */
+function generateSelectOptions(selectedValue = 0) {
+    let literalToReturn
+
+    if(selectedValue == 0) { // If no destination was selected for this select element, make the select description choice 'selected'
+        literalToReturn = `<option disabled selected value="0"> -- select destination -- </option>`
+    } else {
+        literalToReturn = `<option disabled value="0"> -- select destination -- </option>`
+    }
+
+    if(!currentNodeInFocus.isTerminal) {
+        nodes.forEach((value, key) => {
+            if(value !== currentNodeInFocus) {
+                if(selectedValue == key) {
+                    literalToReturn += `<option selected value="${key}">${nodes.get(key).nodeName}</option>`
+                } else {
+                    literalToReturn += `<option value="${key}">${nodes.get(key).nodeName}</option>`
+                }
+            }
+        })
+    }
+    return literalToReturn
 }
 
 /**
@@ -279,14 +354,14 @@ function addChoice(choiceIndex = -1, choiceDescription = "", selectedValue = 0) 
         <div class="card mb-3 choice-card" id="choice-${choiceIndex}">
             <div class="card-body">
             
-                <form>
+                <form novalidate>
                     <div class="form-group">
-                        <label for="choice-description-input">Choice description:</label>
-                        <textarea class="form-control" id="node-description-input">${choiceDescription}</textarea>
+                        <label for="choiceDescriptionInput-${choiceIndex}">Choice description:</label>
+                        <textarea class="form-control" id="choiceDescriptionInput-${choiceIndex}" data-toggle="tooltip" title="">${choiceDescription}</textarea>
                     </div>
                 </form>
                 
-            <select class="custom-select">
+            <select class="custom-select" data-toggle="tooltip" title="" id="choiceDestinationSelect-${choiceIndex}">
             ${generateSelectOptions(selectedValue)}
             </select>
             <a href="javascript:removeChoice(${choiceIndex})" class="card-link">Delete</a>
@@ -294,34 +369,12 @@ function addChoice(choiceIndex = -1, choiceDescription = "", selectedValue = 0) 
         </div>
         `
     $("#choices-column .column-button-container:first-child").after(htmlToAdd)
-}
 
-/**
- * Used to generate possible destination options when creating choice cards
- * Marks one choice as 'selected' if 'selectedValue' parameter is not 0
- *
- * @param selectedValue index of the selected destination (0 if none selected)
- * @returns {string} HTML literal wtih the options to be inserted inside an 'insert' element
- */
-function generateSelectOptions(selectedValue = 0) {
-    let literalToReturn
-
-    if(selectedValue == 0) { // If no destination was selected for this select element, make the select description choice 'selected'
-        literalToReturn = `<option disabled selected value="0"> -- select destination -- </option>`
-    } else {
-        literalToReturn = `<option disabled value="0"> -- select destination -- </option>`
+    if(validating) {
+        document.getElementById("no-choices-error").style.display = "none"
+        validateChoiceDestinationSelect(choiceIndex)
+        validateChoiceDescriptionInput(choiceIndex)
     }
-
-    nodes.forEach((value, key) => {
-        if(value !== currentNodeInFocus) {
-            if(selectedValue == key) {
-                literalToReturn += `<option selected value="${key}">${nodes.get(key).nodeName}</option>`
-            } else {
-                literalToReturn += `<option value="${key}">${nodes.get(key).nodeName}</option>`
-            }
-        }
-    })
-    return literalToReturn
 }
 
 /**
@@ -332,6 +385,8 @@ function removeChoice(choiceIndex) {
     let choiceCard = document.getElementById("choice-" + choiceIndex)
     choiceCard.parentElement.removeChild(choiceCard)
     currentNodeInFocus.responseChoices.delete(choiceIndex)
+
+    if(validating) validateResponseChoices()
 }
 
 /**
@@ -340,66 +395,337 @@ function removeChoice(choiceIndex) {
  * @returns {string}
  */
 function getEmbeddableUrl(url) {
-    REGEX = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-    let match = url.match(REGEX)
-    regexedUrl = (match&&match[7].length==11)? match[7] : ""
+    const REGEX = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
+    const match = url.match(REGEX)
+    const regexedUrl = (match&&match[7].length==11)? match[7] : ""
     if(!(regexedUrl == "")) {
         return "https://www.youtube.com/embed/" + regexedUrl
     }
     return ""
 }
 
-// Here are all the DOM getters/setters... technically we don't need standalone functions since most are only used once
-// However, we might end up needing them once we are setting up template edit functionality... if not, they can always be moved inline
+
+/*********************************************************************************************************************/
+/**
+ * Input handlers
+ */
+
+function handleNodeNameInput() {
+    const input = getNodeNameInput().value.trim()
+    $("#step-" + currentNodeInFocus.index + " .card-title").text(input)
+    currentNodeInFocus.nodeName = input
+}
+
+function handleURLInput() {
+    currentNodeInFocus.videoUrl = getVideoUrlInput().value.trim()
+    if(validating) validateURLInput()
+}
+
+function handleNodeDescriptionInput() {
+    currentNodeInFocus.nodeDescription = getNodeDescriptionInput().value.trim()
+    if(validating) validateNodeDescriptionInput()
+}
+
+function handleIsFirstNodeCheck() {
+    const element = getFirstStepToggle()
+    const checked = element.checked
+
+    currentNodeInFocus.isFirst = checked
+
+    // Go through and mark every other node as not first
+    if(checked) {
+        nodes.forEach((value) => {
+            value.isFirst = value === currentNodeInFocus;
+        })
+    }
+
+    if(validating) validateIsFirstNodeCheck()
+}
+
+function handleIsTerminalNodeCheck() {
+    const checked = getTerminalStepToggle().checked
+
+    currentNodeInFocus.isTerminal = checked
+
+    // Updates selects visible on the page
+    const selects = document.getElementsByTagName("select")
+    for(const select of selects) {
+        select.innerHTML = generateSelectOptions();
+    }
+
+    // Resets destination for all current node's choices to 0 in memory
+    if(checked) {
+        currentNodeInFocus.responseChoices.forEach((choiceValue, choiceIndex) => { choiceValue.destinationIndex = 0 })
+    }
+}
+
+function handleTemplateNameInput() {
+    templateName = getTemplateNameInput().value.trim()
+    if(validating) validateTemplateNameInput()
+}
+
+function handleTemplateDescriptionInput() {
+    templateDescription = getTemplateDescriptionInput().value.trim()
+    if(validating) validateTemplateDescriptionInput()
+}
+
+function handleChoiceDescriptionInput(choiceIndex) {
+    currentNodeInFocus.responseChoices.get(choiceIndex).description = getChoiceDescriptionInput(choiceIndex).value.trim()
+    if(validating) validateChoiceDescriptionInput(choiceIndex)
+}
+
+function handleChoiceDestinationSelect(choiceIndex) {
+    currentNodeInFocus.responseChoices.get(choiceIndex).destinationIndex = Number(getChoiceDestinationSelect(choiceIndex).value)
+    if(validating) validateChoiceDestinationSelect(choiceIndex)
+}
+/*********************************************************************************************************************/
+
+
+/*********************************************************************************************************************/
+/**
+ * Validation functions
+ */
+
+/**
+ * Called when validate toggle is toggled
+ */
+function handleValidateToggle() {
+    const checked = getValidateToggle().checked
+    if(checked == true) {
+        validating = true
+        validateAllVisibleFields()
+        updateValidityIndicatorOnAllStepNodes()
+    } else {
+        validating = false
+        setElementAsValid(getVideoUrlInput())
+        setElementAsValid(getNodeDescriptionInput())
+        setElementAsValid(getTemplateNameInput())
+        setElementAsValid(getTemplateDescriptionInput())
+        nodes.forEach((node) => {
+            document.getElementById("invalid-indicator-" + node.index).style.display = "none"
+        })
+        document.getElementById("no-first-node-error").style.display = "none"
+        document.getElementById("no-choices-error").style.display = "none"
+        currentNodeInFocus.responseChoices.forEach((value, key) => {
+            setElementAsValid(getChoiceDescriptionInput(key))
+            setElementAsValid(getChoiceDestinationSelect(key))
+        })
+    }
+}
+
+function setElementAsInvalid(element, message) {
+    element.setAttribute('title', message)
+    element.classList.add('invalid')
+}
+
+function setElementAsValid(element) {
+    element.setAttribute('title', "")
+    element.classList.remove('invalid')
+}
+
+/**
+ * Used to handle validity of a text input
+ * @param element element who's validity is to be checked
+ * @param charLimit max characters for this input
+ */
+function validateRequiredTextField(element, input, charLimit) {
+    if(input == "") {
+        setElementAsInvalid(element, "Must be non-empty")
+    } else if(input.length > charLimit) {
+        setElementAsInvalid(element, "Must be no longer than " + charLimit + " characters")
+    } else {
+        setElementAsValid(element)
+    }
+}
+
+/**
+ *  Checks if a node's data is valid
+ * @param node the node who's validity is to be checked
+ * @returns {boolean}
+ */
+function nodeIsValid(node) {
+    if(
+        node.nodeDescription == "" ||
+        node.nodeDescription.length > TEMPLATE_NODE_DESCRIPTION_CHAR_MAX ||
+        node.videoUrl == "" ||
+        getEmbeddableUrl(node.videoUrl) == "" ||
+        node.responseChoices.size == 0
+    ) {
+        return false
+    }
+
+    if(node.responseChoices.size == 0) return false
+
+    let choicesValid = true
+    node.responseChoices.forEach((value) => {
+        if(
+            value.description == "" ||
+            value.description.length > CHOICE_DESCRIPTION_CHAR_MAX ||
+            ((!node.isTerminal) && value.destinationIndex == 0)
+        )
+        {
+            choicesValid = false
+        }
+    })
+
+    return choicesValid
+}
+
+/**
+ * Updates the validity indicator of all visible fields
+ */
+function validateAllVisibleFields() {
+    validateURLInput()
+    validateNodeDescriptionInput()
+    validateTemplateNameInput()
+    validateTemplateDescriptionInput()
+    validateResponseChoices()
+    validateIsFirstNodeCheck()
+}
+
+/**
+ * Updates node validity indicator on a node (*)
+ * @param node node who's validity indicator is to be updated
+ */
+function updateNodeValidityIndicator(node) {
+    if(!nodeIsValid(node)) {
+        document.getElementById("invalid-indicator-" + node.index).style.display = "block"
+    }
+    else {
+        document.getElementById("invalid-indicator-" + node.index).style.display = "none"
+    }
+}
+
+/**
+ * Updates the validity indicator on all node cards
+ */
+function updateValidityIndicatorOnAllStepNodes() {
+    nodes.forEach((value) => {
+        updateNodeValidityIndicator(value)
+    })
+}
+
+function validateURLInput() {
+    const element = getVideoUrlInput()
+    const input = element.value.trim()
+
+    if(input == "") {
+        setElementAsInvalid(element, "Must be non-empty")
+    } else if(getEmbeddableUrl(input) == "") {
+        setElementAsInvalid(element, "Not a valid YouTube url")
+    } else {
+        setElementAsValid(element)
+    }
+}
+
+function validateNodeDescriptionInput() {
+    const element = getNodeDescriptionInput()
+    const input = element.value.trim()
+    validateRequiredTextField(element, input, TEMPLATE_NODE_DESCRIPTION_CHAR_MAX)
+}
+
+function validateIsFirstNodeCheck() {
+    let foundFirst = false
+    nodes.forEach((value, key) => {
+        if(value.isFirst) {
+            foundFirst = true
+        }
+    })
+
+    if(!foundFirst) {
+        document.getElementById("no-first-node-error").style.display = "block"
+    } else {
+        document.getElementById("no-first-node-error").style.display = "none"
+    }
+}
+
+function validateTemplateNameInput() {
+    const element = getTemplateNameInput()
+    const input = element.value.trim()
+    validateRequiredTextField(element, input, TEMPLATE_NAME_CHAR_MAX)
+}
+
+function validateTemplateDescriptionInput() {
+    const element = getTemplateDescriptionInput()
+    const input = element.value.trim()
+    validateRequiredTextField(element, input, TEMPLATE_DESCRIPTION_CHAR_MAX)
+}
+
+function validateChoiceDescriptionInput(choiceIndex) {
+    const element = getChoiceDescriptionInput(choiceIndex)
+    const input = element.value.trim()
+    validateRequiredTextField(element, input, CHOICE_DESCRIPTION_CHAR_MAX)
+}
+
+function validateChoiceDestinationSelect(choiceIndex) {
+    const element = getChoiceDestinationSelect(choiceIndex)
+    if(element.value == 0) {
+        setElementAsInvalid(element, NO_DESTINATION_FOR_CHOICE_ERROR)
+    } else {
+        setElementAsValid(element)
+    }
+}
+
+function validateResponseChoices() {
+    if(currentNodeInFocus.responseChoices.size == 0) {
+        document.getElementById("no-choices-error").style.display = "block"
+    } else {
+        document.getElementById("no-choices-error").style.display = "none"
+    }
+    for(const key of currentNodeInFocus.responseChoices.keys()) {
+        validateChoiceDescriptionInput(key)
+        validateChoiceDestinationSelect(key)
+    }
+}
+/*********************************************************************************************************************/
+
+
+/*********************************************************************************************************************/
+/**
+ * DOM getters and setters
+ */
 
 function getTemplateNameInput() {
-    return document.getElementById('template-name-input').value
+    return document.getElementById('template-name-input')
 }
 
 function getTemplateDescriptionInput() {
-    return document.getElementById('template-description-input').value
+    return document.getElementById('template-description-input')
 }
 
 function getNodeNameInput() {
-    return document.getElementById('node-name-input').value
-}
-
-function setNodeNameInput(name) {
-    document.getElementById('node-name-input').value = name
+    return document.getElementById('node-name-input')
 }
 
 function getNodeDescriptionInput() {
-    return document.getElementById('node-description-input').value
-}
-
-function setNodeDescriptionInput(description) {
-    document.getElementById('node-description-input').value = description
+    return document.getElementById('node-description-input')
 }
 
 function getFirstStepToggle() {
-    return document.getElementById('is-first-node-check').checked
+    return document.getElementById('is-first-node-check')
 }
 
-function setFirstStepToggle(checked) {
-    document.getElementById('is-first-node-check').checked = checked
-}
-
-function getTerminalToggle() {
-    return document.getElementById('is-terminal-node-check').checked
-}
-
-function setTerminalToggle(checked) {
-    document.getElementById('is-terminal-node-check').checked = checked
+function getTerminalStepToggle() {
+    return document.getElementById('is-terminal-node-check')
 }
 
 function getVideoUrlInput() {
-    return document.getElementById('video-url-input').value
+    return document.getElementById('video-url-input')
 }
 
-function setVideoUrlInput(url) {
-    document.getElementById('video-url-input').value = url
+function getChoiceDestinationSelect(choiceIndex) {
+    return document.getElementById("choiceDestinationSelect-" + String(choiceIndex))
+}
+
+function getChoiceDescriptionInput(choiceIndex) {
+    return document.getElementById("choiceDescriptionInput-" + String(choiceIndex))
+}
+
+function getValidateToggle() {
+    return document.getElementById("validate-check-input")
 }
 
 function setEmbeddedVideoUrl(url) {
     document.getElementById("embedded-video-iframe").setAttribute('src', getEmbeddableUrl(url))
 }
+/*********************************************************************************************************************/
