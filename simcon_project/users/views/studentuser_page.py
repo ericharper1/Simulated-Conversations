@@ -3,5 +3,6 @@ from django.contrib.auth.decorators import login_required
 
 
 @login_required
-def SettingsView(request):
-    return render(request, 'settings_view.html')
+def StudentUserView(request):
+    return render(request, 'studentuser_view.html')
+
