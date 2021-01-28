@@ -7,5 +7,4 @@ from .student_settings_page import StudentSettingsView
 from .student_home import StudentView
 from .student_management import StudentManagement
 from .user_registration import UserRegistration
-from .template_start import TemplateStartView
 from .view_response import ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback

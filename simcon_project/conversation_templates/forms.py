@@ -1,5 +1,5 @@
 from django import forms
-from .models import TemplateFolder
+from .models import TemplateFolder, TemplateNodeChoice
 from .models import ConversationTemplate
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from bootstrap_modal_forms.forms import BSModalModelForm
@@ -31,3 +31,18 @@ class FolderCreationForm(BSModalModelForm):
         model = TemplateFolder
         fields = ['name', 'templates']
         widgets = {'templates': SelectTemplates}
+
+
+class TemplateNodeChoiceForm(forms.Form):
+    """
+    Form to display choices related to a TemplateNode
+    """
+    choices = forms.ModelChoiceField(
+        queryset=None,
+        widget=forms.RadioSelect,
+    )
+
+    def __init__(self, *args, **kwargs):
+        ct_node = kwargs.pop('ct_node', None)
+        super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
+        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)
