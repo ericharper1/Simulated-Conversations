@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import *
+from conversation_templates.views import *
 
 app_name = 'assignments'
 urlpatterns = [
