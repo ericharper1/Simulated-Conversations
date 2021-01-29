@@ -1,3 +1,6 @@
+{% extends "researcher_base.html" %}
+{% block nav-settingsView %}{% endblock %} 
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -11,25 +14,15 @@
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}
     </style>
-    
-
     <title>
-    {% block title %}Simulated Conversations | Template Start{% endblock %}
+    {% block title %}Simulated Conversations | Settings{% endblock %}
     </title>
-    
     {% block extrahead %} {% endblock %}
   </head>
-
   <body>
     <div class="container">
-      <h1> {{name}} Start Page</h1>
-        {% block content %}
-        {% endblock %}
-    </div> <!-- /container -->
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-
-    <!-- Placed at the end of the document so the pages load faster -->
+      <h1> This is the Settings Page</h1>
+    </div> 
   </body>
 </html>
+{% endblock %}
