@@ -149,7 +149,6 @@ DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
 MEDIAFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/media')
 ]
-MEDIA_URL = '/media/'
 
 
 #we will need to hide this in the final version
