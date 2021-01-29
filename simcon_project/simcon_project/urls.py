@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, \
-    UpdateNodeResponseFeedback, TemplateStartView, ResearcherUserView, StudentSettingsView, StudentUserView, \
+    UpdateNodeResponseFeedback, ResearcherUserView, StudentSettingsView, StudentUserView, \
     ResearcherRegistration
 from django.conf.urls import include
 from django.contrib.auth import views
@@ -39,7 +39,6 @@ urlpatterns = [
     path('student-view/', StudentView, name="StudentView"),
     path('studentuser-view/', StudentUserView, name="StudentUserView"),
     path('student-settings/', StudentSettingsView, name="StudentSettingsView"),
-    path('template-start/<str:name>/', TemplateStartView, name="TemplateStartView"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
