@@ -127,6 +127,7 @@
           oA.onclick = function(){
               tBody.removeChild(this.parentNode.parentNode);
               var em=this.parentNode.parentNode.cells[1].innerHTML;
+              //student
               if(id==1) {
                   var index = addedStu.indexOf(em);
                   console.log(em + "  " + index);
@@ -134,6 +135,7 @@
                       addedStu.splice(index, 1);
                   }
               }
+              //template
               else if(id==2){
                   var name=this.parentNode.parentNode.cells[0].innerHTML;
                   var tempKey=name+"--"+em;
@@ -143,6 +145,7 @@
                       addedTmp.splice(index, 1);
                   }
               }
+              //label
               else{
                   var index = addedLabel.indexOf(em);
                   console.log(em + "  " + index);
@@ -159,10 +162,6 @@
       }
 
       function add_stu(tbl, stu){
-          //console.log(eval("students[0]."+"fields.email"));
-          //var tmp=students[0].fields;
-          //console.log(tmp.email);
-          //console.log(students[0].fields);
           var find=false;   //Record find the corresponding student or not
           for(var i=0;i<students.length;i++){
               var stuTmp=students[i];
@@ -243,9 +242,11 @@
 
       //Pass the client data to django through ajax.
       function sub(){
+          //set token
           $.ajaxSetup({
               data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
           });
+          //get data
           assign_name=document.getElementById("assign_name").value;
           assign_date=document.getElementById("assign_date").value;
           researcher_email=document.getElementById("researcher_email").value;
@@ -258,6 +259,7 @@
               return;
           }
 
+          //post data to server
           $.ajax({
               url:"{% url 'assignments:add_data' %}",
               type:'POST',
