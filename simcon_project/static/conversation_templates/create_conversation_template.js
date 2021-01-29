@@ -1,8 +1,3 @@
-// TODO: Reloading the page or leaving should warn.
-//  Update URL stuff to be django
-//  delete ;
-//  " or '
-
 // Character count max values from models
 let CHOICE_DESCRIPTION_CHAR_MAX = 500
 let TEMPLATE_NAME_CHAR_MAX = 100
@@ -75,14 +70,14 @@ function submit() {
     if(everythingIsValid) {
         // Retrieves csrftoken
         let csrftoken = null
-        const cookieName = 'csrftoken'
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
+        const cookieName = "csrftoken"
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";")
             for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, cookieName.length + 1) === (cookieName + '=')) {
-                    csrftoken = decodeURIComponent(cookie.substring(cookieName.length + 1));
-                    break;
+                const cookie = cookies[i].trim()
+                if (cookie.substring(0, cookieName.length + 1) === (cookieName + "=")) {
+                    csrftoken = decodeURIComponent(cookie.substring(cookieName.length + 1))
+                    break
                 }
             }
         }
@@ -95,14 +90,14 @@ function submit() {
 
         // Make POST request
         fetch(window.location.href, {
-            method: 'POST',
-            credentials: 'include',
-            mode: 'same-origin',
+            method: "POST",
+            credentials: "include",
+            mode: "same-origin",
             body: postBody,
             headers: new Headers({
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                'X-Requested-With': 'XMLHttpRequest'
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "X-Requested-With": "XMLHttpRequest"
             })
         }).then(function(response) {
             if(response.ok) {
@@ -132,7 +127,15 @@ function loadState() {
         getFirstStepToggle().checked = true
 
         // Enable tooltips (bootstrap)
-        $('[data-toggle="tooltip"]').tooltip();
+        $("[data-toggle='tooltip']").tooltip()
+
+        // Warn on page reload and leave.
+        window.onbeforeunload =  function (e) {
+            let confirmationMessage = "Leaving or reloading the page will result in all progress being lost";
+
+            (e || window.event).returnValue = confirmationMessage //Gecko + IE
+            return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
+        }
 
         // When an input is changed, properly handle that input
         $(document).on("input", "input, textarea, select", function (event) {
@@ -165,10 +168,10 @@ function loadState() {
                     handleValidateToggle()
                     break
                 default:    // Can't match ids of choice card inputs since they are indexed ie. choiceDescriptionInput-0
-                    if(elementID.split('-')[0] == "choiceDescriptionInput") {
-                        handleChoiceDescriptionInput(Number(elementID.split('-')[1]))
+                    if(elementID.split("-")[0] == "choiceDescriptionInput") {
+                        handleChoiceDescriptionInput(Number(elementID.split("-")[1]))
                     } else {
-                        handleChoiceDestinationSelect(Number(elementID.split('-')[1]))
+                        handleChoiceDestinationSelect(Number(elementID.split("-")[1]))
                     }
             }
 
@@ -177,7 +180,7 @@ function loadState() {
 
         // When a step node card is clicked, that card's context has to be focused
         $(document).on("click", ".step-node-card", function () {
-            let clickedNodeId = parseInt($(this).attr('id').split('-')[1])
+            let clickedNodeId = parseInt($(this).attr("id").split("-")[1])
             if(!(nodes.get(clickedNodeId) === currentNodeInFocus)) updateNodeInFocus(clickedNodeId)
         })
 
@@ -207,7 +210,7 @@ function updateNodeInFocus(nodeIndex) {
     currentNodeInFocus = nodes.get(nodeIndex)
 
     // Update choice cards
-    document.querySelectorAll('.choice-card').forEach(e => e.remove())
+    document.querySelectorAll(".choice-card").forEach(e => e.remove())
     let currentNodeResponseChoices = currentNodeInFocus.responseChoices
     currentNodeResponseChoices.forEach((value, key) => {
         addChoice(key, value.description, value.destinationIndex)
@@ -435,7 +438,7 @@ function handleIsFirstNodeCheck() {
     // Go through and mark every other node as not first
     if(checked) {
         nodes.forEach((value) => {
-            value.isFirst = value === currentNodeInFocus;
+            value.isFirst = value === currentNodeInFocus
         })
     }
 
@@ -450,7 +453,7 @@ function handleIsTerminalNodeCheck() {
     // Updates selects visible on the page
     const selects = document.getElementsByTagName("select")
     for(const select of selects) {
-        select.innerHTML = generateSelectOptions();
+        select.innerHTML = generateSelectOptions()
     }
 
     // Resets destination for all current node's choices to 0 in memory
@@ -514,13 +517,13 @@ function handleValidateToggle() {
 }
 
 function setElementAsInvalid(element, message) {
-    element.setAttribute('title', message)
-    element.classList.add('invalid')
+    element.setAttribute("title", message)
+    element.classList.add("invalid")
 }
 
 function setElementAsValid(element) {
-    element.setAttribute('title', "")
-    element.classList.remove('invalid')
+    element.setAttribute("title", "")
+    element.classList.remove("invalid")
 }
 
 /**
@@ -686,31 +689,31 @@ function validateResponseChoices() {
  */
 
 function getTemplateNameInput() {
-    return document.getElementById('template-name-input')
+    return document.getElementById("template-name-input")
 }
 
 function getTemplateDescriptionInput() {
-    return document.getElementById('template-description-input')
+    return document.getElementById("template-description-input")
 }
 
 function getNodeNameInput() {
-    return document.getElementById('node-name-input')
+    return document.getElementById("node-name-input")
 }
 
 function getNodeDescriptionInput() {
-    return document.getElementById('node-description-input')
+    return document.getElementById("node-description-input")
 }
 
 function getFirstStepToggle() {
-    return document.getElementById('is-first-node-check')
+    return document.getElementById("is-first-node-check")
 }
 
 function getTerminalStepToggle() {
-    return document.getElementById('is-terminal-node-check')
+    return document.getElementById("is-terminal-node-check")
 }
 
 function getVideoUrlInput() {
-    return document.getElementById('video-url-input')
+    return document.getElementById("video-url-input")
 }
 
 function getChoiceDestinationSelect(choiceIndex) {
@@ -726,6 +729,6 @@ function getValidateToggle() {
 }
 
 function setEmbeddedVideoUrl(url) {
-    document.getElementById("embedded-video-iframe").setAttribute('src', getEmbeddableUrl(url))
+    document.getElementById("embedded-video-iframe").setAttribute("src", getEmbeddableUrl(url))
 }
 /*********************************************************************************************************************/
