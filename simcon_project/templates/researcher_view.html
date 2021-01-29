@@ -1,7 +1,7 @@
 {% extends "researcher_base.html" %}
-{% load render_table from django_tables2 %}
 {% load static %}
 {% block nav-researcherView %}{% endblock %} 
+{% load render_table from django_tables2 %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
@@ -20,11 +20,24 @@
     </title>
   </head>
   <body>
-<div class="table-container"> 
-  {% render_table responseTable %}
+    <div style="display: inline-block">
 
+<div class="table-container" style="display: inline-block; float: left;"> 
+  {% render_table responseTable %}
 </div>
+<div class="delete-buttons" style="display: inline-block">
+  <br>
+  {% for obj in responseTable %}
+    <form method="POST">
+        {% csrf_token %}
+        <br>
+        <button type="submit" name="delete_items" value="{{ obj.pk }}">Delete</button>
+        <p></p>
+        <!-- The paragraph gave the perfect spacing -->
+    </form>
+{% endfor %}
+</div>
+    </div>
   </body>
 </html>
 {% endblock %}
-

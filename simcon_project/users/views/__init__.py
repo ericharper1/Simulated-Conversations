@@ -6,5 +6,4 @@ from .researcher_registration import ResearcherRegistration
 from .studentuser_page import StudentUserView
 from .student_settings_page import StudentSettingsView
 from .student_home import StudentView
-from .template_start import TemplateStartView
 from .view_response import ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback

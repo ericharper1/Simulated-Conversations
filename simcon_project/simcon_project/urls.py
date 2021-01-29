@@ -43,4 +43,5 @@ urlpatterns = [
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
+    path('conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
 ]
