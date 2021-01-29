@@ -24,7 +24,7 @@ def CreateConversationTemplateView(request):
         conv_temlpate = ConversationTemplate(
             name=body['templateName'],
             description=body['templateDescription'],
-            researcher=Researcher.objects.get(email=request.user.email)) #TODO Not sure if this is the best way to do it?
+            researcher=Researcher.objects.get(email=request.user.email))
         conv_temlpate.save()
 
         # First pass to create all TemplateNode objects
