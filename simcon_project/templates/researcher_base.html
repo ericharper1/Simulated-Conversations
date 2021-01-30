@@ -19,6 +19,7 @@
         <ul class="nav navbar-nav">
           <li>{% block nav-researcherView %}<a href="{% url 'ResearcherView' %}">Home</a>{% endblock %}</li>
           <li>{% block nav-templateView %}<a href="{% url 'management:main' %}">Templates</a>{% endblock %}</li>
+          <li>{% block nav-studentmanagementView %}<a href="{% url 'StudentManagement' %}">Student Management</a>{% endblock %}</li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>{% block nav-userView %}<a href="{% url 'ResearcherUserView' %}"><span class="glyphicon glyphicon-user"></span> User</a>{% endblock %}</li>
