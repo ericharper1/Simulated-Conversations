@@ -144,7 +144,7 @@ LOGIN_REDIRECT_URL = '/redirect-from-login'
 LOGOUT_REDIRECT_URL = 'Login'
 LOGIN_URL = 'Login'
 
-# Bootstrap Template for Django Tables
+# Bootstrap Template for Django Tables 
 DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
 MEDIAFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/media')

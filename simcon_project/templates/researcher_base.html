@@ -22,7 +22,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li>{% block nav-userView %}<a href="{% url 'ResearcherUserView' %}"><span class="glyphicon glyphicon-user"></span> User</a>{% endblock %}</li>
-          <li> {% block nav-settingsView %}<a href="{% url 'ResearcherSettingsView' %}"><span class="glyphicon glyphicon-cog"></span> Settings</a>{% endblock %}</li>
+          <li>{% block nav-settingsView %}<a href="{% url 'settings:main' %}"><span class="glyphicon glyphicon-cog"></span> Settings</a>{% endblock %}</li>
         </ul>
       </div>
     </nav>
