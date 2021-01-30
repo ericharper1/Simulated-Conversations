@@ -18,7 +18,7 @@ from django.urls import path
 from conversation_templates.views import TemplateResponsesView
 from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, \
     UpdateNodeResponseFeedback, ResearcherUserView, StudentSettingsView, StudentUserView, \
-    ResearcherRegistration
+    ResearcherRegistration, StudentManagement, UserRegistration
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -40,5 +40,8 @@ urlpatterns = [
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
     path('view-response/<uuid:pk>/updatenode/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
+    path('student-management/<str:name>', StudentManagement, name="StudentManagement"),
+    path('student-management/', StudentManagement, name="StudentManagement"),
+    path('user-registration/<uidb64>/', UserRegistration, name="UserRegistration"),
     path('conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
 ]
