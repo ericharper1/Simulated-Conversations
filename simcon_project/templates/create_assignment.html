@@ -27,10 +27,6 @@
                 <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="YYYY-MM-DD" required>
             </div>
 
-            <div class="form-group">
-                <label for="researcher_email">Researcher email:</label>
-                <input type="text" class="form-control col-lg-10" id="researcher_email" required>
-            </div>
 
             <!--add student -->
             <div class="form-group">
@@ -249,15 +245,9 @@
           //get data
           assign_name=document.getElementById("assign_name").value;
           assign_date=document.getElementById("assign_date").value;
-          researcher_email=document.getElementById("researcher_email").value;
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
-
-          if(!verify_researcher(researcher_email)){
-              window.alert(researcher_email+" is not a researcher!");
-              return;
-          }
 
           //post data to server
           $.ajax({
@@ -266,7 +256,6 @@
               data: {
                   'name': assign_name,
                   'date': assign_date,
-                  'researcher': researcher_email,
                   'stuData': stuJSON,
                   'tempData': tempJSON,
                   'labelData': labelJSON
