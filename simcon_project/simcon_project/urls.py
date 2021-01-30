@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, UpdateNodeResponseFeedback, ResearcherSettingsView, ResearcherUserView, StudentSettingsView,StudentUserView
 from conversation_templates.views import TemplateResponsesView
+from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, \
+    UpdateNodeResponseFeedback, ResearcherUserView, StudentSettingsView, StudentUserView, \
+    ResearcherRegistration
 from django.conf.urls import include
 from django.contrib.auth import views
 
@@ -26,13 +28,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
-    path('student-view/', StudentView, name="StudentView"),
+    path('researcher-registration/<uidb64>/<token>/', ResearcherRegistration, name="ResearcherRegistration"),
     path('researcher-view/', ResearcherView, name="ResearcherView"),
-    path('user-view/', ResearcherUserView, name="ResearcherUserView"),
-    path('studentuser-view/', StudentUserView, name="StudentUserView"),
-    path('settings/', ResearcherSettingsView, name="ResearcherSettingsView"),
-    path('student-settings/', StudentSettingsView, name="StudentSettingsView"),
     path('researcher-view/template-management/', include('conversation_templates.urls.templates_urls'), name="TemplateManagementView"),
+    path('user-view/', ResearcherUserView, name="ResearcherUserView"),
+    path('researcher-settings/', include('users.urls'), name="ResearcherSettingsView"),
+    path('student-view/', StudentView, name="StudentView"),
+    path('studentuser-view/', StudentUserView, name="StudentUserView"),
+    path('student-settings/', StudentSettingsView, name="StudentSettingsView"),
     path('view-all-response/<uuid:pk>', TemplateResponsesView.as_view(), name="ViewAllResponses"),
     path('view-response/', ViewResponse, name="ViewResponse"),
     path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),

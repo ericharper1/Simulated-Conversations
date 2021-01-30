@@ -1,10 +1,12 @@
 {% extends "researcher_base.html" %}
-{% block nav-settingsView %}{% endblock %} 
+{% block nav-settingsView %}{% endblock %}
+{% load static %}
+{% load render_table from django_tables2 %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    
+
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,15 +16,70 @@
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}
     </style>
+
+
     <title>
     {% block title %}Simulated Conversations | Settings{% endblock %}
     </title>
+      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+
     {% block extrahead %} {% endblock %}
   </head>
   <body>
     <div class="container">
-      <h1> This is the Settings Page</h1>
-    </div> 
+      <h1>Settings</h1>
+        {% for message in messages %}
+            <div class="alert alert-warning">
+                <a class="close" href="#" data-dismiss="alert">×</a>
+                {{ message }}
+            </div>
+        {% endfor %}
+          <form id="change_password_form" method="post">
+            {% csrf_token %}
+            {{ change_password_form }}
+            <button type="submit" form="change_password_form" name="change_password">Save changes</button>
+          </form>
+          <br>
+        {% if researchers_table %}
+            {% render_table researchers_table %}
+        {% endif %}
+        <br>
+        {% if add_researcher_form %}
+            <form id="add_researcher_form" method="post">
+              {% csrf_token %}
+              {{ add_researcher_form }}
+              <button type="submit" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
+            </form>
+        {% endif %}
+    </div> <!-- /container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!-- Code needed for the modal to work properly.
+             Content in folder_creation_modal.html is rendered between "#modal-content" div
+        -->
+        <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $(".bs-modal").each(function () {
+                $(this).modalForm({
+                    formURL: $(this).data('form-url')
+                });
+            });
+        });
+        </script>
   </body>
 </html>
 {% endblock %}
