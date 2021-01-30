@@ -1,7 +1,7 @@
 from django import forms
+from django.db.models.functions import Lower
 from .models import TemplateFolder, TemplateNodeChoice
 from .models import ConversationTemplate
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 
@@ -31,6 +31,27 @@ class FolderCreationForm(BSModalModelForm):
         model = TemplateFolder
         fields = ['name', 'templates']
         widgets = {'templates': SelectTemplates}
+
+
+class SelectTemplateForm(forms.Form):
+    """
+    Form containing a single ChoiceField to select a template.
+    The template being viewed right now will be the initial value in the ChoiceField and others
+    are ordered in alphabetical order (case insensitive).
+    Each choice is a tuple of (template.id, template.name) so template id can be used when the
+    form is submitted on a POST request.
+    """
+
+    def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request')
+        initial = kwargs.pop('initial')
+        super().__init__(*args, **kwargs)
+        if request.user and initial:
+            templates = ConversationTemplate.objects.filter(researcher=request.user.id).exclude(name=initial).order_by(Lower('name'))
+            template_list = [(ConversationTemplate.objects.get(name=initial).id, initial)]
+            for template in templates:
+                template_list.append((template.id, template.name))
+            self.fields['templates'] = forms.ChoiceField(choices=template_list)
 
 
 class TemplateNodeChoiceForm(forms.Form):

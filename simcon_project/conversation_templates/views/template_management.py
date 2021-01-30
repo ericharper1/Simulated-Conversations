@@ -18,6 +18,7 @@ class FolderTemplateTable(tables.Table):
     """
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
                              extra_context={"in_folder": True})
+    name = tables.columns.LinkColumn('ViewAllResponses', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
@@ -31,6 +32,7 @@ class AllTemplateTable(tables.Table):
     Only used when all templates are displayed.
     """
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
+    name = tables.columns.LinkColumn('ViewAllResponses', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
@@ -189,7 +191,6 @@ def remove_template(request, pk):
     This does not delete the template.
     """
     if request.method == 'POST':
-
         previous_url = request.META.get('HTTP_REFERER')
         folder_pk = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
         template = get_object_or_404(ConversationTemplate, pk=pk)
