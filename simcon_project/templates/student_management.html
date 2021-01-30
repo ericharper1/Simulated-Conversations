@@ -1,5 +1,8 @@
+{% extends "researcher_base.html" %}
+{% load static %}
+{% block nav-researcherView %}{% endblock %}
 {% load render_table from django_tables2 %}
-<!DOCTYPE html>
+{% block content %}
 <div lang="en">
   <head>
 
@@ -24,8 +27,7 @@
   <div>
     <p class="container">
       <h1>Student Management</h1>
-        {% block content %}
-        {% endblock %}
+
   </div>
 
   <div class="row">
@@ -43,7 +45,7 @@
       </div>
 
       <div class="col-md-6">
-        <p>Add Student to label:</p>
+        <p>Add Student to the "{{ name }}" label:</p>
         <form action='/student-management/{{ name }}' method="post">
           {%csrf_token%}
           {{ form }}
@@ -64,3 +66,4 @@
 
   </body>
 </html>
+{% endblock %}

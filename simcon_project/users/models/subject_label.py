@@ -11,9 +11,6 @@ class SubjectLabel(models.Model):
     def get_label_name(self):
         return self.label_name
 
-    #def count_students(self):
-        #return len(self.students)
-
     def create_label(self, name, res, **extra_fields):
         """
         Create and save a label

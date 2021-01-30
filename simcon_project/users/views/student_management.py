@@ -3,9 +3,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from users.models import Student, Researcher
+from users.models import Student, Researcher, SubjectLabel
 from django.core.mail import send_mail
-from users.models import SubjectLabel
 import django_tables2 as tables
 from django_tables2.config import RequestConfig
 from django.contrib import messages
@@ -27,32 +26,17 @@ def StudentManagement(request, name="All Students"):
     # gets current researcher for use later
     added_by = Researcher.objects.get(email=request.user)
 
-    #if the label with label_nam = name is not found load default of All Students
+    # if the label with label_nam = name is not found load default of All Students
     if not SubjectLabel.objects.filter(label_name=name, researcher=added_by):
         name = "All Students"
 
-    #if the table for All Students is deleted or does not exist, make it and add all students the resercher
+    # if the table for All Students is deleted or does not exist, make it and add all students the resercher
     # has added and add them to it.
     if not SubjectLabel.objects.filter(label_name='All Students', researcher=added_by):
-        test = SubjectLabel().create_label('All Students', added_by)
+        all_stu_lbl = SubjectLabel().create_label('All Students', added_by)
         all_students = Student.objects.filter(added_by=added_by, is_active=True)
         for stud in all_students:
-            test.students.add(stud)
-
-    #creates the table for the labels
-    lbl_contents = SubjectLabel.objects.filter(researcher=added_by).values(
-        'label_name')
-    label_table = LabelList(lbl_contents, prefix="1-")
-    RequestConfig(request, paginate={"per_page": 10}).configure(label_table)
-
-    #creates the table for the students in current label
-    stu_contents = SubjectLabel.objects.filter(label_name=name).values(
-            'students__first_name',
-            'students__last_name',
-            'students__email',
-            'students__registered')
-    student_table = StudentList(stu_contents, prefix="2-")
-    RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
+            all_stu_lbl.students.add(stud)
 
     #if researcher presses a submit button
     if request.method == "POST":
@@ -118,6 +102,23 @@ def StudentManagement(request, name="All Students"):
                 else:
                     messages.error(request, 'Label name already exists',
                                    fail_silently=False)
+
+
+
+    # creates the table for the labels
+    lbl_contents = SubjectLabel.objects.filter(researcher=added_by).values(
+            'label_name')
+    label_table = LabelList(lbl_contents, prefix="1-")
+    RequestConfig(request, paginate={"per_page": 10}).configure(label_table)
+
+    # creates the table for the students in current label
+    stu_contents = SubjectLabel.objects.filter(label_name=name).values(
+        'students__first_name',
+        'students__last_name',
+        'students__email',
+        'students__registered')
+    student_table = StudentList(stu_contents, prefix="2-")
+    RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
 
     return render(request, 'student_management.html',  {"name":name, "form": SendEmail(), "form2": NewLabel(),
                                                         'stu_table': student_table, 'lbl_table': label_table})
