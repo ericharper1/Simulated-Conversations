@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     # Our apps
     'users',
     'conversation_templates',
-
 ]
 
 MIDDLEWARE = [
@@ -149,7 +148,6 @@ DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
 MEDIAFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/media')
 ]
-
 
 #we will need to hide this in the final version
 SENDGRID_API_KEY = os.getenv('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')
