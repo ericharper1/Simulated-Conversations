@@ -662,7 +662,7 @@ function validateChoiceDescriptionInput(choiceIndex) {
 
 function validateChoiceDestinationSelect(choiceIndex) {
     const element = getChoiceDestinationSelect(choiceIndex)
-    if(element.value == 0) {
+    if(element.value == 0 && !currentNodeInFocus.isTerminal) {
         setElementAsInvalid(element, NO_DESTINATION_FOR_CHOICE_ERROR)
     } else {
         setElementAsValid(element)

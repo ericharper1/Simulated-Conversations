@@ -47,4 +47,4 @@ def CreateConversationTemplateView(request):
                     parent_template=stored_nodes_dict.get(received_node[0]),
                     destination_node=stored_nodes_dict.get(choice['destinationIndex'])).save()
 
-        return HttpResponse(status=250)
+        return HttpResponse(status=202)
