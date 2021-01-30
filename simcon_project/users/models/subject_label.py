@@ -10,3 +10,12 @@ class SubjectLabel(models.Model):
 
     def get_label_name(self):
         return self.label_name
+
+    def create_label(self, name, res, **extra_fields):
+        """
+        Create and save a label
+        """
+        self.label_name = name
+        self.researcher = res
+        self.save()
+        return self
