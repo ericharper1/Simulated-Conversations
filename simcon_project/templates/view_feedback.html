@@ -39,6 +39,9 @@
         {% for node in response_nodes %}
         <div class="row">
             <h2> Response {{node.position_in_sequence}}</h2>
+            <div class="row">
+            {{node.template_node.description}}
+            </div>
         </div>
         <div class="row">
             <div class="col-sm-4">
