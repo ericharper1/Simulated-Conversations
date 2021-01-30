@@ -61,7 +61,8 @@ def add_data(request):
     data=request.POST
     name=data.get('name')
     date=data.get('date')
-    researcher=data.get('researcher')
+    researcher=request.user
+    #researcher='researcher@111.com'
     students=data.get('stuData')
     templates=data.get('tempData')
     labels=data.get('labelData')
@@ -127,10 +128,12 @@ def add_data(request):
 
     subject='Simulated Conversation Assignment Update'
     msg='You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
-    schedId='Assignment--'+name
-    #run_date='2021-01-22 18:35:00'
-    sched.add_job(sendMail, trigger='date', id=schedId, run_date=date, args=(subject, msg, students, researcher))
-    sched.start()
+    schedId='Assignment--'+name+'--'+date
+    #when an error occurs, there is no need to add this task to the schedule.
+    if success==0:
+        #run_date='2021-01-22 18:35:00'
+        sched.add_job(sendMail, trigger='date', id=schedId, run_date=date, args=(subject, msg, students, researcher),replace_existing=True)
+        sched.start()
 
     return HttpResponse(json.dumps({
         'success': success,
