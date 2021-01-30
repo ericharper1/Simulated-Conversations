@@ -80,4 +80,4 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
     def post(self, request, pk):
         # Note: keep pk even if it isn't used since the url requires it.
         # Redirect to selected template_responses_table from the choicefield
-        return redirect(reverse('TemplateResponsesView', args=[request.POST['templates']]))
+        return redirect(reverse('ViewAllResponses', args=[request.POST['templates']]))
