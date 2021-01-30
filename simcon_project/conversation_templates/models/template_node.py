@@ -23,7 +23,7 @@ class TemplateNode(models.Model):
     parent_template = models.ForeignKey('conversation_templates.ConversationTemplate', default=0, related_name='template_nodes', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.description
+        return f"{self.parent_template}: {self.description}"
 
     def get_absolute_url(self):
         return reverse('conversation-step', kwargs={'ct_node_id': self.id})
