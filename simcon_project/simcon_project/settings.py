@@ -136,21 +136,22 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-# Static URLS [These are used when in non production enviroments]
+# Static URLS [These are used when in non production environments]
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-LOGIN_REDIRECT_URL = '/redirect-from-login'
-LOGOUT_REDIRECT_URL = 'Login'
-LOGIN_URL = 'Login'
+LOGIN_REDIRECT_URL = 'redirect-from-login'
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
 
-# Bootstrap Template for Django Tables 
+# Bootstrap Template for Django Tables
 DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
 MEDIAFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/media')
 ]
 
-#we will need to hide this in the final version
-SENDGRID_API_KEY = os.getenv('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')
+# we will need to hide this in the final version
+SENDGRID_API_KEY = os.getenv(
+    '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')
 EMAIL_HOST = 'smtp.sendgrid.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'apikey'

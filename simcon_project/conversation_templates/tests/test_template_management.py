@@ -3,9 +3,9 @@ from django.utils import timezone
 from django.shortcuts import reverse
 from datetime import date
 from users.models import Researcher, Student, Assignment, SubjectLabel
-from ..models import *
-from ..forms import FolderCreationForm
-from ..views.template_management import route_to_current_folder, FolderEditView
+from conversation_templates.models import *
+from conversation_templates.forms import FolderCreationForm
+from conversation_templates.views.template_management import route_to_current_folder, FolderEditView
 
 
 class TemplateManagementTests(TestCase):
@@ -44,9 +44,9 @@ class TemplateManagementTests(TestCase):
         self.assertEqual(form.errors["name"], expected)
 
     def test_route_to_existing_url_with_folder(self):
-        request = self.factory.get(reverse('management:folder_view', args=[self.folder.id]))
+        request = self.factory.get(reverse('management:folder-view', args=[self.folder.id]))
         response = route_to_current_folder(request.get_full_path())
-        self.assertEqual(response, reverse('management:folder_view', args=[self.folder.id]))
+        self.assertEqual(response, reverse('management:folder-view', args=[self.folder.id]))
 
     def test_route_to_existing_url_no_folder(self):
         request = self.factory.get(reverse('management:main'))
@@ -59,7 +59,7 @@ class TemplateManagementTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_folder_view(self):
-        response = self.client.get(reverse('management:folder_view', args=[self.folder.id]))
+        response = self.client.get(reverse('management:folder-view', args=[self.folder.id]))
         self.assertIn('FolderTemplateTable', str(type(response.context['templateTable'])))
         self.assertEqual(response.context['folder_pk'], self.folder.id)
         self.assertEqual(response.status_code, 200)
@@ -67,26 +67,26 @@ class TemplateManagementTests(TestCase):
     def test_edit_folder(self):
         data = {"name": "changed_folder", "templates": []}
         prev_request = self.factory.get(reverse('management:main'))
-        request = self.factory.post(reverse('management:edit_folder', args=[self.folder.id]), data=data)
+        request = self.factory.post(reverse('management:edit-folder', args=[self.folder.id]), data=data)
         request.META['HTTP_REFERER'] = prev_request
         response = FolderEditView.as_view()(request, pk=self.folder.id)
         self.assertEqual(response.status_code, 302)
 
     def test_create_folder(self):
-        response = self.client.post(reverse('management:create_folder'), data={
+        response = self.client.post(reverse('management:create-folder'), data={
             "name": "new_folder",
             "templates": self.template1})
         self.assertEqual(response.status_code, 200)
 
     def test_delete_folder(self):
         folder_count = TemplateFolder.objects.count()
-        response = self.client.post(reverse('management:delete_folder', args=[self.folder.id]))
+        response = self.client.post(reverse('management:delete-folder', args=[self.folder.id]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(TemplateFolder.objects.count(), folder_count - 1)
 
     def test_delete_template(self):
         template_count = ConversationTemplate.objects.count()
-        response = self.client.post(reverse('management:delete_template', args=[self.template1.id]))
+        response = self.client.post(reverse('management:delete-template', args=[self.template1.id]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(ConversationTemplate.objects.count(), template_count - 1)
 
@@ -122,7 +122,7 @@ class TemplateManagementTests(TestCase):
         self.assertEqual(TemplateNodeResponse.objects.count(), 1)
         self.assertEqual(self.template1.name, assignment1.conversation_templates.get(name=self.template1.name).name)
 
-        self.client.post(reverse('management:delete_template', args=[self.template1.id]))
+        self.client.post(reverse('management:delete-template', args=[self.template1.id]))
 
         with self.assertRaises(ConversationTemplate.DoesNotExist):
             assignment1.conversation_templates.get(name=self.template1.name)

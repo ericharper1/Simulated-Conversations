@@ -1,22 +1,19 @@
 from django.contrib.auth.decorators import user_passes_test
+from users.views.student_home import is_student
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render
 
 
-def is_student(user):
-    return user.is_authenticated and not user.get_is_researcher()
-
-
 @user_passes_test(is_student)
-def StudentSettingsView(request):
+def student_settings_view(request):
     """
     Settings view for students and researchers (non-staff)
     :param request:
     :return:
     """
-    change_password_form = ChangePassword(request)
+    change_password_form = change_password(request)
 
     return render(request, 'student_settings_view.html', {
         'change_password_form': change_password_form,
@@ -24,7 +21,7 @@ def StudentSettingsView(request):
 
 
 @user_passes_test(is_student)
-def ChangePassword(request):
+def change_password(request):
     """
     Displays and validates Django default PasswordChangeForm
     :param request:

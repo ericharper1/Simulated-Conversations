@@ -5,6 +5,7 @@ import uuid
 class TemplateNodeResponse(models.Model):
     """
     Contains information related to a user response for a TemplateNode
+
     Fields:
     id: Primary key id for TemplateNodeResponse object
     transcription: Student transcription of their audio_response

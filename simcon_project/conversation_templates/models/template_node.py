@@ -7,6 +7,7 @@ import uuid
 class TemplateNode(models.Model):
     """
     Contains information for a step in a conversation
+
     Fields:
     id: Primary key identifier for TemplateNode object
     description: Context for step in the conversation

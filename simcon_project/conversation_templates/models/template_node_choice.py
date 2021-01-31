@@ -5,6 +5,7 @@ import uuid
 class TemplateNodeChoice(models.Model):
     """
     Contains information for a choice that a Student can choose on a TemplateNode object
+
     Fields:
     id: Primary key id for TemplateNodeChoice object
     choice_text: A text description for the Choice object

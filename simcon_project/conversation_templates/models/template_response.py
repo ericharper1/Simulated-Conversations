@@ -6,6 +6,7 @@ import uuid
 class TemplateResponse(models.Model):
     """
     Contains information for a Student response to a ConversationTemplate object
+
     Fields:
     id: Primary key id for TemplateResponse object
     completion_date: UTC date that Student completed conversation
