@@ -14,7 +14,7 @@ def is_student(user):
 class StudentHomeTable(tables.Table):
     """
     Table of assigned conversation templates for a given student.
-    name is the name of the template assigned.
+    name is the name of the template assigned. links to conversation-start
     date_assigned is the date that template was assigned.
     completion_date is the date the template was last completed by the student or is null.
     """
@@ -31,6 +31,11 @@ class StudentHomeTable(tables.Table):
 
 @user_passes_test(is_student)
 def student_view(request):
+    """
+    Creates table of the student's assigned templates with links to start new responses.
+    :param request:
+    :return: student_view.html with table
+    """
     assigned_templates = []
     # get the Student object matching logged in student
     student = Student.objects.filter(id=request.user.id)
