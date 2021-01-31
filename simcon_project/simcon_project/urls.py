@@ -15,12 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from conversation_templates.views import TemplateResponsesView
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, \
-    UpdateNodeResponseFeedback, ResearcherUserView, StudentSettingsView, StudentUserView, \
-    ResearcherRegistration, StudentManagement, UserRegistration
+from users.views import *
+from conversation_templates.views import *
 from django.conf.urls import include
 from django.contrib.auth import views
+
 
 urlpatterns = [
     path('', views.LoginView.as_view(), name="Login"),

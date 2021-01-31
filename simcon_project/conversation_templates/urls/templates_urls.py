@@ -10,4 +10,5 @@ urlpatterns = [
     path('folder/edit/<uuid:pk>', FolderEditView.as_view(), name='edit_folder'),
     path('templates/delete/<uuid:pk>', TemplateDeleteView.as_view(), name="delete_template"),
     path('folder/remove/<uuid:pk>', remove_template, name="remove_template"),
+    path('templates/new', CreateConversationTemplateView, name="CreateConversationTemplateView")
 ]
