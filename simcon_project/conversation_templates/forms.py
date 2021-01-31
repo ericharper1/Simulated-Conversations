@@ -1,7 +1,6 @@
 from django import forms
 from django.db.models.functions import Lower
-from .models import TemplateFolder, TemplateNodeChoice
-from .models import ConversationTemplate
+from .models import TemplateFolder, TemplateNodeChoice, ConversationTemplate
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 

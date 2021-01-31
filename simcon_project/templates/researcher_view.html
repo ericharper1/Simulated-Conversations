@@ -23,11 +23,11 @@
     <div style="display: inline-block">
 
 <div class="table-container" style="display: inline-block; float: left;"> 
-  {% render_table responseTable %}
+  {% render_table response_table %}
 </div>
 <div class="delete-buttons" style="display: inline-block">
   <br>
-  {% for obj in responseTable %}
+  {% for obj in response_table %}
     <form method="POST">
         {% csrf_token %}
         <br>

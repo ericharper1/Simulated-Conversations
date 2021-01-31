@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from users.views.researcher_home import is_researcher
+from django.contrib.auth.decorators import user_passes_test
 
 
-@login_required
-def ResearcherUserView(request):
+@user_passes_test(is_researcher)
+def researcher_user_view(request):
     return render(request, 'researcher_user_view.html')
-

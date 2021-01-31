@@ -7,13 +7,12 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 
-def ResearcherRegistration(request, uidb64, token):
+def researcher_registration(request, uidb64):
     """
     This displays a form for the researcher to confirm their account details entered in by the admin
     and to set their password. Sends user to the login page
     :param request:
     :param uidb64:
-    :param token: necessary for function to be called correctly. can we remove/change this?
     :return: html page containing form for researcher to register their new account.
     """
     if request.method == "POST":
@@ -33,7 +32,7 @@ def ResearcherRegistration(request, uidb64, token):
                         user.registered = True
                         user.save()
                         login(request, user)
-                        return redirect('Login')
+                        return redirect('researcher-view')
                     else:
                         messages.error(request, 'Please use the link provided in the email and make '
                                                 'sure to enter the same email address where the link was originally '

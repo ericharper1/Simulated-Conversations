@@ -8,21 +8,24 @@ from django.core.mail import send_mail
 import django_tables2 as tables
 from django_tables2.config import RequestConfig
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from users.views.researcher_home import is_researcher
 
 
-class StudentList(tables.Table):  #collects info from students to display on the table
+class StudentList(tables.Table):  # collects info from students to display on the table
     first_name = tables.Column(verbose_name='First Name', accessor='students__first_name')
     last_name = tables.Column(verbose_name='Last Name', accessor='students__last_name')
     email = tables.Column(verbose_name='Email', accessor='students__email')
     registered = tables.Column(verbose_name='Registered', accessor='students__registered')
 
 
-class LabelList(tables.Table):  #collects the table names
-    label_name = tables.Column(linkify={"viewname": "StudentManagement", "args": [tables.A("label_name")]},
+class LabelList(tables.Table):  # collects the table names
+    label_name = tables.Column(linkify={"viewname": "student-management", "args": [tables.A("label_name")]},
                                accessor='label_name', verbose_name='Label Name')
 
 
-def StudentManagement(request, name="All Students"):
+@user_passes_test(is_researcher)
+def student_management(request, name="All Students"):
     # gets current researcher for use later
     added_by = Researcher.objects.get(email=request.user)
 
@@ -30,7 +33,7 @@ def StudentManagement(request, name="All Students"):
     if not SubjectLabel.objects.filter(label_name=name, researcher=added_by):
         name = "All Students"
 
-    # if the table for All Students is deleted or does not exist, make it and add all students the resercher
+    # if the table for All Students is deleted or does not exist, make it and add all students the researcher
     # has added and add them to it.
     if not SubjectLabel.objects.filter(label_name='All Students', researcher=added_by):
         all_stu_lbl = SubjectLabel().create_label('All Students', added_by)
@@ -38,9 +41,9 @@ def StudentManagement(request, name="All Students"):
         for stud in all_students:
             all_stu_lbl.students.add(stud)
 
-    #if researcher presses a submit button
+    # if researcher presses a submit button
     if request.method == "POST":
-        if request.POST.get('student_email'):  #create new student
+        if request.POST.get('student_email'):  # create new student
             form = SendEmail(request.POST)
 
             if form.is_valid():
@@ -49,31 +52,31 @@ def StudentManagement(request, name="All Students"):
 
                 if new:
                     if not Student.objects.filter(email=email):
-                        #creates a student with blank fist and last names, then the password is set to unusable
+                        # creates a student with blank fist and last names, then the password is set to unusable
                         first_name = ""
                         last_name = ""
                         password = ""
                         user = Student.objects.create(email=email, first_name=first_name, last_name=last_name, password=password, added_by=added_by, )
                         user.set_unusable_password()
 
-                        #adds student to current label and/or the All Students label
+                        # adds student to current label and/or the All Students label
                         label = SubjectLabel.objects.get(label_name=name, researcher=added_by)
                         label.students.add(user)
                         if not name == "All Students":
                             label = SubjectLabel.objects.get(label_name="All Students", researcher=added_by)
                             label.students.add(user)
 
-                        #collects the current domain of the website and the users uid
+                        # collects the current domain of the website and the users uid
                         current_site = get_current_site(request)
                         site = current_site.domain
                         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-                        #creates the subject and message content for the emails
+                        # creates the subject and message content for the emails
                         subject = 'Activate Your Simulated conversations account'
-                        message = 'Hi, \nPlease register here: \nhttp://' + site + '/user-registration/'\
-                              + uid + '\n'
+                        message = 'Hi, \nPlease register here: \nhttp://' + site + '/student/register/'\
+                            + uid + '\n'
 
-                        #sends the email
+                        # sends the email
                         send_mail(subject, message, 'simulated.conversation@mail.com', [email], fail_silently=False)
                     else:
                         messages.error(request, 'Student already exists',
@@ -91,19 +94,17 @@ def StudentManagement(request, name="All Students"):
                     else:
                         messages.error(request, 'Student does not already exist',
                                        fail_silently=False)
-        if request.POST.get('label_name'):  #create new label
-            savefldr = NewLabel(request.POST)
-            if savefldr.is_valid():
-                label_name = savefldr.cleaned_data.get("label_name")
+        if request.POST.get('label_name'):  # create new label
+            save_folder = NewLabel(request.POST)
+            if save_folder.is_valid():
+                label_name = save_folder.cleaned_data.get("label_name")
 
-                #if the label does not already exist, create it
+                # if the label does not already exist, create it
                 if not SubjectLabel.objects.filter(label_name=label_name, researcher=added_by):
                     SubjectLabel().create_label(label_name, added_by)
                 else:
                     messages.error(request, 'Label name already exists',
                                    fail_silently=False)
-
-
 
     # creates the table for the labels
     lbl_contents = SubjectLabel.objects.filter(researcher=added_by).values(
@@ -120,5 +121,5 @@ def StudentManagement(request, name="All Students"):
     student_table = StudentList(stu_contents, prefix="2-")
     RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
 
-    return render(request, 'student_management.html',  {"name":name, "form": SendEmail(), "form2": NewLabel(),
+    return render(request, 'student_management.html',  {"name": name, "form": SendEmail(), "form2": NewLabel(),
                                                         'stu_table': student_table, 'lbl_table': label_table})

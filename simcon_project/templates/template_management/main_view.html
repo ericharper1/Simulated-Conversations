@@ -1,10 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 {% extends "researcher_base.html" %}
 {% block nav-templateView %}{% endblock %}
 {% load render_table from django_tables2 %}
 {% load static %}
 {% block content %}
-<html>
+<html lang="en">
     <head>
         <title>Template Management</title>
         <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
@@ -22,8 +22,8 @@
                 <input id="back-to-all" class="btn btn-success" type="submit" value="Back">
             </form>
             <button id="edit-folder" class="bs-modal btn btn-primary" type="button" name="button"
-                    data-form-url="{% url 'management:edit_folder' folder_pk %}">Edit</button>
-            <form method="post" action="{% url 'management:delete_folder' folder_pk %}">
+                    data-form-url="{% url 'management:edit-folder' folder_pk %}">Edit</button>
+            <form method="post" action="{% url 'management:delete-folder' folder_pk %}">
                 {% csrf_token %}
                 <input type="hidden" name="back" value="{{ request.path }}">
                 <button id="delete-folder" class="btn btn-danger" type="submit">Delete</button>
@@ -55,7 +55,7 @@
                 });
             });
             $("#create-folder").modalForm({
-                formURL: "{% url 'management:create_folder' %}",
+                formURL: "{% url 'management:create-folder' %}",
                 modalID: "#create_modal"
             });
         });

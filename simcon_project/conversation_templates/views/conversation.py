@@ -162,7 +162,7 @@ def conversation_end(request, ct_response_id):
         if ct_response.completion_date is None:
             ct_response.completion_date = timezone.now()
             ct_response.save()
-        return redirect('StudentView')
+        return redirect('student-view')
 
     # GET request
     ctx.update({
