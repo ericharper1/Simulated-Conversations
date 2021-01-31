@@ -32,7 +32,8 @@ def UserRegistration(request, uidb64):
                                                 user.registered = True
                                                 user.save()
                                                 login(request, user)
-                                                return redirect('/student-view/')  #sends to the student view after completion
+                                                return redirect('StudentView')  #sends to the student view after
+                                                # completion
                                         else:
                                                 messages.error(request, 'Please use link provided in email, and make '
                                                                         'sure to enter that email in confirm email',
