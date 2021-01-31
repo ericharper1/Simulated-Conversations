@@ -35,7 +35,7 @@ def ResearcherRegistration(request, uidb64):
                         user.registered = True
                         user.save()
                         login(request, user)
-                        return redirect('Login')
+                        return redirect('ResearcherView')
                     else:
                         messages.error(request, 'Please use the link provided in the email and make '
                                                 'sure to enter the same email address where the link was originally '
