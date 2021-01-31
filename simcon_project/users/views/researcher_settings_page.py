@@ -140,7 +140,6 @@ def AddResearcher(request):
             current_site = get_current_site(request)
             subject = 'Activate Your Simulated Conversations account'
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
             site = current_site.domain
             message = 'Hi, \nPlease register here: \nhttp://' + site + '/researcher/register/' \
                       + uid + '\n'
