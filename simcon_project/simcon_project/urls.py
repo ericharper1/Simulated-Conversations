@@ -15,42 +15,38 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from conversation_templates.views import TemplateResponsesView
-from users.views import RedirectFromLogin, StudentView, ResearcherView, ViewResponse, UpdateOverallResponseFeedback, \
-    UpdateNodeResponseFeedback, ResearcherUserView, StudentSettingsView, StudentUserView, \
-    ResearcherRegistration, StudentManagement, UserRegistration
+from conversation_templates.views import *
+from users.views import *
 from django.conf.urls import include
 from django.contrib.auth import views
 
 urlpatterns = [
+    # Redirects and such
     path('', views.LoginView.as_view(), name="Login"),
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', RedirectFromLogin, name="RedirectFromLogin"),
-    path('researcher-registration/<uidb64>/',
-         ResearcherRegistration, name="ResearcherRegistration"),
-    path('researcher/', ResearcherView, name="ResearcherView"),
-    path('researcher/templates/', include('conversation_templates.urls.templates_urls'),
-         name="TemplateManagementView"),
+
+    # Todo: remove
     path('user-view/', ResearcherUserView, name="ResearcherUserView"),
-    path('researcher-settings/', include('users.urls'),
-         name="ResearcherSettingsView"),
-    path('student-view/', StudentView, name="StudentView"),
     path('studentuser-view/', StudentUserView, name="StudentUserView"),
-    path('student-settings/', StudentSettingsView, name="StudentSettingsView"),
-    path('researcher/view-all-response/<uuid:pk>',
-         TemplateResponsesView.as_view(), name="ViewAllResponses"),
-    path('view-response/', ViewResponse, name="ViewResponse"),
-    path('view-response/<uuid:pk>/update/', UpdateOverallResponseFeedback,
-         name='UpdateOverallResponseFeedback'),
-    path('view-response/<uuid:pk>/updatenode/',
-         UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
-    path('student-management/<str:name>',
-         StudentManagement, name="StudentManagement"),
-    path('student-management/', StudentManagement, name="StudentManagement"),
-    path('user-registration/<uidb64>/',
-         UserRegistration, name="UserRegistration"),
-    path('conversation/', include('conversation_templates.urls.conv_urls'),
-         name='conversation'),
-]
+
+    # Stuff students can see
+    path('student/', StudentView, name="StudentView"),
+    path('student/settings/', StudentSettingsView, name="StudentSettingsView"),
+    path('student/register/<uidb64>/', UserRegistration, name="UserRegistration"),
+    path('student/conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
+
+    # Stuff researcher can see
+    path('researcher/', ResearcherView, name="ResearcherView"),
+    path('researcher/register/<uidb64>/', ResearcherRegistration, name="ResearcherRegistration"),
+    path('researcher/templates/', include('conversation_templates.urls.templates_urls'), name="TemplateManagementView"),
+    path('researcher/settings/', include('users.urls'), name="ResearcherSettingsView"),
+    path('researcher/view-all-responses/<uuid:pk>/', TemplateResponsesView.as_view(), name="ViewAllResponses"),
+    path('researcher/students/<str:name>/', StudentManagement, name="StudentManagement"),
+    path('researcher/students/', StudentManagement, name="StudentManagement"),
+    path('researcher/response/', ViewResponse, name="ViewResponse"),
+    path('researcher/response/update/<uuid:pk>/', UpdateOverallResponseFeedback, name='UpdateOverallResponseFeedback'),
+    path('researcher/response/updatenode/<uuid:pk>/', UpdateNodeResponseFeedback, name='UpdateNodeResponseFeedback'),
+    ]

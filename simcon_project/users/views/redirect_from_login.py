@@ -6,9 +6,9 @@ from django.contrib.auth.decorators import login_required
 def RedirectFromLogin(request):
     user = get_user_model()
     if user.get_is_researcher(request.user):
-        return HttpResponseRedirect('/researcher-view')
+        return HttpResponseRedirect('ResearcherView')
     else:
-        return HttpResponseRedirect('/student-view')
+        return HttpResponseRedirect('StudentView')
 
 
 

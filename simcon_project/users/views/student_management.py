@@ -70,7 +70,7 @@ def StudentManagement(request, name="All Students"):
 
                         #creates the subject and message content for the emails
                         subject = 'Activate Your Simulated conversations account'
-                        message = 'Hi, \nPlease register here: \nhttp://' + site + '/user-registration/'\
+                        message = 'Hi, \nPlease register here: \nhttp://' + site + '/student/register/'\
                               + uid + '\n'
 
                         #sends the email

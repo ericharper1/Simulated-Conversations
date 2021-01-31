@@ -4,7 +4,6 @@ from django.contrib.auth import update_session_auth_hash, get_user_model
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
@@ -143,8 +142,8 @@ def AddResearcher(request):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
             site = current_site.domain
-            message = 'Hi, \nPlease register here: \nhttp://' + site + '/researcher-registration/' \
-                      + uid + '/' + token + '\n'
+            message = 'Hi, \nPlease register here: \nhttp://' + site + '/researcher/register/' \
+                      + uid + '\n'
             send_mail(subject, message, 'simulated.conversation@mail.com', [email_address], fail_silently=False)
             messages.success(request, 'A link to register has been sent to the researcher\'s email provided.')
             return AddResearcherForm()
