@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import user_passes_test
+from users.views.researcher_home import is_researcher
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash, get_user_model
 from django.contrib.auth.forms import PasswordChangeForm
@@ -27,8 +28,8 @@ class ResearcherTable(tables.Table):
     email_address = tables.Column(accessor='email')
     """
     commented out lines to use smaller trash icon if we want to later.
-    html_delete_button = '<a href="{% url \'settings:delete_researcher\' record.id %}" class="delete-icon" ' \
-                         'data-form-url="{% url \'settings:delete_researcher\' record.id %}">' \
+    html_delete_button = '<a href="{% url \'settings:delete-researcher\' record.id %}" class="delete-icon" ' \
+                         'data-form-url="{% url \'settings:delete-researcher\' record.id %}">' \
                          '<span class="glyphicon glyphicon-trash"></span></a>'
     delete = tables.TemplateColumn(html_delete_button, verbose_name='')
     """
@@ -56,12 +57,8 @@ class ResearcherDeleteView(BSModalDeleteView):
         return render(request, self.template_name, context)
 
 
-def is_researcher(user):
-    return user.is_authenticated and user.is_researcher
-
-
 @user_passes_test(is_researcher)
-def ResearcherSettingsView(request):
+def researcher_settings_view(request):
     """
     This determines if the user is an admin (staff) or not then displays the appropriate view.
     :param request: HttpRequest used to determine what type of user is accessing view (admin/staff or not)
@@ -70,11 +67,11 @@ def ResearcherSettingsView(request):
     user = get_user_model()
     # determine if user an admin (is_staff) and fetch forms/table accordingly
     if user.get_is_staff(request.user):
-        change_password_form = ChangePassword(request)
-        add_researcher_form = AddResearcher(request)
-        researchers_table = GetCurrentResearchers(request)
+        change_password_form = change_password(request)
+        add_researcher_form = add_researcher(request)
+        researchers_table = get_current_researchers(request)
     else:
-        change_password_form = ChangePassword(request)
+        change_password_form = change_password(request)
         add_researcher_form = None
         researchers_table = None
     return render(request, 'researcher_settings_view.html', {
@@ -85,7 +82,7 @@ def ResearcherSettingsView(request):
 
 
 @user_passes_test(is_researcher)
-def ChangePassword(request):
+def change_password(request):
     """
     Displays and validates Django default PasswordChangeForm
     :param request:
@@ -107,7 +104,7 @@ def ChangePassword(request):
 
 
 @user_passes_test(is_researcher)
-def GetCurrentResearchers(request):
+def get_current_researchers(request):
     """
     Queries database for all researchers and creates django_table showing their names and emails.
     :param request:
@@ -120,9 +117,9 @@ def GetCurrentResearchers(request):
 
 
 @user_passes_test(is_researcher)
-def AddResearcher(request):
+def add_researcher(request):
     """
-    Creates and validates the AddResearcher form. If AddResearcher form is valid, an account registration email is
+    Creates and validates the AddResearcherForm. If AddResearcherForm is valid, an account registration email is
         generated and sent to the email address specified in the form. That email will contain a link
         for the user to register their account.
         First and last names for brand new researchers will both be "N/A". These are overwritten once the researcher

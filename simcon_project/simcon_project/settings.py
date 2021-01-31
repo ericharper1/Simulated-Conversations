@@ -136,12 +136,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-# Static URLS [These are used when in non production enviroments]
+# Static URLS [These are used when in non production environments]
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-LOGIN_REDIRECT_URL = 'RedirectFromLogin'
-LOGOUT_REDIRECT_URL = 'Login'
-LOGIN_URL = 'Login'
+LOGIN_REDIRECT_URL = 'redirect-from-login'
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
 
 # Bootstrap Template for Django Tables
 DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"

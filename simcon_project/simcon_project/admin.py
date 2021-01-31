@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.apps import apps
 from simcon_project.conversation_templates.models import *
 
 admin.site.register(ConversationTemplate)

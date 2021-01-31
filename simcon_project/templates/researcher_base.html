@@ -17,12 +17,12 @@
           <a class="navbar-brand">Simulated Conversations</a>
         </div>
         <ul class="nav navbar-nav">
-          <li>{% block nav-researcherView %}<a href="{% url 'ResearcherView' %}">Home</a>{% endblock %}</li>
+          <li>{% block nav-researcherView %}<a href="{% url 'researcher-view' %}">Home</a>{% endblock %}</li>
           <li>{% block nav-templateView %}<a href="{% url 'management:main' %}">Templates</a>{% endblock %}</li>
-          <li>{% block nav-studentmanagementView %}<a href="{% url 'StudentManagement' %}">Student Management</a>{% endblock %}</li>
+          <li>{% block nav-studentmanagementView %}<a href="{% url 'student-management' %}">Student Management</a>{% endblock %}</li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li>{% block nav-userView %}<a href="{% url 'ResearcherUserView' %}"><span class="glyphicon glyphicon-user"></span> User</a>{% endblock %}</li>
+          <li>{% block nav-userView %}<a href="{% url 'researcher-user-view' %}"><span class="glyphicon glyphicon-user"></span> User</a>{% endblock %}</li>
           <li>{% block nav-settingsView %}<a href="{% url 'settings:main' %}"><span class="glyphicon glyphicon-cog"></span> Settings</a>{% endblock %}</li>
         </ul>
       </div>

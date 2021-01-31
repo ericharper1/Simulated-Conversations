@@ -7,10 +7,6 @@ from conversation_templates.models import ConversationTemplate, TemplateResponse
 from conversation_templates.forms import SelectTemplateForm
 
 
-def is_researcher(user):
-    return user.is_authenticated and user.is_researcher
-
-
 class ResponseTable(tables.Table):
     first = tables.columns.Column()
     last = tables.columns.Column()
@@ -76,8 +72,7 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
 
         return render(request, self.template_name, context)
 
-
     def post(self, request, pk):
         # Note: keep pk even if it isn't used since the url requires it.
         # Redirect to selected template_responses_table from the choicefield
-        return redirect(reverse('ViewAllResponses', args=[request.POST['templates']]))
+        return redirect(reverse('view-all-responses', args=[request.POST['templates']]))

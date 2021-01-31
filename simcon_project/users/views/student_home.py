@@ -27,7 +27,7 @@ class StudentHomeTable(tables.Table):
 
 
 @user_passes_test(is_student)
-def StudentView(request):
+def student_view(request):
     """
     Queries database for one student's assigned templates, the date they were assigned, the date the student last
         completed a template (if they have completed it, otherwise null), and the id of the template to later create
