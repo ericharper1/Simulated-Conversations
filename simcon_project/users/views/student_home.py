@@ -30,7 +30,7 @@ class StudentHomeTable(tables.Table):
 
 
 @user_passes_test(is_student)
-def StudentView(request):
+def student_view(request):
     assigned_templates = []
     # get the Student object matching logged in student
     student = Student.objects.filter(id=request.user.id)
