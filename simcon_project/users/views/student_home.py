@@ -45,16 +45,15 @@ def student_view(request):
     for assignment in assignments:
         templates_in_assignment = ConversationTemplate.objects.filter(assignments=assignment)
         for template in templates_in_assignment:
-            most_recent_response = TemplateResponse.objects.filter(assignment=assignment, template=template,
-                                                                   student=student.first())\
-                .aggregate(Max('completion_date'))
+            last_response = TemplateResponse.objects.filter(assignment=assignment, template=template,
+                                                            student=student.first()).aggregate(Max('completion_date'))
             assigned_template_row = {}
             assigned_template_row.update({"conversation_templates__id": template.id,
                                           "id": assignment.id,
                                           "conversation_templates__name": template.name,
                                           "date_assigned": assignment.date_assigned,
                                           "conversation_templates__template_responses__completion_date":
-                                              most_recent_response['completion_date__max']})
+                                              last_response['completion_date__max']})
             assigned_templates.append(assigned_template_row)
     assigned_templates_table = StudentHomeTable(assigned_templates)
     RequestConfig(request, paginate={"page": 10}).configure(assigned_templates_table)
