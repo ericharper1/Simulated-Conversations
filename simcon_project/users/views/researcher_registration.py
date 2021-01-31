@@ -23,8 +23,7 @@ def researcher_registration(request, uidb64):
             if password1 == password2:
                 email = form.cleaned_data.get('email')
                 if Researcher.objects.filter(email=email, registered=False):
-                    user = Researcher.objects.get(
-                        email=email, registered=False)
+                    user = Researcher.objects.get(email=email, registered=False)
                     if uidb64 == urlsafe_base64_encode(force_bytes(user.pk)):
                         user = Researcher.objects.get(email=email, registered=False)
                         user.set_password(form.cleaned_data.get('password1'))
@@ -41,16 +40,13 @@ def researcher_registration(request, uidb64):
                                        fail_silently=False)
                 else:
                     if Researcher.objects.filter(email=email, registered=True):
-                        messages.error(
-                            request, 'Account already created', fail_silently=False)
+                        messages.error(request, 'Account already created', fail_silently=False)
                     else:
                         messages.error(request, 'Invalid email address. Please enter the email '
                                                 'address that you received the email at.',
                                        fail_silently=False)
             else:
-                messages.error(
-                    request, 'The passwords you entered do not match.', fail_silently=False)
+                messages.error(request, 'The passwords you entered do not match.', fail_silently=False)
         else:
-            messages.error(
-                request, 'Please fill out the form completely.', fail_silently=False)
+            messages.error(request, 'Please fill out the form completely.', fail_silently=False)
     return render(request, 'researcher_registration.html', {"form": NewResearcherCreationForm()})

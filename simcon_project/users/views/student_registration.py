@@ -45,7 +45,6 @@ def student_registration(request, uidb64):
                         messages.error(request, 'Invalid email address, please enter the email '
                                                 'address that you received the email at.',
                                        fail_silently=False)
-
             else:
                 messages.error(request, 'passwords do not match', fail_silently=False)
         else:
