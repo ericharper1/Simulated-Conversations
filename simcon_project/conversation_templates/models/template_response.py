@@ -6,6 +6,7 @@ import uuid
 class TemplateResponse(models.Model):
     """
     Contains information for a Student response to a ConversationTemplate object
+
     Fields:
     id: Primary key id for TemplateResponse object
     completion_date: UTC date that Student completed conversation
@@ -22,7 +23,7 @@ class TemplateResponse(models.Model):
     feedback = models.CharField(max_length=1000, default=None, null=True, blank=True)
 
     def __str__(self):
-        return str(self.completion_date)
+        return f"{self.student.email}: {self.template.name}, {self.template.researcher} ({self.completion_date})"
 
     def get_absolute_url(self):
         return reverse('conversation-end', kwargs={'ct_response_id': self.id})
