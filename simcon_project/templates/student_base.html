@@ -22,6 +22,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li>{% block nav-userView %}<a href="{% url 'student-user-view' %}"><span class="glyphicon glyphicon-user"></span> User</a>{% endblock %}</li>
           <li> {% block nav-studentssettingsView %}<a href="{% url 'student-settings-view' %}"><span class="glyphicon glyphicon-cog"></span> Settings</a>{% endblock %}</li>
+          <li>{% block nav-logoutView %}<a href="{% url 'logout' %}"><span class="	glyphicon glyphicon-log-out"></span> Log Out</a>{% endblock %}</li>
         </ul>
       </div>
     </nav>
