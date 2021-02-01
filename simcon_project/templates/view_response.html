@@ -35,11 +35,14 @@
             <h2>Overall feedback:</h2>
         </div>
         <div class="row">
-            {{response.feedback}} <a href="{% url 'UpdateOverallResponseFeedback' response.id %}"> Edit </a>
+            {{response.feedback}} <a href="{% url 'update-overall-response-feedback' response.id %}"> Edit </a>
         </div>
         {% for node in response_nodes %}
         <div class="row">
             <h2> Response {{node.position_in_sequence}}</h2>
+        </div>
+        <div class="row">
+             {{node.template_node.description}}
         </div>
 
         <div class="row">
@@ -50,7 +53,7 @@
                 {{node.transcription}}
             </div>
             <div class="col-sm-4" id="feedback">
-                {{node.feedback}} <a href="{% url 'UpdateNodeResponseFeedback' node.id %}">Edit</a>
+                {{node.feedback}} <a href="{% url 'update-node-response-feedback' node.id %}">Edit</a>
             </div>
         </div>
         {% endfor %}

@@ -32,7 +32,7 @@
 <div class="table-container" style="display: inline-block; float: left;"> 
   {% if searchResponses %}               
      {% for searchResponse in searchResponses %}               
-        <li>{{ searchResponse.completion_date }} - {{ searchResponse.student }} - {{ searchResponse.template }} - {{ searchResponse.assignment }} - {{ searchResponse.feedback }}  </li>           
+        <li>{ searchResponse.completion_date }} - {{ searchResponse.student }} - {{ searchResponse.template }} - {{ searchResponse.assignment }} - {{ searchResponse.feedback }}  </li>           
      {% endfor %} 
 {% else %}
   {% render_table responseTable %}
@@ -40,7 +40,7 @@
 </div>
 <div class="delete-buttons" style="display: inline-block">
   <br>
-  {% for obj in responseTable %}
+  {% for obj in response_table %}
     <form method="POST">
         {% csrf_token %}
         <br>

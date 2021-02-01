@@ -1,12 +1,16 @@
 from django.shortcuts import render
 from conversation_templates.models import TemplateResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.core.paginator import Paginator
 
 
-@login_required(login_url="/accounts/login/")
-def ResearcherView(request):
-    responseTable = TemplateResponse.objects.all()
+def is_researcher(user):
+    return user.is_authenticated and user.get_is_researcher()
+
+
+@user_passes_test(is_researcher)
+def researcher_view(request):
+    response_table = TemplateResponse.objects.all()
     if request.method == "POST":
         items_to_delete = request.POST.getlist('delete_items')
         responseTable.filter(pk__in=items_to_delete).delete()

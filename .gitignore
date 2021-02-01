@@ -4,7 +4,7 @@
 *.pyc
 __pycache__
 db.sqlite3
-migrations
+audio
 simcon_project/static/media
 
 # Backup files # 
@@ -12,12 +12,12 @@ simcon_project/static/media
 
 # If you are using PyCharm # 
 .idea/*
-*.iws /out/ 
+*.iws /out/
+Pipfile
 
 # Python # 
 *.py[cod] 
 *$py.class
-pipfile
 
 # Distribution / packaging 
 .Python build/ 

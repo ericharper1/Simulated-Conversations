@@ -1,0 +1,105 @@
+{% load static %}
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Creating Conversation Template</title>
+        {% load static %}
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'conversation_templates/create_conversation_template.css' %}">
+        <script src="{% static 'conversation_templates/create_conversation_template.js' %}" type="text/javascript"></script>
+    </head>
+
+    <body>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+
+            <!-- Step node column -->
+            <div class="col" id="nodes-column">
+                <div class="column-button-container">
+                    <button class="btn btn-primary btn-sm mb-3 column-button" onclick="addStepNode()">ADD</button>
+                </div>
+                <!-- Step node cards will be inserted here !-->
+            </div>
+
+
+            <!-- Center column -->
+            <div class="col-5">
+                <div class="column-button-container">
+                    <button class="btn btn-primary btn-sm mb-3" onclick="submit()">COMPLETE</button>
+                </div>
+
+                <!-- Template node form (will change dynamically as different nodes are put in focus) -->
+                <div class="card">
+                    <div class="card-body">
+                        <form novalidate>
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="embed-responsive-item" id="embedded-video-iframe" src="" allowfullscreen></iframe>
+                            </div>
+                            <input class="form-control" type="url" placeholder="url" id="video-url-input" data-toggle="tooltip" title="">
+                            <div class="form-group mt-3">
+                                <label for="node-name-input">Step name:</label>
+                                <input class="form-control" type="text" id="node-name-input" data-toggle="tooltip" title="">
+                            </div>
+                            <div class="form-group">
+                                <label for="node-description-input">Step description:</label>
+                                <textarea class="form-control" id="node-description-input" data-toggle="tooltip" title=""></textarea>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is-first-node-check" data-toggle="tooltip" title="">
+                                <label class="form-check-label" for="is-first-node-check">First step</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="is-terminal-node-check" data-toggle="tooltip" title="">
+                                <label class="form-check-label" for="is-terminal-node-check">Terminal step</label>
+                            </div>
+                        </form>
+                        <h6 class="invalid-indicator mt-2" id="no-first-node-error">No step has been labeled as first</h6>
+                        <h6 class="invalid-indicator mt-2" id="no-choices-error">No choices have been added to this step</h6>
+                    </div>
+                </div>
+
+                <!-- General template info form (present no matter which conversation node is in focus) -->
+                <div class="card mt-5">
+                    <div class="card-body">
+                        <h5 class="card-title">Template</h5>
+                        <form novalidate>
+                            <div class="form-group">
+                                <label for="template-name-input">Template name:</label>
+                                <input class="form-control" type="text" id="template-name-input" data-toggle="tooltip" title="">
+                            </div>
+                            <div class="form-group">
+                                <label for="template-description-input">Template description:</label>
+                                <textarea class="form-control" id="template-description-input" data-toggle="tooltip" title=""></textarea>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="validate-check-input">
+                                <label class="form-check-label" for="validate-check-input">Validate</label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Choices column -->
+            <div class="col" id="choices-column">
+                <div class="column-button-container">
+                    <button class="btn btn-primary btn-sm mb-3 column-button" onclick="addChoice()">ADD</button>
+                </div>
+                <!-- Choice cards will be inserted here -->
+            </div>
+
+        </div>
+    </div>
+
+    <script> loadState() </script>
+    </body>
+    </html>
+{% endblock %}

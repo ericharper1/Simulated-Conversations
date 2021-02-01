@@ -2,6 +2,7 @@ from django.views.generic import DeleteView
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
+from users.views.researcher_home import is_researcher
 from conversation_templates.models import ConversationTemplate, TemplateFolder
 from conversation_templates.forms import FolderCreationForm
 from users.models import Researcher
@@ -18,6 +19,7 @@ class FolderTemplateTable(tables.Table):
     """
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
                              extra_context={"in_folder": True})
+    name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
@@ -31,6 +33,7 @@ class AllTemplateTable(tables.Table):
     Only used when all templates are displayed.
     """
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
+    name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
@@ -42,16 +45,12 @@ class FolderTable(tables.Table):
     """
     Table showing all folders (unique to a researcher in the future)
     """
-    name = tables.columns.LinkColumn('management:folder_view', args=[A('pk')])
+    name = tables.columns.LinkColumn('management:folder-view', args=[A('pk')])
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'folder-table'}
         model = TemplateFolder
         fields = ['name']
-
-
-def is_researcher(user):
-    return user.is_authenticated and user.is_researcher
 
 
 @user_passes_test(is_researcher)
@@ -189,7 +188,6 @@ def remove_template(request, pk):
     This does not delete the template.
     """
     if request.method == 'POST':
-
         previous_url = request.META.get('HTTP_REFERER')
         folder_pk = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
         template = get_object_or_404(ConversationTemplate, pk=pk)
@@ -206,7 +204,7 @@ def route_to_current_folder(previous_url):
     """
     if "folder" in previous_url:
         folder_id = re.findall(r"/folder/([A-Za-z0-9\-]+)", previous_url)[0]
-        return reverse_lazy('management:folder_view', args=[folder_id])
+        return reverse_lazy('management:folder-view', args=[folder_id])
     else:
         return reverse_lazy('management:main')
 
