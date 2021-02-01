@@ -10,11 +10,43 @@
         <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
     </head>
     <body>
-        {% render_table folderTable %}
+        <h3>Folders</h3>
+        <!-- Folder Search Bar-->
+        {% if folder_pk %}
+            <form action="{% url "management:folder-view" folder_pk %}" method="get">
+                {% csrf_token %}
+                <input name="folder-filter" type="text" placeholder="Search Folders">
+            </form>
+        {% else %}
+            <form action="{% url "management:main"%}" method="get">
+                {% csrf_token %}
+                <input name="folder-filter" type="text" placeholder="Search Folders">
+            </form>
+        {% endif %}
+
+        {% if folderTable %}
+            {% render_table folderTable %}
+        {% else %}
+            <div>There are no folders to show at the moment</div>
+        {% endif %}
+
         <!-- Create Folder Button--->
         <button id="create-folder" class="btn btn-primary" type="button" name="button">Create Folder</button>
-        <br>
-        <br>
+
+        <h3>Templates</h3>
+        <!-- Templates Search Bar-->
+        {% if folder_pk %}
+            <form action="{% url "management:folder-view" folder_pk %}" method="get">
+                {% csrf_token %}
+                <input name="template-filter" type="text" placeholder="Search Folders">
+            </form>
+        {% else %}
+            <form action="{% url "management:main"%}" method="get">
+                {% csrf_token %}
+                <input name="template-filter" type="text" placeholder="Search Folders">
+            </form>
+        {% endif %}
+
         {% if folder_pk %}
             <!-- Line these buttons up later with css -->
             <form method="post" action="{% url 'management:main' %}">
@@ -29,8 +61,22 @@
                 <button id="delete-folder" class="btn btn-danger" type="submit">Delete</button>
             </form>
         {% endif %}
-        {% render_table templateTable %}
-        <button id="create-template" class="btn btn-primary">Create Template</button>
+
+        {%  if templateTable %}
+            {% render_table templateTable %}
+        {% else %}
+            {% if folder_pk %}
+                <div>There are no templates in this folder</div>
+            {% else %}
+                <div>There are no templates to show at the moment</div>
+            {%  endif %}
+        {% endif %}
+
+        <!-- Create Template Button--->
+        <form action="{% url 'management:redirect-to-template-creation' %}" method="post">
+            {% csrf_token %}
+            <input id="create-template" class="btn btn-primary" type="submit" value="Create template"/>
+        </form>
 
         <!-- Code needed for the modal to work properly.
              Content in folder_creation_modal.html is rendered between "#modal-content" div
