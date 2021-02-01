@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from users.models import Assignment
 from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Max
+from users.models import *
+from conversation_templates.models import *
 import django_tables2 as tables
+from django_tables2 import RequestConfig
 
 
 def is_student(user):
@@ -11,7 +14,7 @@ def is_student(user):
 class StudentHomeTable(tables.Table):
     """
     Table of assigned conversation templates for a given student.
-    name is the name of the template assigned.
+    name is the name of the template assigned. links to conversation-start
     date_assigned is the date that template was assigned.
     completion_date is the date the template was last completed by the student or is null.
     """
@@ -29,20 +32,29 @@ class StudentHomeTable(tables.Table):
 @user_passes_test(is_student)
 def student_view(request):
     """
-    Queries database for one student's assigned templates, the date they were assigned, the date the student last
-        completed a template (if they have completed it, otherwise null), and the id of the template to later create
-        a unique URL.
-    :param request: HttpRequest containing user id needed to pull one student's assigned templates.
-    :return: render returns an HttpResponse object that combines the student_view with the assigned templates table
+    Creates table of the student's assigned templates with links to start new responses.
+    :param request:
+    :return: student_view.html with table
     """
-    contents = Assignment.objects.filter(students=request.user.id)\
-        .values(
-            'conversation_templates__name',
-            'date_assigned',
-            'conversation_templates__template_responses__completion_date',
-            'conversation_templates__id',
-            'id'
-    )
-    template_table = StudentHomeTable(contents)
-    template_table.paginate(page=request.GET.get("page", 1), per_page=10)
-    return render(request, 'student_view.html', {'table': template_table})
+    assigned_templates = []
+    # get the Student object matching logged in student
+    student = Student.objects.filter(id=request.user.id)
+    # get the assignments for that student
+    assignments = Assignment.objects.filter(students=student.first())
+    # for each assignment, get all templates contained. Get most recent response by the student for each template
+    for assignment in assignments:
+        templates_in_assignment = ConversationTemplate.objects.filter(assignments=assignment)
+        for template in templates_in_assignment:
+            last_response = TemplateResponse.objects.filter(assignment=assignment, template=template,
+                                                            student=student.first()).aggregate(Max('completion_date'))
+            assigned_template_row = {}
+            assigned_template_row.update({"conversation_templates__id": template.id,
+                                          "id": assignment.id,
+                                          "conversation_templates__name": template.name,
+                                          "date_assigned": assignment.date_assigned,
+                                          "conversation_templates__template_responses__completion_date":
+                                              last_response['completion_date__max']})
+            assigned_templates.append(assigned_template_row)
+    assigned_templates_table = StudentHomeTable(assigned_templates)
+    RequestConfig(request, paginate={"page": 10}).configure(assigned_templates_table)
+    return render(request, 'student_view.html', {'table': assigned_templates_table})
