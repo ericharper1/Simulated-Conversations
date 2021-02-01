@@ -4,6 +4,7 @@ URL = window.URL || window.webkitURL;
 var gumStream; 						//stream from getUserMedia()
 var rec; 							//Recorder.js object
 var input; 							//MediaStreamAudioSourceNode we'll be recording
+var blob;
 
 // shim for AudioContext when it's not avb.
 var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -79,6 +80,7 @@ function stopRecording() {
 	stopButton.disabled = true;
 	recordButton.disabled = true;
 
+	//hide and show elements
 	document.getElementById("choice-form").style.display = "block";
 	document.getElementById("embedded-video").style.display = "none";
 	document.getElementById("recordButton").style.display = "none";
@@ -91,9 +93,8 @@ function stopRecording() {
 	gumStream.getAudioTracks()[0].stop();
 
 	//create the wav blob and pass it on to createDownloadLink
-	var blob = rec.exportWAV(createDownloadLink);
+	rec.exportWAV(createDownloadLink);
 	//  var blob = rec.exportWAV(createDownloadLink);
-	//  sendData(blob)
 }
 
 function createDownloadLink(blob) {
@@ -125,32 +126,50 @@ function createDownloadLink(blob) {
 	// p.appendChild(document.createTextNode(filename+".wav "))
 
 	//upload link
-	var upload = document.createElement('a');
-	upload.href="#";
-	upload.innerHTML = "Upload";
-	upload.addEventListener("click", function(event){
-		  var xhr=new XMLHttpRequest();
-		  xhr.onload=function(e) {
-		      if(this.readyState === 4) {
-		          console.log("Server returned: ",e.target.responseText);
-		      }
-		  };
-		  var fd=new FormData();
-		  fd.append("audio_data",blob, filename);
-		  xhr.open("POST","upload.php",true);
-		  xhr.send(fd);
-	})
+	//I want to do this functionality without clicking the link
+	// var upload = document.createElement('a');
+	// upload.href="#";
+	// upload.innerHTML = "Upload";
+	// upload.addEventListener("click", function(event){
+	// 	  var xhr=new XMLHttpRequest();
+	// 	  xhr.onload=function(e) {
+	// 	      if(this.readyState === 4) {
+	// 	          console.log("Server returned: ",e.target.responseText);
+	// 	      }
+	// 	  };
+	// 	  var fd=new FormData();
+	// 	  fd.append("audio_data",blob, filename);
+	// 	  xhr.open("POST","upload.php",true);
+	// 	  xhr.send(fd);
+	// })
 	//p.appendChild(upload)//add the upload link to li
 
 	//add the p element to the page
 	recording.appendChild(p);
 }
 
-// function sendData(blob) {
-//     let csrftoken = getCookie('csrftoken');
-//     let response=fetch("/voice_request", {
-//     method: "POST",
-//     body: blob,
-//     headers: { "X-CSRFToken": csrftoken },
-// 	})
-// }
+$(document).on('submit', '#choice-form', (form) => {
+		console.log('submitted.')
+    	sendData(blob)
+});
+
+
+function sendData(blob, filename) {
+	$.ajax({
+		type: 'POST',
+		url: '{{ ct_node.get_absolute_url }}',
+		dataType: 'json',
+		data: {
+			name: "audio_data",
+			blob: blob,
+			filename: filename,
+			csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+		},
+		success: res => {
+			console.log('Success.')
+			// result = res[res.compute];
+			// document.getElementById(`input-text-${res.compute}`).value = result;
+			// document.getElementById('graph-container').style = 'width: 100%; display: block;';
+		}
+	});
+}

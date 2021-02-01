@@ -85,6 +85,7 @@ def conversation_step(request, ct_node_id):
     if request.method == 'POST':
         # Trying to detect audio blob
         print(request.POST)
+        print(request.is_ajax())
         choice = None
         ct_response_id = request.session.get('ct_response_id')
         if ct_response_id is None:
