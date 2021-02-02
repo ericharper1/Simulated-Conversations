@@ -1,0 +1,63 @@
+{% extends "researcher_base.html" %}
+{% load static %}
+{% block nav-researcherView %}{% endblock %}
+{% load render_table from django_tables2 %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- prevent line breaks when using form fields -->
+    <style type="text/css">
+    form {display:inline; margin:0px; padding:0px;}
+    </style>
+
+    <title>
+    {% block title %}Simulated Conversations | Researcher{% endblock %}
+    </title>
+    
+    {% block extrahead %} {% endblock %}
+  </head>
+
+  <div>
+    <p class="container">
+      <h1>Student Management</h1>
+
+  </div>
+
+  <div class="row">
+      <div class="col-md-6">
+        <p>Add New Label:</p>
+
+
+        <form action='/researcher/students/{{ name }}/' method="post">
+          {%csrf_token%}
+          {{ form2 }}
+          <br/><input type="submit" class="btn btn-success" value="Add Label"><br/><br/>
+        </form>
+
+          {% render_table lbl_table %}
+      </div>
+
+      <div class="col-md-6">
+        <p>Add Student to the "{{ name }}" label:</p>
+        <form action='/researcher/students/{{ name }}/' method="post">
+          {%csrf_token%}
+          {{ form }}
+          <br/><input type="submit" class="btn btn-success" value="Add Student"><br/><br/>
+        </form>
+          {% render_table stu_table %}
+      </div>
+              {% for message in messages %}
+
+                    <div class="alert alert-warning">
+                        <a class="close" href="#" data-dismiss="alert">×</a>
+
+                        {{ message }}
+
+                    </div>
+            {% endfor %}
+   </div>
+
+  </body>
+</html>
+{% endblock %}

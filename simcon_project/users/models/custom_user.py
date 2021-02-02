@@ -1,10 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager
-from django.utils.translation import ugettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
@@ -56,9 +54,9 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(_('email address'), unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    email = models.EmailField(_('Email Address'), unique=True)
+    first_name = models.CharField(max_length=30, default="None")
+    last_name = models.CharField(max_length=30, default="None")
     is_researcher = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -84,3 +82,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def get_is_registered(self):
         return self.registered
+
+    def get_is_staff(self):
+        return self.is_staff

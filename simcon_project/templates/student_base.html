@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    {% block nav %}
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand">Simulated Conversations</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li>{% block nav-studentView %}<a href="{% url 'student-view' %}">Home</a>{% endblock %}</li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li> {% block nav-studentssettingsView %}<a href="{% url 'student-settings-view' %}"><span class="glyphicon glyphicon-cog"></span> Settings</a>{% endblock %}</li>
+        </ul>
+      </div>
+    </nav>
+    {% endblock %}
+    {% block content %}{% endblock %}
+  </body>
+</html>

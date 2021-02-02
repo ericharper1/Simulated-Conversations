@@ -1,35 +1,43 @@
+{% extends "researcher_base.html" %}
+{% load static %}
+{% block nav-researcherView %}{% endblock %} 
+{% load render_table from django_tables2 %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
-
-    <!-- prevent line breaks when using form fields -->
-    <style type="text/css">
-    form {display:inline; margin:0px; padding:0px;}
-    </style>
-    
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" src="{% static 'users/researcherTable.css' %}">
     <title>
-    {% block title %}Simulated Conversations | Researcher{% endblock %}
+    SimCon | Researcher View
     </title>
-    
-    {% block extrahead %} {% endblock %}
   </head>
-
   <body>
-    <div class="container">
-      <h1> THIS IS THE Researcher PAGE</h1>
-        {% block content %}
-        {% endblock %}
-    </div> <!-- /container -->
+    <div style="display: inline-block">
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-
-    <!-- Placed at the end of the document so the pages load faster -->
+<div class="table-container" style="display: inline-block; float: left;"> 
+  {% render_table response_table %}
+</div>
+<div class="delete-buttons" style="display: inline-block">
+  <br>
+  {% for obj in response_table %}
+    <form method="POST">
+        {% csrf_token %}
+        <br>
+        <button type="submit" name="delete_items" value="{{ obj.pk }}">Delete</button>
+        <p></p>
+        <!-- The paragraph gave the perfect spacing -->
+    </form>
+{% endfor %}
+</div>
+    </div>
   </body>
 </html>
+{% endblock %}

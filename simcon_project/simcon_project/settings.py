@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.admindocs',
 
     # Third-party apps
+    'bootstrap_modal_forms',
+    'django_tables2',
     'embed_video',
 
     # Our apps
@@ -67,6 +69,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -129,6 +132,30 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
-LOGIN_REDIRECT_URL = '/redirect-from-login'
+# Static URLS [These are used when in non production environments]
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+LOGIN_REDIRECT_URL = 'redirect-from-login'
+LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'login'
+
+# Bootstrap Template for Django Tables
+DJANGO_TABLES2_TEMPLATE = "django_tables2/semantic.html"
+MEDIAFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/media')
+]
+
+# we will need to hide this in the final version
+SENDGRID_API_KEY = os.getenv(
+    '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')
+EMAIL_HOST = 'smtp.sendgrid.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
