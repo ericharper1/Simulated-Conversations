@@ -97,7 +97,12 @@ def conversation_step(request, ct_node_id):
         else:
             choice_form = TemplateNodeChoiceForm(request.POST, ct_node=ct_node)
             if choice_form.is_valid():
-                choice = choice_form.cleaned_data['choices']
+                ####################################################
+                if request.POST.get('choices') == 'custom-response':
+                    print(request.POST.get('custom-text'))
+                    choice = None
+                else:
+                    choice = choice_form.cleaned_data['choices']
                 # Create the new response
                 ct_node_response = TemplateNodeResponse.objects.create(
                     template_node=ct_node,

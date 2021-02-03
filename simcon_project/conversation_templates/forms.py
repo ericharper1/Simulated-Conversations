@@ -53,16 +53,47 @@ class SelectTemplateForm(forms.Form):
             self.fields['templates'] = forms.ChoiceField(choices=template_list)
 
 
+class NodeChoiceWidget(forms.RadioSelect):
+    def __init__(self, name, data_list, *args, **kwargs):
+        super(NodeChoiceWidget, self).__init__(*args, **kwargs)
+        self._name = name
+        self._list = data_list
+
+    def render(self, name, value, attrs=None, renderer=None):
+        choice_html = f'<ul id="id_{name}">'
+        for idx, choice in enumerate(self._list):
+
+            choice_html += f'<li><label for="id_choice-{idx}"><input type="radio" id="id_choice-{idx}"' \
+                            f'name={name} value="{choice.id}"> {choice.choice_text}  </label></li>'
+
+        choice_html += f'<li><label for="id_choice-custom"><input type="radio" id="id_choice-custom"' \
+                       f'name={name} value="custom-response"><input name="custom-text" type="text" ' \
+                       f'placeholder="Enter Custom Response" id="id_custom-input"></label></li>'
+
+        choice_html += '</ul>'
+
+        return choice_html
+
+
 class TemplateNodeChoiceForm(forms.Form):
     """
     Form to display choices related to a TemplateNode
     """
     choices = forms.ModelChoiceField(
         queryset=None,
-        widget=forms.RadioSelect,
     )
 
     def __init__(self, *args, **kwargs):
         ct_node = kwargs.pop('ct_node', None)
+        choice_list = TemplateNodeChoice.objects.filter(parent_template=ct_node)
         super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
         self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)
+        self.fields['choices'].widget = NodeChoiceWidget(name="hello", data_list=choice_list)
+
+    def is_valid(self):
+        valid = super(TemplateNodeChoiceForm, self).is_valid()
+
+        if not valid and self.data['choices'] != 'custom-response':
+            return False
+
+        return True
