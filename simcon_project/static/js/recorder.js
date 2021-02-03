@@ -4,7 +4,8 @@ URL = window.URL || window.webkitURL;
 var gumStream; 						//stream from getUserMedia()
 var rec; 							//Recorder.js object
 var input; 							//MediaStreamAudioSourceNode we'll be recording
-var blob;
+// var blob;							//audio blob object
+// var filename;						//filename of the audio blob
 
 // shim for AudioContext when it's not avb.
 var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -94,7 +95,6 @@ function stopRecording() {
 
 	//create the wav blob and pass it on to createDownloadLink
 	rec.exportWAV(createDownloadLink);
-	//  var blob = rec.exportWAV(createDownloadLink);
 }
 
 function createDownloadLink(blob) {
@@ -108,7 +108,7 @@ function createDownloadLink(blob) {
 	//Need to change this to fit the format of how we're storing audio files
     //Maybe filename is uuid of TemplateNodeResponse?
     //Or student email/current date
-	var filename = new Date().toISOString();
+	filename = new Date().toISOString();
 
 	//add controls to the <audio> element
 	au.controls = true;
@@ -121,55 +121,9 @@ function createDownloadLink(blob) {
 	//add the new audio element to p
 	p.appendChild(au);
 
-	//add the filename to the p
-	//Save this for debugging filename
-	// p.appendChild(document.createTextNode(filename+".wav "))
-
-	//upload link
-	//I want to do this functionality without clicking the link
-	// var upload = document.createElement('a');
-	// upload.href="#";
-	// upload.innerHTML = "Upload";
-	// upload.addEventListener("click", function(event){
-	// 	  var xhr=new XMLHttpRequest();
-	// 	  xhr.onload=function(e) {
-	// 	      if(this.readyState === 4) {
-	// 	          console.log("Server returned: ",e.target.responseText);
-	// 	      }
-	// 	  };
-	// 	  var fd=new FormData();
-	// 	  fd.append("audio_data",blob, filename);
-	// 	  xhr.open("POST","upload.php",true);
-	// 	  xhr.send(fd);
-	// })
-	//p.appendChild(upload)//add the upload link to li
-
 	//add the p element to the page
 	recording.appendChild(p);
-}
 
-$(document).on('submit', '#choice-form', (form) => {
-		console.log('submitted.')
-    	sendData(blob)
-});
-
-
-function sendData(blob, filename) {
-	$.ajax({
-		type: 'POST',
-		url: '{{ ct_node.get_absolute_url }}',
-		dataType: 'json',
-		data: {
-			name: "audio_data",
-			blob: blob,
-			filename: filename,
-			csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-		},
-		success: res => {
-			console.log('Success.')
-			// result = res[res.compute];
-			// document.getElementById(`input-text-${res.compute}`).value = result;
-			// document.getElementById('graph-container').style = 'width: 100%; display: block;';
-		}
-	});
+	//save recording
+	saveRecording(blob)
 }

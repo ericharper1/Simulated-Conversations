@@ -37,14 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
 
+    # Our apps
+    'users',
+    'conversation_templates',
+
     # Third-party apps
     'bootstrap_modal_forms',
     'django_tables2',
     'embed_video',
-
-    # Our apps
-    'users',
-    'conversation_templates',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

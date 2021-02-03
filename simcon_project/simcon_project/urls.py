@@ -18,7 +18,9 @@ from django.urls import path
 from conversation_templates.views import *
 from users.views import *
 from django.conf.urls import include
+from django.conf.urls.static import static
 from django.contrib.auth import views
+from django.conf import settings
 
 urlpatterns = [
     # Redirects and such

@@ -1,6 +1,9 @@
+from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from simcon_project.settings import MEDIA_ROOT
 from conversation_templates.models import ConversationTemplate, TemplateNode, TemplateNodeResponse, TemplateResponse
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
@@ -80,12 +83,12 @@ def conversation_step(request, ct_node_id):
     ctx = {}
     t = '{}/conversation_step.html'.format(ct_templates_dir)
     ct_node = TemplateNode.objects.get(id=ct_node_id)
+    recorded = False
 
     # POST request
     if request.method == 'POST':
         # Trying to detect audio blob
         print(request.POST)
-        print(request.is_ajax())
         choice = None
         ct_response_id = request.session.get('ct_response_id')
         if ct_response_id is None:
@@ -107,10 +110,12 @@ def conversation_step(request, ct_node_id):
                     parent_template_response=ct_response,
                     selected_choice=choice,
                     position_in_sequence=ct_response.node_responses.count() + 1,
-                    audio_response=None  # Don't have audio feature yet
+                    audio_response=request.session.get('path')
                 )
                 # # Persist that node response id
                 add_node_response(request, ct_node_id, ct_node_response.id)
+                del request.session['path']
+                request.session.modified = True
             else:
                 # For debugging, will be removed or changed before deploying to production
                 return HttpResponseNotFound('An invalid choice was selected')
@@ -123,6 +128,7 @@ def conversation_step(request, ct_node_id):
     # GET request
     choice_form = TemplateNodeChoiceForm(ct_node=ct_node)
     ct = ct_node.parent_template
+    request.session['ct_node_id'] = ct_node_id
     # Check for page refresh
     if ct_node.start and request.session.get('ct_response_id') is None:
         ct_response = TemplateResponse.objects.create(
@@ -132,13 +138,34 @@ def conversation_step(request, ct_node_id):
         )
         request.session['ct_response_id'] = str(ct_response.id)  # persist the template response in the session
         request.session.modified = True
+    audio_path = ''
+    if 'path' in request.session:
+        recorded = True
+        audio_path = request.session.get('path')
+        audio_path = '%s/%s' % (MEDIA_ROOT, audio_path)
+        print(audio_path)
 
     ctx.update({
         'ct': ct,
         'ct_node': ct_node,
         'choice_form': choice_form,
+        'recorded': recorded,
+        'audio_path': audio_path,
     })
     return render(request, t, ctx)
+
+
+@csrf_exempt
+def save_audio(request):
+    # c = {}
+    # c.update(csrf(request))
+    data = request.FILES.get('data')
+    save_to = timezone.now()
+    save_to = "audio/%s.wav" % save_to
+
+    audio_path = default_storage.save(save_to, data)
+    request.session['audio_path'] = audio_path
+    return HttpResponse("saved")
 
 
 @user_passes_test(is_student)
