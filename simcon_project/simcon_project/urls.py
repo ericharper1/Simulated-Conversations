@@ -28,10 +28,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', redirect_from_login, name="redirect-from-login"),
 
-    # Todo: remove
-    path('user-view/', researcher_user_view, name="researcher-user-view"),
-    path('studentuser-view/', student_user_view, name="student-user-view"),
-
     # Stuff students can see
     path('student/', student_view, name="student-view"),
     path('student/settings/', student_settings_view, name="student-settings-view"),
