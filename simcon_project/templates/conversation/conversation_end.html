@@ -30,6 +30,8 @@
                     <input type="text" name="{{ response.id }}" id="{{ response.id }}"><br>
                 </div>
             {% endfor %}
+            <label for="{{ ct_response.self_rating }}">Rate how you did from 1 to 10: </label>
+            <input type="number" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}"><br>
             <button type="submit" class="btn btn-primary btn-sm">Finish</button>
         </form>
         <script>

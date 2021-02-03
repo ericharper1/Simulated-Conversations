@@ -159,6 +159,7 @@ def conversation_end(request, ct_response_id):
         for response in ct_node_responses:
             response.transcription = request.POST.get(str(response.id), '')
             response.save()
+        ct_response.self_rating = request.POST.get(int(ct_response.self_rating), '')
         if ct_response.completion_date is None:
             ct_response.completion_date = timezone.now()
             ct_response.save()
