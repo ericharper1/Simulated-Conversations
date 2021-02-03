@@ -36,7 +36,8 @@ def student_view(request):
     :param request:
     :return: student_view.html with table
     """
-    assigned_templates = []
+    incomplete_templates = []
+    completed_templates = []
     # get the Student object matching logged in student
     student = Student.objects.filter(id=request.user.id)
     # get the assignments for that student
@@ -54,7 +55,13 @@ def student_view(request):
                                           "date_assigned": assignment.date_assigned,
                                           "conversation_templates__template_responses__completion_date":
                                               last_response['completion_date__max']})
-            assigned_templates.append(assigned_template_row)
-    assigned_templates_table = StudentHomeTable(assigned_templates)
-    RequestConfig(request, paginate={"page": 10}).configure(assigned_templates_table)
-    return render(request, 'student_view.html', {'table': assigned_templates_table})
+            if last_response['completion_date__max'] is None:
+                incomplete_templates.append(assigned_template_row)
+            else:
+                completed_templates.append(assigned_template_row)
+    incomplete_templates_table = StudentHomeTable(incomplete_templates)
+    completed_templates_table = StudentHomeTable(completed_templates)
+    RequestConfig(request, paginate={"page": 10}).configure(incomplete_templates_table)
+    RequestConfig(request, paginate={"page": 10}).configure(completed_templates_table)
+    return render(request, 'student_view.html', {'incomplete_table': incomplete_templates_table,
+                                                 'completed_table': completed_templates_table})
