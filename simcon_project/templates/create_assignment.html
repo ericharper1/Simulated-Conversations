@@ -226,15 +226,6 @@
           }
       }
 
-      function verify_researcher(email){
-          for(var i=0;i<researchers.length;i++){
-              var researcherTmp=researchers[i];
-              if(researcherTmp.email==email){
-                  return true;
-              }
-          }
-          return false;
-      }
 
       //Pass the client data to django through ajax.
       function sub(){
