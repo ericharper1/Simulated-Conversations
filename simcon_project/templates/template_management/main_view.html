@@ -13,12 +13,12 @@
         <h3>Folders</h3>
         <!-- Folder Search Bar-->
         {% if folder_pk %}
-            <form action="{% url "management:folder-view" folder_pk %}" method="get">
+            <form action="{% url 'management:folder-view' folder_pk %}" method="get">
                 {% csrf_token %}
                 <input name="folder-filter" type="text" placeholder="Search Folders">
             </form>
         {% else %}
-            <form action="{% url "management:main"%}" method="get">
+            <form action="{% url 'management:main' %}" method="get">
                 {% csrf_token %}
                 <input name="folder-filter" type="text" placeholder="Search Folders">
             </form>
@@ -36,12 +36,12 @@
         <h3>Templates</h3>
         <!-- Templates Search Bar-->
         {% if folder_pk %}
-            <form action="{% url "management:folder-view" folder_pk %}" method="get">
+            <form action="{% url 'management:folder-view' folder_pk %}" method="get">
                 {% csrf_token %}
                 <input name="template-filter" type="text" placeholder="Search Folders">
             </form>
         {% else %}
-            <form action="{% url "management:main"%}" method="get">
+            <form action="{% url 'management:main'%}" method="get">
                 {% csrf_token %}
                 <input name="template-filter" type="text" placeholder="Search Folders">
             </form>
