@@ -61,8 +61,8 @@ def add_data(request):
     data=request.POST
     name=data.get('name')
     date=data.get('date')
-    researcher=request.user
-    #researcher='researcher@111.com'
+    #researcher=request.user
+    researcher='researcher@111.com'
     students=data.get('stuData')
     templates=data.get('tempData')
     labels=data.get('labelData')
@@ -134,6 +134,8 @@ def add_data(request):
         #run_date='2021-01-22 18:35:00'
         sched.add_job(sendMail, trigger='date', id=schedId, run_date=date, args=(subject, msg, students, researcher),replace_existing=True)
         sched.start()
+    else:
+        assignment.delete()
 
     return HttpResponse(json.dumps({
         'success': success,
