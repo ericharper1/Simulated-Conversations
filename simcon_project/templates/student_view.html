@@ -1,9 +1,9 @@
+<!DOCTYPE html>
 {% extends "student_base.html" %}
 {% load static %}
 {% block nav-studentView %}{% endblock %}
 {% load render_table from django_tables2 %}
 {% block content %}
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -11,9 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'users/student_home.css' %}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
 
     <title>
     {% block title %}Simulated Conversations | Student{% endblock %}
@@ -27,8 +26,27 @@
           {% render_table incomplete_table %}
           {% render_table completed_table %}
      </div><!-- /container -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
+      <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+      </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
+      </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".bs-modal").each(function () {
+                $(this).modalForm({
+                    formURL: $(this).data('form-url')
+                });
+            });
+        });
+    </script>
   </body>
 </html>
 {% endblock %}
