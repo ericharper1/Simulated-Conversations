@@ -26,5 +26,7 @@ class TemplateNodeResponse(models.Model):
     audio_response = models.FileField(upload_to='audio/%Y/%m/%d', default=None)
 
     def __str__(self):
+        if self.template_node is None:
+            return str(self.id)
         return f"{self.parent_template_response.student}: {self.template_node.description}, " \
                f"{self.parent_template_response.template.researcher} {self.position_in_sequence}"

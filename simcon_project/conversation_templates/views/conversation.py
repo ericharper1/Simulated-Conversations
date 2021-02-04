@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.http import HttpResponseNotFound, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from simcon_project.settings import MEDIA_ROOT
 from conversation_templates.models import ConversationTemplate, TemplateNode, TemplateNodeResponse, TemplateResponse
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
@@ -36,12 +35,14 @@ def get_node_response(request, ct_node_id):
     return TemplateNodeResponse.objects.get(id=page_dict.get(str(ct_node_id)))
 
 
-def add_node_response(request, ct_node_id, ct_node_response_id):
+# Tracks pages that have been completed
+def mark_page_complete(request, ct_node_id, ct_node_response_id):
     page_dict = request.session.get('page_dict')
     page_dict.update({str(ct_node_id): str(ct_node_response_id)})
     request.session.modified = True
 
 
+# Clear things from past user session
 def flush_session_data(request):
     if 'page_dict' in request.session:
         del request.session['page_dict']
@@ -49,6 +50,8 @@ def flush_session_data(request):
         del request.session['ct_response_id']
     if 'assign_id' in request.session:
         del request.session['assign_id']
+    if 'ct_node_response_id' in request.session:
+        del request.session['ct_node_response_id']
     request.session.modified = True
 
 
@@ -83,12 +86,11 @@ def conversation_step(request, ct_node_id):
     ctx = {}
     t = '{}/conversation_step.html'.format(ct_templates_dir)
     ct_node = TemplateNode.objects.get(id=ct_node_id)
-    recorded = False
+    ct_node_response_id = request.session.get('ct_node_response_id')
+    audio_response = None
 
     # POST request
     if request.method == 'POST':
-        # Trying to detect audio blob
-        print(request.POST)
         choice = None
         ct_response_id = request.session.get('ct_response_id')
         if ct_response_id is None:
@@ -104,17 +106,16 @@ def conversation_step(request, ct_node_id):
             choice_form = TemplateNodeChoiceForm(request.POST, ct_node=ct_node)
             if choice_form.is_valid():
                 choice = choice_form.cleaned_data['choices']
-                # Create the new response
-                ct_node_response = TemplateNodeResponse.objects.create(
-                    template_node=ct_node,
-                    parent_template_response=ct_response,
-                    selected_choice=choice,
-                    position_in_sequence=ct_response.node_responses.count() + 1,
-                    audio_response=request.session.get('path')
-                )
-                # # Persist that node response id
-                add_node_response(request, ct_node_id, ct_node_response.id)
-                del request.session['path']
+
+                # Edit node response to add remaining fields
+                update_node_response = TemplateNodeResponse.objects.get(id=request.session.get('ct_node_response_id'))
+                update_node_response.template_node = ct_node
+                update_node_response.selected_choice = choice
+                update_node_response.save()
+
+                # Persist that node response id
+                mark_page_complete(request, ct_node_id, ct_node_response_id)
+                del request.session['ct_node_response_id']
                 request.session.modified = True
             else:
                 # For debugging, will be removed or changed before deploying to production
@@ -128,7 +129,7 @@ def conversation_step(request, ct_node_id):
     # GET request
     choice_form = TemplateNodeChoiceForm(ct_node=ct_node)
     ct = ct_node.parent_template
-    request.session['ct_node_id'] = ct_node_id
+
     # Check for page refresh
     if ct_node.start and request.session.get('ct_response_id') is None:
         ct_response = TemplateResponse.objects.create(
@@ -138,34 +139,41 @@ def conversation_step(request, ct_node_id):
         )
         request.session['ct_response_id'] = str(ct_response.id)  # persist the template response in the session
         request.session.modified = True
-    audio_path = ''
-    if 'path' in request.session:
-        recorded = True
-        audio_path = request.session.get('path')
-        audio_path = '%s/%s' % (MEDIA_ROOT, audio_path)
-        print(audio_path)
+    # Check if audio already exists
+    if ct_node_response_id:
+        ct_node_response = TemplateNodeResponse.objects.get(id=ct_node_response_id)
+        audio_response = ct_node_response.audio_response
 
     ctx.update({
         'ct': ct,
         'ct_node': ct_node,
         'choice_form': choice_form,
-        'recorded': recorded,
-        'audio_path': audio_path,
+        'audio_response': audio_response,
     })
     return render(request, t, ctx)
 
 
 @csrf_exempt
 def save_audio(request):
-    # c = {}
-    # c.update(csrf(request))
-    data = request.FILES.get('data')
-    save_to = timezone.now()
-    save_to = "audio/%s.wav" % save_to
-
-    audio_path = default_storage.save(save_to, data)
-    request.session['audio_path'] = audio_path
-    return HttpResponse("saved")
+    # Check if node response already exists
+    if request.session.get('ct_node_response_id') is None:
+        # Get audio blob from session
+        data = request.FILES.get('data')
+        save_to = timezone.now()
+        save_to = "audio/%s/%s.wav" % (request.user, save_to)  # Create file handle
+        audio_path = default_storage.save(save_to, data)  # Store audio in media root
+        ct_response = TemplateResponse.objects.get(id=request.session.get('ct_response_id'))
+        ct_node_response = TemplateNodeResponse.objects.create(
+            template_node=None,
+            parent_template_response=ct_response,
+            selected_choice=None,
+            position_in_sequence=ct_response.node_responses.count() + 1,
+            audio_response=audio_path
+        )
+        request.session['ct_node_response_id'] = ct_node_response.id
+        return HttpResponse("saved")
+    else:
+        return HttpResponse("audio response already exists")
 
 
 @user_passes_test(is_student)
@@ -175,6 +183,7 @@ def conversation_end(request, ct_response_id):
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
     ct = ct_response.template
 
+    # Get responses in order
     ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response) \
         .order_by('position_in_sequence')
 

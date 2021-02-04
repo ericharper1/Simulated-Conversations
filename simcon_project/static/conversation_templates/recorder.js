@@ -1,18 +1,16 @@
 //webkitURL is deprecated but nevertheless
 URL = window.URL || window.webkitURL;
 
-var gumStream; 						//stream from getUserMedia()
-var rec; 							//Recorder.js object
-var input; 							//MediaStreamAudioSourceNode we'll be recording
-// var blob;							//audio blob object
-// var filename;						//filename of the audio blob
+let gumStream; 						//stream from getUserMedia()
+let rec; 							//Recorder.js object
+let input; 							//MediaStreamAudioSourceNode we'll be recording
 
 // shim for AudioContext when it's not avb.
-var AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioContext //audio context to help us record
+let AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioContext //audio context to help us record
 
-var recordButton = document.getElementById("recordButton");
-var stopButton = document.getElementById("stopButton");
+let recordButton = document.getElementById("recordButton");
+let stopButton = document.getElementById("stopButton");
 
 //add events to those 2 buttons
 recordButton.addEventListener("click", startRecording);
@@ -25,13 +23,12 @@ function startRecording() {
 		Simple constraints object, for more advanced audio features see
 		https://addpipe.com/blog/audio-constraints-getusermedia/
 	*/
-    var constraints = { audio: true, video:false }
+    let constraints = { audio: true, video:false }
 
  	/*
     	Disable the record button until we get a success or fail from getUserMedia()
 	*/
-	recordButton.disabled = true;
-	stopButton.disabled = false;
+	toggleAudioControls(true, false);
 
 	/*
     	We're using the standard promise based getUserMedia()
@@ -69,8 +66,7 @@ function startRecording() {
 
 	}).catch(function(err) {
 	  	//enable the record button if getUserMedia() fails
-    	recordButton.disabled = false;
-    	stopButton.disabled = true;
+		toggleAudioControls(false, true);
 	});
 }
 
@@ -78,14 +74,10 @@ function stopRecording() {
 	console.log("stopButton clicked");
 
 	//disable the record and stop button so user can't re-record
-	stopButton.disabled = true;
-	recordButton.disabled = true;
+	toggleAudioControls(true, true);
 
 	//hide and show elements
-	document.getElementById("choice-form").style.display = "block";
-	document.getElementById("embedded-video").style.display = "none";
-	document.getElementById("recordButton").style.display = "none";
-	document.getElementById("stopButton").style.display = "none";
+    toggleElementDisplay();
 
 	//tell the recorder to stop the recording
 	rec.stop();
@@ -99,16 +91,13 @@ function stopRecording() {
 
 function createDownloadLink(blob) {
 
-	var url = URL.createObjectURL(blob);
-	var au = document.createElement('audio');
-	var p = document.createElement('p');
-	var link = document.createElement('a');
+	let url = URL.createObjectURL(blob);
+	let au = document.createElement('audio');
+	let p = document.createElement('p');
+	let link = document.createElement('a');
 
 	//name of .wav file to use during upload and download (without extension)
-	//Need to change this to fit the format of how we're storing audio files
-    //Maybe filename is uuid of TemplateNodeResponse?
-    //Or student email/current date
-	filename = new Date().toISOString();
+	let filename = new Date().toISOString();
 
 	//add controls to the <audio> element
 	au.controls = true;
@@ -125,5 +114,17 @@ function createDownloadLink(blob) {
 	recording.appendChild(p);
 
 	//save recording
-	saveRecording(blob)
+	saveRecording(blob);
+}
+
+function toggleElementDisplay() {
+	document.getElementById("choice-form").style.display = "block";
+	document.getElementById("embedded-video").style.display = "none";
+	document.getElementById("recordButton").style.display = "none";
+	document.getElementById("stopButton").style.display = "none";
+}
+
+function toggleAudioControls(record, stop) {
+	recordButton.disabled = record;
+	stopButton.disabled = stop;
 }
