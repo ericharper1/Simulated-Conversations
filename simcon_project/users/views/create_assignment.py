@@ -61,8 +61,8 @@ def add_data(request):
     data=request.POST
     name=data.get('name')
     date=data.get('date')
-    #researcher=request.user
-    researcher='researcher@111.com'
+    researcher=request.user
+    #researcher='researcher@111.com'
     students=data.get('stuData')
     templates=data.get('tempData')
     labels=data.get('labelData')
