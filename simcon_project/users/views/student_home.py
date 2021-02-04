@@ -55,6 +55,7 @@ class ModalFeedbackTable(tables.Table):
     Table of dates where responses were completed and a button to view the feedback on them
     """
     completion_date = tables.Column(verbose_name='Completion Date', accessor='completion_date', orderable=False)
+    self_rating = tables.Column(verbose_name='Self Rating', accessor='self_rating', orderable=False)
     feedback = tables.TemplateColumn(verbose_name='', template_name='feedback/select_feedback_button.html',
                                      orderable=False)
 
