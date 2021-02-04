@@ -31,7 +31,7 @@
                 </div>
             {% endfor %}
             <label for="{{ ct_response.self_rating }}">Rate how you did from 1 to 10: </label>
-            <input type="number" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}"><br>
+            <input type="number" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}" min="0" max="10"><br>
             <button type="submit" class="btn btn-primary btn-sm">Finish</button>
         </form>
         <script>

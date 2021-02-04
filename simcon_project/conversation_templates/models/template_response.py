@@ -22,7 +22,7 @@ class TemplateResponse(models.Model):
     template = models.ForeignKey('conversation_templates.ConversationTemplate', default=0, related_name='template_responses', on_delete=models.CASCADE)
     assignment = models.ForeignKey('users.Assignment', default=0, related_name='template_responses', on_delete=models.CASCADE)
     feedback = models.CharField(max_length=1000, default=None, null=True, blank=True)
-    self_rating = models.IntegerField(default=None)
+    self_rating = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.student.email}: {self.template.name}, {self.template.researcher} ({self.completion_date})"
