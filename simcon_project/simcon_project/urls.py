@@ -33,6 +33,7 @@ urlpatterns = [
     path('student/settings/', student_settings_view, name="student-settings-view"),
     path('student/register/<uidb64>/', student_registration, name="student-registration"),
     path('student/conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
+    path('student/response/', view_response, name="view-response"),
 
     # Stuff researcher can see
     path('researcher/', researcher_view, name="researcher-view"),
