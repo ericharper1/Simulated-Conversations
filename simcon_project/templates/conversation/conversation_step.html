@@ -20,15 +20,19 @@
     </head>
     <body>
         <h1>Simulated Conversations</h1>
-        <h3>{{ ct.name }}</h3>
-        <h3 style="text-align:right;">{{ request.user }}</h3>
+        <a style="float:right" href="{% url 'student-view' %}" class="button">Exit conversation</a>
+        <div style="clear:both">
+            <h3 style="float:left">{{ ct }}</h3>
+            <h3 style="float:right"><small>{{ request.user }}</small></h3>
+        </div>
+        <br><br>
         <div id="embedded-video">
             {% video ct_node.video_url 'small' %}
             <p>{{ ct_node.description }}</p>
         </div>
         <div id="controls">
             <button id="recordButton" class="btn btn-primary btn-sm">Record</button>
-            <button id="stopButton" class="btn btn-primary btn-sm" onclick="showForm()" disabled>Stop</button>
+            <button id="stopButton" class="btn btn-primary btn-sm" disabled>Stop</button>
         </div>
         <p id="recording"></p>
         {% if audio_response %}

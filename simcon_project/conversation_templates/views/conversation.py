@@ -18,7 +18,8 @@ class NodeDescriptionTable(tables.Table):
     """
     Creates table that displays the description for each TemplateNode object that a Student visited.
     """
-    node_description = tables.Column()
+    position = tables.Column(accessor='position_in_sequence')
+    description = tables.Column(accessor='template_node__description')
 
 
 def if_visited(request, ct_node_id):
@@ -171,9 +172,9 @@ def save_audio(request):
             audio_response=audio_path
         )
         request.session['ct_node_response_id'] = ct_node_response.id
-        return HttpResponse("saved")
+        return HttpResponse('saved')
     else:
-        return HttpResponse("audio response already exists")
+        return HttpResponse('audio response already exists')
 
 
 @user_passes_test(is_student)
@@ -186,12 +187,12 @@ def conversation_end(request, ct_response_id):
     # Get responses in order
     ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response) \
         .order_by('position_in_sequence')
-
-    # Create a dict to send to table creation method
-    table_contents = []
-    for response in ct_node_responses:
-        table_contents.append({'node_description': response.template_node.description})
-    ct_node_table = NodeDescriptionTable(table_contents)
+    response_table_content = ct_node_responses.values(
+        'position_in_sequence',
+        'template_node__description',
+        'audio_response'
+    )
+    ct_node_table = NodeDescriptionTable(response_table_content)
 
     # POST request
     if request.method == 'POST':
