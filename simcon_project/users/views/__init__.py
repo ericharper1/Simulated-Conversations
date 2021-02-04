@@ -8,3 +8,4 @@ from .student_management import student_management
 from .student_registration import student_registration
 from .view_response import view_response, update_overall_response_feedback, update_node_response_feedback
 from .logout import logout
+from .create_assignment import *
