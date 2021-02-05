@@ -1,3 +1,5 @@
+import os
+
 from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -160,9 +162,10 @@ def save_audio(request):
     if request.session.get('ct_node_response_id') is None:
         # Get audio blob from session
         data = request.FILES.get('data')
-        save_to = timezone.now()
-        save_to = "audio/%s/%s.wav" % (request.user, save_to)  # Create file handle
-        audio_path = default_storage.save(save_to, data)  # Store audio in media root
+        file_handle = str(timezone.now())
+        file_handle = file_handle.replace(':', '-') + '.wav'
+        file_handle = os.path.join('audio', str(request.user), file_handle)  # Create full file handle
+        audio_path = default_storage.save(file_handle, data)  # Store audio in media root
         ct_response = TemplateResponse.objects.get(id=request.session.get('ct_response_id'))
         ct_node_response = TemplateNodeResponse.objects.create(
             template_node=None,
