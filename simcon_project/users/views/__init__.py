@@ -6,5 +6,6 @@ from .student_settings_page import student_settings_view
 from .student_home import student_view
 from .student_management import student_management
 from .student_registration import student_registration
+from .password_reset import password_reset
 from .view_response import view_response, update_overall_response_feedback, update_node_response_feedback
 from .logout import logout
