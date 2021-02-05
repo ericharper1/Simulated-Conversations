@@ -27,9 +27,9 @@ def password_reset(request):
                     token=default_token_generator.make_token(user)
 
                     # creates the subject and message content for the emails
-                    subject = 'Activate Your Simulated conversations account'
-                    message = 'Hi, \nPlease register here: \nhttp://' + site + '/password-reset-confirm/' \
-                          + uid + '/' + token +'/' '\n'
+                    subject = 'Reset Your Simulated conversations account password'
+                    message = 'Hi, \nPlease follow this link to reset your password: \nhttp://' + site + \
+                              '/password-reset-confirm/' + uid + '/' + token + '/' '\n'
 
                     # sends the email
                     send_mail(subject, message, 'simulated.conversation@mail.com', [email], fail_silently=False)

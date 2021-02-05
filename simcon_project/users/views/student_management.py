@@ -49,40 +49,38 @@ def student_management(request, name="All Students"):
             if form.is_valid():
                 new = form.cleaned_data.get('new')
                 email = form.cleaned_data.get('student_email')
+                if not Student.objects.filter(email=email):
+                    # creates a student with blank fist and last names, then the password is set to unusable
+                    first_name = ""
+                    last_name = ""
+                    password = ""
+                    user = Student.objects.create(email=email, first_name=first_name, last_name=last_name, password=password, added_by=added_by, )
+                    user.set_unusable_password()
 
-                if new:
-                    if not Student.objects.filter(email=email):
-                        # creates a student with blank fist and last names, then the password is set to unusable
-                        first_name = ""
-                        last_name = ""
-                        password = ""
-                        user = Student.objects.create(email=email, first_name=first_name, last_name=last_name, password=password, added_by=added_by, )
-                        user.set_unusable_password()
-
-                        # adds student to current label and/or the All Students label
-                        label = SubjectLabel.objects.get(label_name=name, researcher=added_by)
+                    # adds student to current label and/or the All Students label
+                    label = SubjectLabel.objects.get(label_name=name, researcher=added_by)
+                    label.students.add(user)
+                    if not name == "All Students":
+                        label = SubjectLabel.objects.get(label_name="All Students", researcher=added_by)
                         label.students.add(user)
-                        if not name == "All Students":
-                            label = SubjectLabel.objects.get(label_name="All Students", researcher=added_by)
-                            label.students.add(user)
 
-                        # collects the current domain of the website and the users uid
-                        current_site = get_current_site(request)
-                        site = current_site.domain
-                        uid = urlsafe_base64_encode(force_bytes(user.pk))
+                    # collects the current domain of the website and the users uid
+                    current_site = get_current_site(request)
+                    site = current_site.domain
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-                        # creates the subject and message content for the emails
-                        subject = 'Activate Your Simulated conversations account'
-                        message = 'Hi, \nPlease register here: \nhttp://' + site + '/student/register/'\
-                            + uid + '\n'
+                    # creates the subject and message content for the emails
+                    subject = 'Activate Your Simulated conversations account'
+                    message = 'Hi, \nPlease register here: \nhttp://' + site + '/student/register/'\
+                        + uid + '\n'
 
-                        # sends the email
-                        send_mail(subject, message, 'simulated.conversation@mail.com', [email], fail_silently=False)
-                    else:
-                        messages.error(request, 'Student already exists',
-                                       fail_silently=False)
-
+                    # sends the email
+                    send_mail(subject, message, 'simulated.conversation@mail.com', [email], fail_silently=False)
                 else:
+                    messages.error(request, 'Student already exists',
+                                   fail_silently=False)
+
+        if request.POST.get('email'):
                     # checks to make sure user exists
                     if Student.objects.filter(email=email):
 
