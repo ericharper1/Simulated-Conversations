@@ -18,7 +18,9 @@ from django.urls import path
 from conversation_templates.views import *
 from users.views import *
 from django.conf.urls import include
+from django.conf.urls.static import static
 from django.contrib.auth import views
+from django.conf import settings
 
 urlpatterns = [
     # Redirects and such
@@ -51,3 +53,7 @@ urlpatterns = [
     path('researcher/response/update/<uuid:pk>/', update_overall_response_feedback, name='update-overall-response-feedback'),
     path('researcher/response/updatenode/<uuid:pk>/', update_node_response_feedback, name='update-node-response-feedback'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
