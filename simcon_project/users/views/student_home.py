@@ -36,6 +36,10 @@ def student_view(request):
     :param request:
     :return: student_view.html with table
     """
+    # Clear conversation validation key if user returns to home page without finishing conversation
+    if 'validation_key' in request.session:
+        del request.session['validation_key']
+        request.session.modified = True
     assigned_templates = []
     # get the Student object matching logged in student
     student = Student.objects.filter(id=request.user.id)
