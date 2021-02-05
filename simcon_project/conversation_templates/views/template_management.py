@@ -1,4 +1,5 @@
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, RedirectView
+from django.db.models import Q
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
@@ -59,14 +60,20 @@ def main_view(request):
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
-    templates = get_templates(request.user)
-    template_table = AllTemplateTable(templates)
+    all_templates = get_templates(request.user)
+    templates = filter_templates(request, all_templates)
+    if templates:
+        template_table = AllTemplateTable(templates, prefix="1-")
+        RequestConfig(request, paginate={"per_page": 5}).configure(template_table)
+    else:
+        template_table = None
 
-    folders = TemplateFolder.objects.filter(researcher=request.user.id)
-    folder_table = FolderTable(folders)
-
-    RequestConfig(request, paginate=False).configure(template_table)
-    RequestConfig(request, paginate=False).configure(folder_table)
+    folders = filter_folder(request)
+    if folders:
+        folder_table = FolderTable(folders, prefix="2-")
+        RequestConfig(request, paginate={"per_page": 5}).configure(folder_table)
+    else:
+        folder_table = None
 
     context = {
         'templateTable': template_table,
@@ -84,14 +91,19 @@ def folder_view(request, pk):
     Shows the all folders, but shows only templates belonging to the selected folder
     """
     current_folder = get_object_or_404(TemplateFolder, pk=pk)
-    templates = current_folder.templates.all()
-    template_table = FolderTemplateTable(templates)
 
-    folders = TemplateFolder.objects.filter(researcher=request.user.id)
-    folder_table = FolderTable(folders)
+    all_templates = current_folder.templates.all()
+    templates = filter_templates(request, all_templates)
+    if templates:
+        template_table = FolderTemplateTable(templates, prefix="1-")
+        RequestConfig(request, paginate={"per_page": 5}).configure(template_table)
+    else:
+        template_table = None
 
-    RequestConfig(request, paginate=False).configure(template_table)
-    RequestConfig(request, paginate=False).configure(folder_table)
+    folders = filter_folder(request)
+    folder_table = FolderTable(folders, prefix="2-")
+
+    RequestConfig(request, paginate={"per_page": 5}).configure(folder_table)
 
     context = {
         'templateTable': template_table,
@@ -100,6 +112,10 @@ def folder_view(request, pk):
     }
 
     return render(request, 'template_management/main_view.html', context)
+
+
+class RedirectToTemplateCreation(RedirectView):
+    url = reverse_lazy('management:create-conversation-template-view')
 
 
 class FolderCreateView(BSModalCreateView):
@@ -207,6 +223,22 @@ def route_to_current_folder(previous_url):
         return reverse_lazy('management:folder-view', args=[folder_id])
     else:
         return reverse_lazy('management:main')
+
+
+def filter_folder(request):
+    folder_filter = request.GET.get('folder-filter')
+    if folder_filter is not None:
+        return TemplateFolder.objects.filter(researcher=request.user.id, name__contains=folder_filter)
+    return TemplateFolder.objects.filter(researcher=request.user.id)
+
+
+def filter_templates(request, templates):
+    template_filter = request.GET.get('template-filter')
+    if template_filter is not None:
+        # Constraint to filter for names OR descriptions that contain the search value
+        filter_fields = Q(name__contains=template_filter) | Q(description__contains=template_filter)
+        return templates.filter(filter_fields)
+    return templates
 
 
 def get_templates(user):
