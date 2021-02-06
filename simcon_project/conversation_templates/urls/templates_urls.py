@@ -11,4 +11,5 @@ urlpatterns = [
     path('delete/<uuid:pk>/', TemplateDeleteView.as_view(), name="delete-template"),
     path('folder/remove/<uuid:pk>/', remove_template, name="remove-template"),
     path('new/', create_conversation_template_view, name="create-conversation-template-view"),
+    path('redirect/template/', RedirectToTemplateCreation.as_view(), name="redirect-to-template-creation"),
 ]
