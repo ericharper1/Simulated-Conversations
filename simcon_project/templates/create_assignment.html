@@ -106,7 +106,6 @@
       var addedLabel=new Array();
 
       function add2table(tblId,name,key,id){
-          console.log(tblId);
           var tBody = tblId.tBodies[0];
           //Create tr and td elements
           var tr = document.createElement('tr');
@@ -126,7 +125,6 @@
               //student
               if(id==1) {
                   var index = addedStu.indexOf(em);
-                  console.log(em + "  " + index);
                   if (index > -1) {
                       addedStu.splice(index, 1);
                   }
@@ -136,7 +134,6 @@
                   var name=this.parentNode.parentNode.cells[0].innerHTML;
                   var tempKey=name+"--"+em;
                   var index = addedTmp.indexOf(tempKey);
-                  console.log(tempKey + "  " + index);
                   if (index > -1) {
                       addedTmp.splice(index, 1);
                   }
@@ -144,7 +141,6 @@
               //label
               else{
                   var index = addedLabel.indexOf(em);
-                  console.log(em + "  " + index);
                   if (index > -1) {
                       addedLabel.splice(index, 1);
                   }
