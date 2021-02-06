@@ -11,6 +11,7 @@ let NO_DESTINATION_FOR_CHOICE_ERROR = "No destination selected"
 let templateName = ""           // Holds template's name
 let templateDescription = ""    // Holds template's description
 let nodes = new Map()           // Map from counter to node. Used to keep track of all the created nodes
+let formSubmitted = false       // Used to indicate if a form was submitted successfully
 
 // Variables used purely for client side purposes
 let validating = false          // Indicates if validation is turned on or not
@@ -61,13 +62,17 @@ class Choice {
 function submit() {
     // Checks that everything is valid before submission
     let everythingIsValid = true
+    let foundFirst = false
     nodes.forEach((node) => {
         if(!nodeIsValid(node)){
             everythingIsValid = false
         }
+        if(node.isFirst) {
+            foundFirst = true
+        }
     })
 
-    if(everythingIsValid) {
+    if(everythingIsValid && foundFirst) {
         // Retrieves csrftoken
         let csrftoken = null
         const cookieName = "csrftoken"
@@ -101,18 +106,20 @@ function submit() {
             })
         }).then(function(response) {
             if(response.ok) {
-                //TODO: think of potential cuases and handle properly
+                formSubmitted = true
+                alert("Template saved successfully")
+                window.location.replace(window.location.href.split('new')[0])
             } else throw new Error(response.status)
         }).catch(function (error) {
             alert("Something went wrong while submitting the form\nError: " + error)
-            //TODO: think of potential cuases and handle properly if needed
         })
     } else { // If the input was invalid turn on validation and validate everything
         validating = true
         getValidateToggle().checked = true
-        alert("The form is invalid")
+        alert("Template is incomplete")
         updateValidityIndicatorOnAllStepNodes()
         validateAllVisibleFields()
+        validateIsFirstNodeCheck()
     }
 }
 
@@ -131,10 +138,12 @@ function loadState() {
 
         // Warn on page reload and leave.
         window.onbeforeunload =  function (e) {
-            let confirmationMessage = "Leaving or reloading the page will result in all progress being lost";
+            if(!formSubmitted) {
+                let confirmationMessage = "Leaving or reloading the page will result in all progress being lost";
 
-            (e || window.event).returnValue = confirmationMessage //Gecko + IE
-            return confirmationMessage //Gecko + Webkit, Safari, Chrome etc.
+                (e || window.event).returnValue = confirmationMessage
+                return confirmationMessage
+            }
         }
 
         // When an input is changed, properly handle that input
@@ -460,6 +469,8 @@ function handleIsTerminalNodeCheck() {
     if(checked) {
         currentNodeInFocus.responseChoices.forEach((choiceValue, choiceIndex) => { choiceValue.destinationIndex = 0 })
     }
+
+    if(validating) validateResponseChoices()
 }
 
 function handleTemplateNameInput() {
