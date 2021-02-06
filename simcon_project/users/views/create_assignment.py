@@ -20,10 +20,8 @@ class CreateAssignmentView(TemplateView):
         stud=Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active')
         label=SubjectLabel.objects.all().filter(researcher=curResearcher)
         template=ConversationTemplate.objects.all().filter(researcher=curResearcher)
-        researchers=Researcher.objects.all().values('email')
 
         student=json.dumps(list(stud))
-        researcher=json.dumps(list(researchers))
         subLabel = serializers.serialize("json",label)
         template = serializers.serialize("json",template)
 
@@ -31,7 +29,6 @@ class CreateAssignmentView(TemplateView):
             'student': student,
             'subLabel': subLabel,
             'template': template,
-            'researcher': researcher
         })
 
 #Transfer string type list to list type
