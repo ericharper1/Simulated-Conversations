@@ -32,8 +32,9 @@
             <div class="form-group">
                 <label for="add_stu">Add student</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please input student email." >
+                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please input student email." list="stu_list">
                     <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
+                    <datalist id="stu_list"></datalist>
                 </div>
                 <br>
                 <table id="tbl" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
@@ -56,8 +57,9 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." >
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." list="temp_list">
                     <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
+                    <datalist id="temp_list"></datalist>
                 </div>
                 <br>
                 <table id="tbl1" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
@@ -76,8 +78,9 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." >
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." list="label_list">
                     <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
+                    <datalist id="label_list"></datalist>
                 </div>
                 <br>
                 <table id="tbl2" class="table table-bordered table-hover col-lg-10" style="background-color: white;">
@@ -105,6 +108,36 @@
       var addedTmp=new Array();
       var addedLabel=new Array();
 
+      //add dropbox of every input box which has button.
+      function init(){
+          var stu_list=document.getElementById("stu_list");
+          var temp_list=document.getElementById("temp_list");
+          var label_list=document.getElementById("label_list");
+
+          for(var i=0;i<students.length;i++) {
+              var stuTmp = students[i];
+              var op=document.createElement("option");
+              op.innerHTML=stuTmp.email;
+              stu_list.appendChild(op);
+          }
+          for(var i=0;i<templates.length;i++) {
+              var tempTmp = templates[i].fields;
+              var op=document.createElement("option");
+              op.innerHTML=tempTmp.name;
+              temp_list.appendChild(op);
+          }
+          for(var i=0;i<subLabels.length;i++) {
+              var labelTmp = subLabels[i].fields;
+              var op=document.createElement("option");
+              op.innerHTML=labelTmp.label_name;
+              label_list.appendChild(op);
+          }
+      }
+      window.onload = function(){
+          init();
+      }
+
+      //add data to the table
       function add2table(tblId,name,key,id){
           var tBody = tblId.tBodies[0];
           //Create tr and td elements
