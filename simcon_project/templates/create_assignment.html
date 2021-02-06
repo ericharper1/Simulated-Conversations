@@ -32,7 +32,7 @@
             <div class="form-group">
                 <label for="add_stu">Add student</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" name="stu_name" placeholder="Please input student email." required>
+                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please input student email." >
                     <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
                 </div>
                 <br>
@@ -56,7 +56,7 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." required>
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." >
                     <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                 </div>
                 <br>
@@ -76,7 +76,7 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." required>
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." >
                     <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
                 </div>
                 <br>
@@ -178,6 +178,7 @@
           if(find==false){
               window.alert("Cannot find: "+stu);
           }
+          document.getElementById('stu_name').value="";
       }
 
       function add_temp(tbl, name){
@@ -199,6 +200,7 @@
           if(find==false){
               window.alert("Cannot find: "+name);
           }
+          document.getElementById('template_name').value="";
       }
 
       function add_label(tbl, name){
@@ -220,6 +222,7 @@
           if(find==false){
               window.alert("Cannot find: "+name);
           }
+          document.getElementById('label_name').value="";
       }
 
 
@@ -235,6 +238,16 @@
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
+
+          //varify name and date
+          if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
+              window.alert("Assignment name must not be empty!");
+              return;
+          }
+          if(typeof assign_date == "undefined" || assign_date == null || assign_date.split("-").length !=3){
+              window.alert("Assignment start date must in YYYY-MM-DD format and not be empty!");
+              return;
+          }
 
           //post data to server
           $.ajax({
