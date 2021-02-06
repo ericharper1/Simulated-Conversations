@@ -22,4 +22,4 @@ class ConversationTemplate(models.Model):
     researcher = models.ForeignKey('users.Researcher', related_name='templates', default=0, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.id}" # TODO: Undo
+        return f"{self.name}"
