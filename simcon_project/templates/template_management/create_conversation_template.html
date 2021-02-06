@@ -99,7 +99,12 @@
         </div>
     </div>
 
-    <script> loadState() </script>
+    <script>
+        if ("{{ modelObject }}") {
+            var modelObject = JSON.parse("{{modelObject|escapejs}}")
+        }
+        loadState()
+    </script>
     </body>
     </html>
 {% endblock %}

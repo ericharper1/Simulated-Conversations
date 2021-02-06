@@ -43,7 +43,7 @@ def create_conversation_template_view(request):
             for choice in received_node[1]['responseChoices']:
                 TemplateNodeChoice(
                     choice_text=choice['description'],
-                    parent_template=stored_nodes_dict.get(received_node[0]),
+                    parent_template_node=stored_nodes_dict.get(received_node[0]),
                     destination_node=stored_nodes_dict.get(choice['destinationIndex'])).save()
 
         return HttpResponse(status=202)

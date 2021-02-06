@@ -131,7 +131,7 @@ def conversation_step(request, ct_node_id):
 
     # GET request
     choice_form = TemplateNodeChoiceForm(ct_node=ct_node)
-    ct = ct_node.parent_template
+    ct = ct_node.parent_template_node
 
     # Check for page refresh
     if ct_node.start and request.session.get('ct_response_id') is None:
