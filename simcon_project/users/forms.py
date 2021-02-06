@@ -48,6 +48,10 @@ class UpdateFeedback(forms.Form):
     feedback = forms.CharField(help_text="Enter new Feedback")
 
 
+class UpdateTranscription(forms.Form):
+    transcription = forms.CharField(help_text="Enter new transcription")
+
+
 class NewResearcherCreationForm(forms.Form):
     email = forms.EmailField(max_length=254, required=True)
     first_name = forms.CharField(max_length=100, required=True)

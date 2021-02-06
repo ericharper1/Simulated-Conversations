@@ -50,7 +50,7 @@
                 <audio src="{% static node.audio_response %}" controls></audio>
             </div>
             <div class="col-sm-4">
-                {{node.transcription}}
+                {{node.transcription}} <a href="{% url 'update-node-transcription' node.id %}">Edit</a>
             </div>
             <div class="col-sm-4" id="feedback">
                 {{node.feedback}} <a href="{% url 'update-node-response-feedback' node.id %}">Edit</a>
