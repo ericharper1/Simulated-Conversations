@@ -87,7 +87,7 @@
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Researcher</th>
+                        <th>Number of students</th>
                         <th>Delete</th>
                     </tr>
                     </thead>
@@ -245,8 +245,8 @@
                       window.alert("Adding failed, the label is already in the table.");
                   }
                   else {
-                      var researcher = labelTmp.researcher;
-                      add2table(tbl2, name, researcher, 3);
+                      var stdNum=labelTmp.students.length;
+                      add2table(tbl2, name, stdNum, 3);
                       addedLabel.push(name);
                   }
               }
