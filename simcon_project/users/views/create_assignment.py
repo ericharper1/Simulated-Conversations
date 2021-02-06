@@ -7,15 +7,19 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
+from django.contrib.auth.decorators import user_passes_test
+from users.views.researcher_home import is_researcher
 import json
 import datetime
 
 
 class CreateAssignmentView(TemplateView):
     def get(self, request):
-        stud=Student.objects.all().values('email', 'first_name','last_name','is_active')
-        label=SubjectLabel.objects.all()
-        template=ConversationTemplate.objects.all()
+        curResearcher=request.user
+
+        stud=Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active')
+        label=SubjectLabel.objects.all().filter(researcher=curResearcher)
+        template=ConversationTemplate.objects.all().filter(researcher=curResearcher)
         researchers=Researcher.objects.all().values('email')
 
         student=json.dumps(list(stud))
@@ -52,6 +56,7 @@ def isNull(data):
         return True
     return False
 
+@user_passes_test(is_researcher)
 def add_data(request):
     #Error signs and error messages.
     errMsg=''
