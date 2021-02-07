@@ -1,11 +1,14 @@
+<!DOCTYPE html>
 {% extends "researcher_base.html" %}
 {% load static %}
 {% block nav-researcherView %}{% endblock %}
 {% load render_table from django_tables2 %}
 {% block content %}
-<!DOCTYPE html>
 <html lang="en">
   <head>
+
+    <link rel="stylesheet" href="{% static 'users/django_tables2.css' %}">
+
     <!-- prevent line breaks when using form fields -->
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}

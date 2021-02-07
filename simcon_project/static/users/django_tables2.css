@@ -1,0 +1,23 @@
+/*
+    Table occupies maximum amount of space inside container boundary
+*/
+.table-container {
+    width: 100%;
+    margin: auto;
+}
+
+/*
+       Table element occupies entire table-container
+       Not sure if this is necessary but leaving in.
+*/
+table {
+    width: 100%;
+
+}
+
+/*
+    Center aligns any column with this attribute
+*/
+.centered {
+    text-align: center;
+}

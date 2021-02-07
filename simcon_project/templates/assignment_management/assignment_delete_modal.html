@@ -10,15 +10,8 @@
   </div>
 
   <div class="modal-body">
-    <p>Are you sure you want to delete <strong>{{ researcher.first_name }} {{ researcher.last_name }}</strong>
-      ({{ researcher.email }}) and their associated data?</p>
-    <p>This will permanently remove the following:</p>
-    <ul>
-      <li>All assignments they created</li>
-      <li>All templates they created</li>
-      <li>All students they added</li>
-      <li>All responses completed by those students</li>
-    </ul>
+    <p>Are you sure you want to delete <strong>{{ assignment.name }}</strong>?</p>
+    <p>This will permanently remove all of the responses attached to that assignment as well.</p>
   </div>
 
   <div class="modal-footer">

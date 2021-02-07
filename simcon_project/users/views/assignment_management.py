@@ -4,24 +4,51 @@ from django_tables2.config import RequestConfig
 from django.contrib.auth.decorators import user_passes_test
 from django.urls import reverse_lazy
 from users.views.researcher_home import is_researcher
-from users.models import Assignment, Researcher
+from users.models import Assignment, Researcher, Student
 from conversation_templates.models import ConversationTemplate, TemplateResponse
 from bootstrap_modal_forms.generic import BSModalDeleteView
 
 
 class AssignmentsTable(tables.Table):
-    name = tables.Column(verbose_name='Assignment Name', accessor='name')
+    name = tables.Column(verbose_name='Name', accessor='name')
     date_assigned = tables.Column(verbose_name='Date Assigned', accessor='date_assigned')
+    # attempts blank until updated model merged into main
+    attempts = tables.Column(verbose_name='Attempts',
+                             accessor='attempts',
+                             attrs={'td': {'class': 'centered'}, 'th': {'class': 'centered'}})
     view_templates = tables.TemplateColumn(verbose_name='',
                                            template_name='assignment_management/view_templates_button.html')
-    completion = tables.Column(verbose_name='% Students Completed', accessor='completion')
-    delete = tables.TemplateColumn(verbose_name='', template_name='assignment_management/delete_ass_button.html')
+    view_students = tables.TemplateColumn(verbose_name='',
+                                          template_name='assignment_management/view_students_button.html')
+    # completion = tables.Column(verbose_name='% Students Completed', accessor='completion')
+    delete = tables.TemplateColumn(verbose_name='',
+                                   template_name='assignment_management/delete_ass_button.html')
 
 
 class TemplatesContainedTable(tables.Table):
-    name = tables.Column(verbose_name='Template Name', accessor='name') # make link to template management
-    description = tables.Column(verbose_name='Description', accessor='description')
-    creation_date = tables.Column(verbose_name='Creation Date', accessor='creation_date')
+    name = tables.Column(verbose_name='Name',
+                         accessor='name',
+                         orderable=False)
+    description = tables.Column(verbose_name='Description',
+                                accessor='description',
+                                orderable=False)
+    # creation_date = tables.Column(verbose_name='Creation Date', accessor='creation_date', orderable=False)
+    view_responses = tables.TemplateColumn(verbose_name='',
+                                           template_name='assignment_management/view_responses_button.html',
+                                           orderable=False)
+
+
+class AssignedStudentsTable(tables.Table):
+    name = tables.Column(verbose_name='Name',
+                         accessor='name',
+                         orderable=False)
+    email_address = tables.Column(verbose_name='Email Address',
+                                  accessor='email_address',
+                                  orderable=False)
+    templates_completed = tables.Column(verbose_name='Templates Completed',
+                                        accessor='templates_completed',
+                                        orderable=False,
+                                        attrs={'td': {'class': 'centered'}, 'th': {'class': 'centered'}})
 
 
 class AssignmentDeleteView(BSModalDeleteView):
@@ -55,21 +82,24 @@ def assignment_management_view(request):
         total_assigned_templates = ConversationTemplate.objects.filter(assignments=assignment).count() * \
                                    assignment.students.count()
         templates = ConversationTemplate.objects.filter(assignments=assignment)
-        total_completed_templates = TemplateResponse.objects.filter(assignment=assignment,
-                                                                    template__in=templates).\
-                                                            values('student').\
-                                                            distinct().count()
+        total_completed_templates = TemplateResponse.objects.exclude(completion_date=None) \
+                                                            .filter(assignment=assignment,
+                                                                    template__in=templates) \
+                                                            .values('student') \
+                                                            .distinct().count()
         completion_percent = total_completed_templates / total_assigned_templates
+        completion_percent = str(completion_percent*100)[:-2] + '%'
 
         row_data = {}
         row_data.update({"id": assignment.id,
                         "name": assignment.name,
                          "date_assigned": assignment.date_assigned,
+                         "attempts": assignment.attempts,
                          "completion": completion_percent})
         assignment_rows.append(row_data)
 
     assignments_table = AssignmentsTable(assignment_rows)
-    RequestConfig(request, paginate={"page": 10}).configure(assignments_table)
+    RequestConfig(request, paginate={"per_page": 10}).configure(assignments_table)
     return render(request, 'assignment_management/main_view.html', {'table': assignments_table})
 
 
@@ -77,6 +107,43 @@ def assignment_management_view(request):
 def view_templates(request, pk):
     assignment = Assignment.objects.get(pk=pk)
     templates = ConversationTemplate.objects.filter(assignments=assignment)
+    for template in templates:
+        if len(template.description) >= 200:
+            template.description = template.description[:197] + '...'
     templates_contained_table = TemplatesContainedTable(templates)
-    RequestConfig(request, paginate={"per_page": 10}).configure(templates_contained_table)
     return render(request, 'assignment_management/view_templates_modal.html', {'table': templates_contained_table})
+
+
+@user_passes_test(is_researcher)
+def view_students(request, pk):
+    student_rows = []
+    assignment = Assignment.objects.get(pk=pk)
+    students = Student.objects.filter(assignments=assignment)
+    templates = ConversationTemplate.objects.filter(assignments=assignment)
+    assigned_template_count = ConversationTemplate.objects.filter(assignments=assignment).count()
+    for student in students:
+        completed_template_count = TemplateResponse.objects.exclude(completion_date=None) \
+                                                            .filter(assignment=assignment,
+                                                                    template__in=templates,
+                                                                    student=student) \
+                                                            .values('template') \
+                                                            .distinct().count()
+        row_data = {}
+        row_data.update({'id': student.id,
+                         'name': student.first_name + ' ' + student.last_name,
+                         'email_address': student.email,
+                         'templates_completed': str(completed_template_count) + '/' + str(assigned_template_count)})
+        student_rows.append(row_data)
+    assigned_students_table = AssignedStudentsTable(student_rows)
+
+    total_assigned_templates = ConversationTemplate.objects.filter(assignments=assignment).count() * \
+                                                                        assignment.students.count()
+    templates = ConversationTemplate.objects.filter(assignments=assignment)
+    total_completed_templates = TemplateResponse.objects.filter(assignment=assignment,
+                                                                template__in=templates). \
+                                                        values('student'). \
+                                                        distinct().count()
+    completion_percent = total_completed_templates / total_assigned_templates
+    completion_percent = str(completion_percent * 100).split('.', 1)[0] + '%'
+    return render(request, 'assignment_management/view_students_modal.html', {'table': assigned_students_table,
+                                                                               'completion_percent': completion_percent})
