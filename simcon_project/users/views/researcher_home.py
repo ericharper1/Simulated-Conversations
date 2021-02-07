@@ -10,11 +10,15 @@ def is_researcher(user):
 
 @user_passes_test(is_researcher)
 def researcher_view(request):
-    response_table = TemplateResponse.objects.all()
+    #responseTable = TemplateResponse.objects.all()
+    responseTable = TemplateResponse.objects.filter(
+        template__researcher__email__icontains=request.user.email)
     if request.method == "POST":
+        responseTable = TemplateResponse.objects.all()
         items_to_delete = request.POST.getlist('delete_items')
         responseTable.filter(pk__in=items_to_delete).delete()
     if 'searchParam' in request.GET and request.GET['searchParam']:
+        responseTable = TemplateResponse.objects.all()
         searchParam = request.GET['searchParam']
         searchResponses = []
         search1 = TemplateResponse.objects.filter(
@@ -26,6 +30,7 @@ def researcher_view(request):
         search3 = TemplateResponse.objects.filter(
             assignment__subject_labels__label_name__icontains=searchParam)
         searchResponses.append(search3)
+        print(searchResponses)
         return render(request, 'researcher_view.html',
                       {'searchResponses': searchResponses})
     paginator = Paginator(responseTable, 10)
