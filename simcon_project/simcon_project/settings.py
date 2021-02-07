@@ -37,14 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admindocs',
 
+    # Our apps
+    'users',
+    'conversation_templates',
+
     # Third-party apps
     'bootstrap_modal_forms',
     'django_tables2',
     'embed_video',
-
-    # Our apps
-    'users',
-    'conversation_templates',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -138,6 +139,8 @@ STATICFILES_DIRS = [
 
 # Static URLS [These are used when in non production environments]
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = 'redirect-from-login'
 LOGOUT_REDIRECT_URL = 'login'

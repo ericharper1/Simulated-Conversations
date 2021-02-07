@@ -6,7 +6,7 @@
     <title>SimCon | Template Response View</title>
 </head>
 <body>
-    {% if empty %}
+    {% if not table %}
         <p>Looks like there are no responses at the moment</p>
     {% else %}
         <form method="post">

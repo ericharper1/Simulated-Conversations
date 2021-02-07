@@ -4,8 +4,9 @@
 *.pyc
 __pycache__
 db.sqlite3
-audio
-simcon_project/static/media
+**/media/**
+!**/media
+!**/media/audio
 
 # Backup files # 
 *.bak 

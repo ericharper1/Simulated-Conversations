@@ -31,8 +31,6 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
         Columns: student.first_name, student.last_name, template_response.completion_date,
                  and template_node_responses with template_node.description as headers (this is
                  dynamically created since each template has different number of nodes")
-
-        TODO: make sure incomplete responses aren't shown
         """
         template = ConversationTemplate.objects.get(pk=pk)
         extra_columns = []  # List of tuples of description and column object to pass to table
@@ -54,15 +52,15 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
 
             table_data.append(column_data)
 
-        response_table = ResponseTable(data=table_data, extra_columns=extra_columns)
-        RequestConfig(request, paginate=False).configure(response_table)
+        if not table_data:
+            response_table = None
+        else:
+            response_table = ResponseTable(data=table_data, extra_columns=extra_columns)
         export_format = request.GET.get("_export", None)
         context = {
             "table": response_table,
             "form": SelectTemplateForm(request=request, initial=template.name)
         }
-        if not template.template_nodes.all():
-            context.update({"empty": True})
 
         # Code needed to export table as .xls
         if TableExport.is_valid_format(export_format):

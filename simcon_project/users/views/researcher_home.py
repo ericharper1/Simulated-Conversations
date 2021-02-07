@@ -13,6 +13,7 @@ def researcher_view(request):
     #responseTable = TemplateResponse.objects.all()
     responseTable = TemplateResponse.objects.filter(
         template__researcher__email__icontains=request.user.email)
+    print(responseTable)
     if request.method == "POST":
         responseTable = TemplateResponse.objects.all()
         items_to_delete = request.POST.getlist('delete_items')
