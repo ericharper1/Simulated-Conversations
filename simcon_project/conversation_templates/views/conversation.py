@@ -215,3 +215,9 @@ def conversation_end(request, ct_response_id):
         'ct_node_responses': ct_node_responses
     })
     return render(request, t, ctx)
+
+
+def exit_conversation(request):
+    ctx = {}
+    t = '{}/exit_conversation_modal.html'.format(ct_templates_dir)
+    return render(request, t, ctx)
