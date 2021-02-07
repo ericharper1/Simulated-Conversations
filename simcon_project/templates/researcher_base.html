@@ -16,14 +16,14 @@
         <div class="navbar-header">
           <a class="navbar-brand">Simulated Conversations</a>
         </div>
-        <ul class="nav navbar-nav">
-          <li>{% block nav-researcherView %}<a href="{% url 'researcher-view' %}">Home</a>{% endblock %}</li>
-          <li>{% block nav-templateView %}<a href="{% url 'management:main' %}">Templates</a>{% endblock %}</li>
-          <li>{% block nav-studentmanagementView %}<a href="{% url 'student-management' %}">Student Management</a>{% endblock %}</li>
+        <ul class="nav navbar-collapse collapse">
+          <li class="px-3">{% block nav-researcherView %}<a href="{% url 'researcher-view' %}">  <span >   Home   </span> </a>{% endblock %}</li>
+          <li class="px-3">{% block nav-templateView %}<a href="{% url 'management:main' %}">  <span> Templates </span>  </a>{% endblock %}</li>
+          <li class="px-3">{% block nav-studentmanagementView %}<a href="{% url 'student-management' %}">   Student Management   </a>{% endblock %}</li>
         </ul>
         <ul class="nav navbar-nav justify-content-end">
-          <li>{% block nav-settingsView %}<a href="{% url 'settings:main' %}"><span class="glyphicon glyphicon-cog"></span> Settings</a>{% endblock %}</li>
-          <li>{% block nav-logoutView %}<a href="{% url 'logout' %}"><span class="	glyphicon glyphicon-log-out"></span> Log Out</a>{% endblock %}</li>
+          <li class="px-3">{% block nav-settingsView %}<a href="{% url 'settings:main' %}"> Settings</a>{% endblock %}</li>
+          <li>{% block nav-logoutView %}<a href="{% url 'logout' %}"> Log Out</a>{% endblock %}</li>
         </ul>
       </div>
     </nav>
