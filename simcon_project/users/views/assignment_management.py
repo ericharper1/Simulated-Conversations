@@ -117,6 +117,7 @@ def view_templates(request, pk):
 @user_passes_test(is_researcher)
 def view_students(request, pk):
     student_rows = []
+    total_completed_templates = 0
     assignment = Assignment.objects.get(pk=pk)
     students = Student.objects.filter(assignments=assignment)
     templates = ConversationTemplate.objects.filter(assignments=assignment)
@@ -128,6 +129,11 @@ def view_students(request, pk):
                                                                     student=student) \
                                                             .values('template') \
                                                             .distinct().count()
+        total_completed_templates = total_completed_templates + completed_template_count
+        if completed_template_count > assigned_template_count:
+            completed_template_count = assigned_template_count
+        if completed_template_count < 0:
+            completed_template_count = 0
         row_data = {}
         row_data.update({'id': student.id,
                          'name': student.first_name + ' ' + student.last_name,
@@ -138,11 +144,10 @@ def view_students(request, pk):
 
     total_assigned_templates = ConversationTemplate.objects.filter(assignments=assignment).count() * \
                                                                         assignment.students.count()
-    templates = ConversationTemplate.objects.filter(assignments=assignment)
-    total_completed_templates = TemplateResponse.objects.filter(assignment=assignment,
-                                                                template__in=templates). \
-                                                        values('student'). \
-                                                        distinct().count()
+    if total_completed_templates > assigned_template_count:
+        total_completed_templates = assigned_template_count
+    if total_completed_templates < 0:
+        total_completed_templates = 0
     completion_percent = total_completed_templates / total_assigned_templates
     completion_percent = str(completion_percent * 100).split('.', 1)[0] + '%'
     return render(request, 'assignment_management/view_students_modal.html', {'table': assigned_students_table,

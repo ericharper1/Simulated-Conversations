@@ -33,10 +33,6 @@
         {% if table %}
             {% render_table table %}
         {% endif %}
-        <form action="{% url assignments:create_assignments %}" method="post">
-            {% csrf_token %}
-            <input type="submit" class="btn btn-success" value="Create Assignment"><br/><br/>
-        </form>
     </div> <!-- /container -->
 
     <!-- Bootstrap core JavaScript

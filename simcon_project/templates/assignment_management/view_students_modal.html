@@ -16,7 +16,7 @@
 
     <div class="modal-body">
       {% if completion_percent %}
-        <p>Percentage of students with at least one response to all assigned templates: {{ completion_percent }}</p>
+        <p>{{ completion_percent }} of assigned templates have been completed at least once.</p>
       {% endif %}
       {% if table %}
         {% render_table table %}
