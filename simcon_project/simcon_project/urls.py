@@ -29,7 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', redirect_from_login, name="redirect-from-login"),
-    path('password-reset/', password_reset, name="password-reset"),
+    path('password-reset/', views.PasswordResetView.as_view(template_name='registration/password_reset.html'), name="password-reset"),
     path('password-reset/done/', views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'),name="password-reset-done"),
     path('password-reset-confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'),name="password-reset-confirm"),
     path('password-reset-complete/', views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'),name="password-reset-complete"),
