@@ -112,5 +112,4 @@ def select_feedback_view(request, pk_assignment, pk_template):
     responses = TemplateResponse.objects.filter(student=student.first(), assignment=assignment.first(),
                                                 template=template.first())
     feedback_table = ModalFeedbackTable(responses)
-    RequestConfig(request, paginate={"per_page": 10}).configure(feedback_table)
     return render(request, 'feedback/view_feedback_modal.html', {'table': feedback_table})

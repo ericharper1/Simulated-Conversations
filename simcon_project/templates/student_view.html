@@ -23,8 +23,14 @@
 
   <body>
     <div class="body-container">
+      {% if incomplete_table %}
+      <h2>Incomplete Templates</h2>
           {% render_table incomplete_table %}
+      {% endif  %}
+      {% if completed_table %}
+      <h2>Completed Templates</h2>
           {% render_table completed_table %}
+      {% endif  %}
      </div><!-- /container -->
 
     <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
