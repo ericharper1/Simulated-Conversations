@@ -18,7 +18,9 @@ from django.urls import path
 from conversation_templates.views import *
 from users.views import *
 from django.conf.urls import include
+from django.conf.urls.static import static
 from django.contrib.auth import views
+from django.conf import settings
 
 urlpatterns = [
     # Redirects and such
@@ -33,8 +35,9 @@ urlpatterns = [
     path('student/settings/', student_settings_view, name="student-settings-view"),
     path('student/register/<uidb64>/', student_registration, name="student-registration"),
     path('student/conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
+    path('student/feedback/', include('conversation_templates.urls.feedback_urls'), name='view-feedback'),
 
-    # Stuff researcher can see
+    # Stuff researchers can see
     path('researcher/', researcher_view, name="researcher-view"),
     path('researcher/register/<uidb64>/', researcher_registration, name="researcher-registration"),
     path('researcher/templates/', include('conversation_templates.urls.templates_urls'), name="template-management-view"),
@@ -46,3 +49,7 @@ urlpatterns = [
     path('researcher/response/update/<uuid:pk>/', update_overall_response_feedback, name='update-overall-response-feedback'),
     path('researcher/response/updatenode/<uuid:pk>/', update_node_response_feedback, name='update-node-response-feedback'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
