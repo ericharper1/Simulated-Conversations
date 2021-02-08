@@ -26,7 +26,7 @@ def view_response(request, pk):
     if user.get_is_researcher(request.user):
         return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
     else:
-        return render(request, 'view_feedback.html', {'response_nodes': nodes, 'response': response})
+        return render(request, 'feedback/view_feedback.html', {'response_nodes': nodes, 'response': response})
 
 
 @user_passes_test(is_researcher)

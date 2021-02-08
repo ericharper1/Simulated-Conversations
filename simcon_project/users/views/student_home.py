@@ -11,9 +11,9 @@ def is_student(user):
     return user.is_authenticated and not user.get_is_researcher()
 
 
-class StudentHomeTable(tables.Table):
+class IncompleteTemplatesTable(tables.Table):
     """
-    Table of assigned conversation templates for a given student.
+    Table of assigned conversation templates with no responses for a given student.
     name is the name of the template assigned. links to conversation-start
     date_assigned is the date that template was assigned.
     completion_date is the date the template was last completed by the student or is null.
@@ -27,6 +27,37 @@ class StudentHomeTable(tables.Table):
     date_assigned = tables.Column(verbose_name='Date Assigned')
     completion_date = tables.Column(accessor='conversation_templates__template_responses__completion_date',
                                     verbose_name='Last Response')
+    attempts_left = tables.Column(verbose_name='Attempts Left')
+
+
+class CompletedTemplatesTable(tables.Table):
+    """
+    Table of assigned conversation templates with at least one responses for a given student.
+    name is the name of the template assigned. links to conversation-start
+    date_assigned is the date that template was assigned.
+    completion_date is the date the template was last completed by the student or is null.
+    """
+    name = tables.Column(linkify=("conversation-start",
+                                  {"ct_id": tables.A("conversation_templates__id"),
+                                   "assign_id": tables.A("id")
+                                   }),
+                         accessor='conversation_templates__name',
+                         verbose_name='Template Name')
+    date_assigned = tables.Column(verbose_name='Date Assigned')
+    completion_date = tables.Column(accessor='conversation_templates__template_responses__completion_date',
+                                    verbose_name='Last Response')
+    attempts_left = tables.Column(verbose_name='Attempts Left')
+    feedback = tables.TemplateColumn(verbose_name='', template_name='feedback/view_feedback_button.html')
+
+
+class ModalFeedbackTable(tables.Table):
+    """
+    Table of dates where responses were completed and a button to view the feedback on them
+    """
+    completion_date = tables.Column(verbose_name='Completion Date', accessor='completion_date', orderable=False)
+    self_rating = tables.Column(verbose_name='Self Rating', accessor='self_rating', orderable=False)
+    feedback = tables.TemplateColumn(verbose_name='', template_name='feedback/select_feedback_button.html',
+                                     orderable=False)
 
 
 @user_passes_test(is_student)
@@ -36,11 +67,8 @@ def student_view(request):
     :param request:
     :return: student_view.html with table
     """
-    # Clear conversation validation key if user returns to home page without finishing conversation
-    if 'validation_key' in request.session:
-        del request.session['validation_key']
-        request.session.modified = True
-    assigned_templates = []
+    incomplete_templates = []
+    completed_templates = []
     # get the Student object matching logged in student
     student = Student.objects.filter(id=request.user.id)
     # get the assignments for that student
@@ -49,16 +77,39 @@ def student_view(request):
     for assignment in assignments:
         templates_in_assignment = ConversationTemplate.objects.filter(assignments=assignment)
         for template in templates_in_assignment:
-            last_response = TemplateResponse.objects.filter(assignment=assignment, template=template,
-                                                            student=student.first()).aggregate(Max('completion_date'))
+            responses = TemplateResponse.objects.filter(assignment=assignment, template=template,
+                                                            student=student.first())
+            last_response = responses.aggregate(Max('completion_date'))
+            attempts_left = assignment.attempts - len(responses)
+            if attempts_left < 0:
+                attempts_left = 0
+
             assigned_template_row = {}
             assigned_template_row.update({"conversation_templates__id": template.id,
                                           "id": assignment.id,
                                           "conversation_templates__name": template.name,
                                           "date_assigned": assignment.date_assigned,
                                           "conversation_templates__template_responses__completion_date":
-                                              last_response['completion_date__max']})
-            assigned_templates.append(assigned_template_row)
-    assigned_templates_table = StudentHomeTable(assigned_templates)
-    RequestConfig(request, paginate={"page": 10}).configure(assigned_templates_table)
-    return render(request, 'student_view.html', {'table': assigned_templates_table})
+                                              last_response['completion_date__max'],
+                                          "attempts_left": attempts_left})
+            if last_response['completion_date__max'] is None:
+                incomplete_templates.append(assigned_template_row)
+            else:
+                completed_templates.append(assigned_template_row)
+
+    incomplete_templates_table = IncompleteTemplatesTable(incomplete_templates, prefix="-1")
+    completed_templates_table = CompletedTemplatesTable(completed_templates, prefix="-2")
+    RequestConfig(request, paginate={"per_page": 10}).configure(incomplete_templates_table)
+    RequestConfig(request, paginate={"per_page": 10}).configure(completed_templates_table)
+    return render(request, 'student_view.html', {'incomplete_table': incomplete_templates_table,
+                                                 'completed_table': completed_templates_table})
+
+
+def select_feedback_view(request, pk_assignment, pk_template):
+    student = Student.objects.filter(id=request.user.id)
+    assignment = Assignment.objects.filter(pk=pk_assignment)
+    template = ConversationTemplate.objects.filter(pk=pk_template, assignments=assignment.first())
+    responses = TemplateResponse.objects.filter(student=student.first(), assignment=assignment.first(),
+                                                template=template.first())
+    feedback_table = ModalFeedbackTable(responses)
+    return render(request, 'feedback/view_feedback_modal.html', {'table': feedback_table})
