@@ -1,5 +1,7 @@
-{% load static %}
 <!DOCTYPE html>
+{% extends "student_base.html" %}
+{% block nav-studentsView %}{% endblock %}
+{% load static %}
 <html lang="en">
 <head>
 
@@ -39,7 +41,7 @@
         </div>
         {% for node in response_nodes %}
         <div class="row">
-            <h2> Response {{node.position_in_sequence}}</h2>
+            <h3> Response {{node.position_in_sequence}}</h3>
             <div class="row">
             {{node.template_node.description}}
             </div>
