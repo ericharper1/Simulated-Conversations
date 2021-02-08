@@ -7,7 +7,8 @@ JSONEncoder_olddefault = JSONEncoder.default
 
 
 def JSONEncoder_newdefault(self, o):
-    if isinstance(o, UUID): return str(o)
+    if isinstance(o, UUID):
+        return str(o)
     return JSONEncoder_olddefault(self, o)
 
 
@@ -23,6 +24,9 @@ class Assignment(models.Model):
     students = models.ManyToManyField('users.Student', related_name='assignments')
     researcher = models.ForeignKey('users.Researcher', default=0, related_name='assignments', on_delete=models.CASCADE)
     subject_labels = models.ManyToManyField('users.SubjectLabel', related_name='assignments', blank=True)
+
+    def __str__(self):
+        return f"{self.name}, {self.researcher}, ({self.date_assigned})"
 
     def get_name(self):
         return self.name

@@ -17,15 +17,24 @@
     </head>
     <body>
         <h1>Simulated Conversations</h1>
-        <h3>{{ ct }}</h3>
-        <h3 style="text-align:right;">{{ request.user }}</h3>
+        <a style="float:right" href="{% url 'student-view' %}" class="button">Exit conversation</a>
+        <div style="clear:both">
+            <h3 style="float:left">{{ ct }}</h3>
+            <h3 style="float:right"><small>{{ request.user }}</small></h3>
+        </div>
+        <br><br>
         <p>{{ ct.description }}</p>
         {%  render_table ct_node_table %}
         <div id="error"></div>
         <form action="{{ ct_response.get_absolute_url }}" method="POST" id="trans-form">
             {% csrf_token %}
             {% for response in ct_node_responses %}
-                <div>
+                <div id="audio">
+                    <p>{{ forloop.counter }})</p>
+                    <audio controls src="{{ response.audio_response.url }}">
+                    </audio>
+                </div>
+                <div id="transcription">
                     <label for="{{ response.id }}">Transcription: </label>
                     <input type="text" name="{{ response.id }}" id="{{ response.id }}"><br>
                 </div>
