@@ -14,6 +14,7 @@ class TemplateResponse(models.Model):
     template: ConversationTemplate object that TemplateResponse relates to
     assignment: Assignment object that ConversationTemplate belongs to
     feedback: General feedback left by a Researcher for a Student
+    self_rating: The rating a student gives their performance. Should be out of 10
     """
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     completion_date = models.DateTimeField(default=None, null=True)
@@ -21,7 +22,7 @@ class TemplateResponse(models.Model):
     template = models.ForeignKey('conversation_templates.ConversationTemplate', default=0, related_name='template_responses', on_delete=models.CASCADE)
     assignment = models.ForeignKey('users.Assignment', default=0, related_name='template_responses', on_delete=models.CASCADE)
     feedback = models.CharField(max_length=1000, default=None, null=True, blank=True)
-    self_rating = models.IntegerField(default=0, null=True)
+    self_rating = models.PositiveSmallIntegerField(default=0, null=True)
 
     def __str__(self):
         return f"{self.student.email}: {self.template.name}, {self.template.researcher} ({self.completion_date})"
