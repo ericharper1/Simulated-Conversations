@@ -77,9 +77,12 @@ def add_data(request):
     #Verify date
     today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     dateTmp=datetime.datetime.strptime(date, "%Y-%m-%d")
-    if dateTmp<=today:
+    assignToday=False
+    if dateTmp==today:
+        assignToday=True
+    if dateTmp<today:
         success=1
-        errMsg=errMsg+'The assigned date cannot be today or before today.\n\n'
+        errMsg=errMsg+'The assigned date cannot before today.\n\n'
 
     #Save the data that can be directly assigned to assignment.
     assignment=Assignment()
@@ -132,12 +135,16 @@ def add_data(request):
     msg='You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
     schedId='Assignment--'+name+'--'+date
     #when an error occurs, there is no need to add this task to the schedule.
-    if success==0:
+    if success==0 and not assignToday:
+        #To test the sending mail function, change the content of run_date to the time you want.
         #run_date='2021-01-22 18:35:00'
         sched.add_job(sendMail, trigger='date', id=schedId, run_date=date, args=(subject, msg, students, researcher),replace_existing=True)
         sched.start()
     else:
         assignment.delete()
+    #If the assignment date is the same day.
+    if assignToday:
+        sendMail(subject, msg, students, researcher)
 
     return HttpResponse(json.dumps({
         'success': success,
