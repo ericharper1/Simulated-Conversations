@@ -161,7 +161,7 @@ def conversation_end(request, ct_response_id):
             response.transcription = request.POST.get(str(response.id), '')
             response.save()
         # The key has to be 0, I have no clue why, just don't touch it
-        ct_response.self_rating = request.POST.get('0', 3)
+        ct_response.self_rating = request.POST.get('0', 0)
         ct_response.save()
         if ct_response.completion_date is None:
             ct_response.completion_date = timezone.now()
