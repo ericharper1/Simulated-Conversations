@@ -41,11 +41,7 @@
         {% endif %}
         <form action="{{ ct_node.get_absolute_url }}" method="POST" id="choice-form" name="choice-form">
             {% csrf_token %}
-            {% for choice in choice_form.choices %}
-                <div class="radio-choice">
-                    {{ choice }}
-                </div>
-            {% endfor %}
+            {{  choice_form.choices }}
             {% if ct_node.terminal %}
                 <button type="submit" class="btn btn-primary btn-sm">End Conversation</button>
             {% else %}

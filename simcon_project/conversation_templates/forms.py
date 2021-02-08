@@ -53,16 +53,18 @@ class SelectTemplateForm(forms.Form):
             self.fields['templates'] = forms.ChoiceField(choices=template_list)
 
 
-class NodeChoiceWidget(forms.RadioSelect):
+class CustomChoiceRadioSelectWidget(forms.RadioSelect):
+    """
+    RadioSelect Widget that has a text input box as the last choice
+    """
     def __init__(self, name, data_list, *args, **kwargs):
-        super(NodeChoiceWidget, self).__init__(*args, **kwargs)
+        super(CustomChoiceRadioSelectWidget, self).__init__(*args, **kwargs)
         self._name = name
         self._list = data_list
 
     def render(self, name, value, attrs=None, renderer=None):
         choice_html = f'<ul id="id_{name}">'
         for idx, choice in enumerate(self._list):
-
             choice_html += f'<li><label for="id_choice-{idx}"><input type="radio" id="id_choice-{idx}"' \
                             f'name={name} value="{choice.id}"> {choice.choice_text}  </label></li>'
 
@@ -81,6 +83,7 @@ class TemplateNodeChoiceForm(forms.Form):
     """
     choices = forms.ModelChoiceField(
         queryset=None,
+        widget=forms.RadioSelect,
     )
 
     def __init__(self, *args, **kwargs):
@@ -88,12 +91,15 @@ class TemplateNodeChoiceForm(forms.Form):
         choice_list = TemplateNodeChoice.objects.filter(parent_template=ct_node)
         super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
         self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)
-        self.fields['choices'].widget = NodeChoiceWidget(name="hello", data_list=choice_list)
+        self.fields['choices'].widget = CustomChoiceRadioSelectWidget(name="choice-widget", data_list=choice_list)
 
     def is_valid(self):
         valid = super(TemplateNodeChoiceForm, self).is_valid()
 
-        if not valid and self.data['choices'] != 'custom-response':
+        # Return True if the custom response choice is selected and the input box is filled out
+        if not valid:
+            if 'choices' in self.data and self.data['custom-text'].strip() != '':
+                return True
             return False
 
         return True
