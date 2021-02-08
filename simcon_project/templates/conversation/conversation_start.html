@@ -16,8 +16,11 @@
     </head>
     <body>
         <h1>Simulated Conversations</h1>
-        <h3>{{ ct.name }}</h3>
-        <h3 style="text-align:right;">{{ request.user }}</h3>
+        <div style="clear:both">
+            <h3 style="float:left">{{ ct }}</h3>
+            <h3 style="float:right"><small>{{ request.user }}</small></h3>
+        </div>
+        <br><br>
         <p>{{ ct.description }}</p>
         <form action="{% url "student-view" %}" method="GET">
             <button type="submit" class="btn btn-primary btn-sm">Cancel</button>
@@ -25,6 +28,12 @@
         <form action="{{ ct_node.get_absolute_url }}" method="GET">
             <button type="submit" class="btn btn-primary btn-sm">Start</button>
         </form>
+        <br><br>
+        <div>
+            <strong>Note: Do not travel back during a conversation.<br>If you do not wish to
+            finish a conversation, you can exit the conversation at any point with the option
+            provided at the upper right-hand corner of the screen.</strong>
+        </div>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
