@@ -75,6 +75,21 @@
                         formURL: $(this).data('form-url')
                     });
                 });
+
+                // Make input for custom response required when radio is clicked
+                $('.node-choice').change(function () {
+                    console.log('click')
+                    if (this.value == 'custom-response') {
+                        $('#id_custom-input').attr('required', true);
+                    } else {
+                        $('#id_custom-input').attr('required', false);
+                    }
+                });
+
+                // Make input for custom text required if radio is initially selected on page refresh
+                if($('#id_choice-custom').is(':checked')){
+                    $('#id_custom-input').attr('required', true);
+                };
             });
             {% if not audio_response %}
                 document.getElementById("choice-form").style.display = "none";

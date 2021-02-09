@@ -66,10 +66,10 @@ class CustomChoiceRadioSelectWidget(forms.RadioSelect):
         choice_html = f'<ul id="id_{name}">'
         for idx, choice in enumerate(self._list):
             choice_html += f'<li><label for="id_choice-{idx}"><input type="radio" id="id_choice-{idx}"' \
-                            f'name={name} value="{choice.id}"> {choice.choice_text}  </label></li>'
+                            f'name={name} value="{choice.id}" class="node-choice"> {choice.choice_text}  </label></li>'
 
         choice_html += f'<li><label for="id_choice-custom"><input type="radio" id="id_choice-custom"' \
-                       f'name={name} value="custom-response"><input name="custom-text" type="text" ' \
+                       f'name={name} value="custom-response" class="node-choice"><input name="custom-text" type="text"'\
                        f'placeholder="Enter Custom Response" id="id_custom-input"></label></li>'
 
         choice_html += '</ul>'
