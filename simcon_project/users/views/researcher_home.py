@@ -2,11 +2,16 @@ from django.shortcuts import render
 from django.db.models import Q
 from conversation_templates.models import TemplateResponse
 from django.contrib.auth.decorators import user_passes_test
-from django_tables2 import TemplateColumn, tables, RequestConfig, A
+import django_tables2 as tables
+from django_tables2 import RequestConfig
 
 
 class ResponseTable(tables.Table):
     name = tables.columns.Column(accessor="student.get_full_name")
+    response = tables.TemplateColumn(
+        '''<a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}">View</a>''')
+    delete = tables.TemplateColumn(
+        '''<a class="btn btn-danger" href="{% url 'delete-response' record.id %}"  >Delete</a>''')
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'response-table'}
@@ -39,40 +44,9 @@ def researcher_view(request):
 def filter_search(request, responses):
     if 'searchParam' in request.GET:
         param = request.GET['searchParam']
-        # Add columns you want the search to apply to here
         filter_fields = Q(student__first_name__contains=param) | Q(student__last_name__contains=param) | \
-            Q(template__name__contains=param)
+            Q(template__name__contains=param) | \
+            Q(assignment__subject_labels__label_name__contains=param)
         responses = responses.filter(filter_fields)
 
     return responses
-
-# @user_passes_test(is_researcher)
-# def researcher_view(request):
-#    #responseTable = TemplateResponse.objects.all()
-#    responseTable = TemplateResponse.objects.filter(
-#        template__researcher__email__icontains=request.user.email)
-#    print(responseTable)
-#    if request.method == "POST":
-#        responseTable = TemplateResponse.objects.all()
-#        items_to_delete = request.POST.getlist('delete_items')
-#        responseTable.filter(pk__in=items_to_delete).delete()
-#    if 'searchParam' in request.GET and request.GET['searchParam']:
-#        responseTable = TemplateResponse.objects.all()
-#        searchParam = request.GET['searchParam']
-#        searchResponses = []
-#        search1 = TemplateResponse.objects.filter(
-#            student__email__icontains=searchParam)
-#        searchResponses.append(search1)
-#        search2 = TemplateResponse.objects.filter(
-#            template__name__icontains=searchParam)
-#        searchResponses.append(search2)
-#        search3 = TemplateResponse.objects.filter(
-#            assignment__subject_labels__label_name__icontains=searchParam)
-#        searchResponses.append(search3)
-#        print(searchResponses)
-#        return render(request, 'researcher_view.html',
-#                      {'searchResponses': searchResponses})
-#    paginator = Paginator(responseTable, 10)
-#    pageNumber = request.GET.get('page')
-#    pageObject = paginator.get_page(pageNumber)
-#    return render(request, 'researcher_view.html', locals())

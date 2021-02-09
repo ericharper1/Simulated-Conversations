@@ -19,6 +19,7 @@ class Assignment(models.Model):
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=100) 
     date_assigned = models.DateField()
+    attempts = models.PositiveSmallIntegerField(default=1, blank=False)
     conversation_templates = models.ManyToManyField('conversation_templates.ConversationTemplate', related_name='assignments')
     students = models.ManyToManyField('users.Student', related_name='assignments')
     researcher = models.ForeignKey('users.Researcher', default=0, related_name='assignments', on_delete=models.CASCADE)
