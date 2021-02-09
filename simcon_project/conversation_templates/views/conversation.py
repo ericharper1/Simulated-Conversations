@@ -1,5 +1,6 @@
 import os
-
+import django_tables2 as tables
+import secrets
 from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -10,7 +11,6 @@ from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
 from django.contrib.auth.decorators import user_passes_test
 from users.views.student_home import is_student
-import django_tables2 as tables
 
 # Globals
 ct_templates_dir = 'conversation'
@@ -55,6 +55,8 @@ def flush_session_data(request):
         del request.session['assign_id']
     if 'ct_node_response_id' in request.session:
         del request.session['ct_node_response_id']
+    if 'validation_key' in request.session:
+        del request.session['validation_key']
     request.session.modified = True
 
 
@@ -64,6 +66,14 @@ def conversation_start(request, ct_id, assign_id):
     """
     Renders entry page for a conversation. Student can choose to start the conversation or go back.
     """
+    # Check if user has retries
+    assignment = Assignment.objects.get(id=assign_id)
+    student = Student.objects.get(email=request.user)
+    student_attempts = TemplateResponse.objects.filter(student=student, assignment=assignment).count()
+    if student_attempts >= assignment.attempts:
+        return HttpResponseNotFound('<h1>Sorry, maximum number of attempts reached for this conversation.</h1>')
+
+    # Else, set up conversation
     ctx = {}
     t = '{}/conversation_start.html'.format(ct_templates_dir)
     ct = ConversationTemplate.objects.get(id=ct_id)
@@ -73,6 +83,7 @@ def conversation_start(request, ct_id, assign_id):
     flush_session_data(request)
     request.session['assign_id'] = assign_id
     request.session['page_dict'] = {}
+    request.session['validation_key'] = secrets.token_hex(8)
     ctx.update({
         'ct': ct,
         'ct_node': ct_node,
@@ -86,6 +97,11 @@ def conversation_step(request, ct_node_id):
     Renders each step in a conversation where a Student can watch the video, record a response,
     and select a choice.
     """
+    # Check to make sure student didn't copy paste old conversation link
+    if request.session.get('validation_key') is None:
+        return HttpResponseNotFound('<h1>Access Denied</h1>')
+
+    # Else, set up TemplateNode data
     ctx = {}
     t = '{}/conversation_step.html'.format(ct_templates_dir)
     ct_node = TemplateNode.objects.get(id=ct_node_id)
@@ -199,15 +215,22 @@ def conversation_end(request, ct_response_id):
 
     # POST request
     if request.method == 'POST':
+        print(request.POST)
         for response in ct_node_responses:
             response.transcription = request.POST.get(str(response.id), '')
             response.save()
+        # The key has to be 0, I have no clue why, just don't touch it
+        ct_response.self_rating = request.POST.get('0', 0)
+        ct_response.save()
         if ct_response.completion_date is None:
             ct_response.completion_date = timezone.now()
             ct_response.save()
         return redirect('student-view')
 
     # GET request
+    if 'validation_key' in request.session:
+        del request.session['validation_key']
+        request.session.modified = True
     ctx.update({
         'ct': ct,
         'ct_response': ct_response,
