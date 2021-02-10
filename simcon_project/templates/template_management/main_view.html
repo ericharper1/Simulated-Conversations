@@ -34,6 +34,20 @@
         <button id="create-folder" class="btn btn-primary" type="button" name="button">Create Folder</button>
 
         <h3>Templates</h3>
+        <!-- Show/Hide Archived Templates Button -->
+        {% if show_archived %}
+            <form method="post" action="{% url 'management:main' %}">
+                {% csrf_token %}
+                <button name="show-archived" type="submit" value="False">
+                Hide Archived Templates</button>
+            </form>
+        {% else %}
+            <form method="post" action="{% url 'management:main-archived' %}">
+                {% csrf_token %}
+                <button name="show-archived" type="submit" value="True">
+                    Show Archived Templates</button>
+            </form>
+        {% endif %}
         <!-- Templates Search Bar-->
         {% if folder_pk %}
             <form action="{% url 'management:folder-view' folder_pk %}" method="get">
@@ -100,10 +114,27 @@
                     formURL: $(this).data('form-url')
                 });
             });
+
             $("#create-folder").modalForm({
                 formURL: "{% url 'management:create-folder' %}",
                 modalID: "#create_modal"
             });
+
+            //if({{ show_archived }}) {
+            //    $("#show-archived").prop('checked', true)
+            //}
+
+            //$("#show-archived").change(function (){
+            //    if($(this).is(":checked")){
+            //        if(String(document.location).includes("?")) {
+            //            document.location.search = "&show-archived=true"
+            //        } else {
+            //            document.location.search = "?show-archived=true"
+            //        }
+            //    } else {
+            //        document.location.search = "?show-archived=false"
+            //    }
+            //});
         });
         </script>
     </body>

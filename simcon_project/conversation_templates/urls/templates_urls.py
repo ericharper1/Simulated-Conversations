@@ -4,6 +4,7 @@ from conversation_templates.views import *
 app_name = 'management'
 urlpatterns = [
     path('', main_view, name="main"),
+    path('&show-archived=true/', main_view, name="main-archived"),
     path('folder/<uuid:pk>/', folder_view, name="folder-view"),
     path('folder/new/', FolderCreateView.as_view(), name='create-folder'),
     path('folder/delete/<uuid:pk>/', FolderDeleteView.as_view(), name='delete-folder'),

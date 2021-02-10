@@ -60,6 +60,10 @@ def main_view(request):
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
+    show_archived = False
+    if request.POST:
+        if 'show-archived' in request.POST:
+            show_archived = True
     all_templates = get_templates(request.user)
     templates = filter_templates(request, all_templates)
     if templates:
@@ -79,6 +83,7 @@ def main_view(request):
         'templateTable': template_table,
         'folderTable': folder_table,
         'folder_pk': None,
+        'show_archived': show_archived,
     }
 
     return render(request, 'template_management/main_view.html', context)
