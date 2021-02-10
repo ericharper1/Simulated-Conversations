@@ -12,7 +12,7 @@ class ResponseTable(tables.Table):
     response = tables.TemplateColumn(
         ''' <a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}" >View</a>''', verbose_name='')
     delete = tables.TemplateColumn(
-        '''<a class="btn btn-danger" href="{% url 'delete-response' record.id %}" >Delete</a>''', verbose_name='')
+        '''<button class="bs-modal btn btn-danger" type="button" name="button" data-form-url="{% url 'delete-response' record.id %}" >Delete</button>''', verbose_name='')
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'response-table'}

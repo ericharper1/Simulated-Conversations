@@ -144,9 +144,5 @@ def update_node_transcription(request, pk):
 class ResponseDeleteView(BSModalDeleteView):
     model = TemplateResponse
     template_name = 'response_delete_modal.html'
-    success_message = 'Success: Response was deleted.'
-    success_url = reverse_lazy('view-response')
-
-    def post(self, request, *args, **kwargs):
-        delete_response(request, self.kwargs['pk'])
-        return HttpResponseRedirect(reverse('researcher-view'))
+    success_message = None
+    success_url = reverse_lazy('researcher-view')
