@@ -7,11 +7,12 @@ from django_tables2 import RequestConfig
 
 
 class ResponseTable(tables.Table):
-    name = tables.columns.Column(accessor="student.get_full_name")
+    name = tables.columns.Column(
+        accessor="student.get_full_name", order_by="student.last_name")
     response = tables.TemplateColumn(
-        '''<a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}">View</a>''')
+        ''' <a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}" >View</a>''', verbose_name='')
     delete = tables.TemplateColumn(
-        '''<a class="btn btn-danger" href="{% url 'delete-response' record.id %}"  >Delete</a>''')
+        '''<a class="btn btn-danger" href="{% url 'delete-response' record.id %}" >Delete</a>''', verbose_name='')
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'response-table'}
@@ -23,7 +24,7 @@ def is_researcher(user):
     return user.is_authenticated and user.get_is_researcher()
 
 
-@user_passes_test(is_researcher)
+@ user_passes_test(is_researcher)
 def researcher_view(request):
     responses = TemplateResponse.objects.filter(
         template__researcher__email=request.user)

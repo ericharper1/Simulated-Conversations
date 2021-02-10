@@ -1,12 +1,10 @@
 {% block content %}
-<form method="post" action="">
+<div class="modal-dialog modal-lg">
+<form method="POST" action="">
   {% csrf_token %}
-
   <div class="modal-header">
     <h3 class="modal-title">Delete Response</h3>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <a class= "button" href="{% url 'researcher-view' %}" class="close" data-dismiss="modal" aria-label="close">Cancel Delete</a>
   </div>
 
   <div class="modal-body">
@@ -19,5 +17,6 @@
   </div>
 
 </form>
+</div>
 {% endblock %}
 

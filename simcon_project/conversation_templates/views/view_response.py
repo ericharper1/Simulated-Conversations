@@ -1,21 +1,20 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from users.views.redirect_from_login import is_authenticated
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth import get_user_model
 from users.forms import UpdateFeedback, UpdateTranscription
 from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
+from bootstrap_modal_forms.generic import BSModalDeleteView
 
 
 @user_passes_test(is_authenticated)
 def view_response(request, pk):
     response = get_object_or_404(TemplateResponse, pk=pk)
     if request.method == "POST":
-        response_table = TemplateResponse.objects.all()
-        items_to_delete = request.POST.getlist('delete_items')
-        response_table.filter(pk__in=items_to_delete).delete()
+        delete_response(request, pk)
         return HttpResponseRedirect(reverse('researcher-view'))
     nodes = []
     num_nodes = TemplateNodeResponse.objects.filter(
@@ -140,3 +139,14 @@ def update_node_transcription(request, pk):
     }
 
     return render(request, 'update_node_transcription.html', context)
+
+
+class ResponseDeleteView(BSModalDeleteView):
+    model = TemplateResponse
+    template_name = 'response_delete_modal.html'
+    success_message = 'Success: Response was deleted.'
+    success_url = reverse_lazy('view-response')
+
+    def post(self, request, *args, **kwargs):
+        delete_response(request, self.kwargs['pk'])
+        return HttpResponseRedirect(reverse('researcher-view'))
