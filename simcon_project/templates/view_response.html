@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
     <!-- prevent line breaks when using form fields -->
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}
@@ -29,7 +30,7 @@
     <div class="col-sm-4" style=" float: right;">
         <form method="POST">
             {% csrf_token %}
-            <button type="submit" name="delete_items" value="{{ response.pk }}">Delete Response</button>
+            <button class="bs-modal btn btn-danger" type="button" name="button" data-form-url="{% url 'delete-response' response.pk %}" >Delete</button>
         </form>
     </div>
     <br>
@@ -71,7 +72,20 @@
     </div>
 
 </div> <!-- /container -->
-
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+              <div class="modal-content"></div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $(".bs-modal").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data('form-url')
+            });
+        });
+    });
+  </script>
 <!-- Bootstrap core JavaScript
 ================================================== -->
 

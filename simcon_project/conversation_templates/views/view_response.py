@@ -13,9 +13,7 @@ from bootstrap_modal_forms.generic import BSModalDeleteView
 @user_passes_test(is_authenticated)
 def view_response(request, pk):
     response = get_object_or_404(TemplateResponse, pk=pk)
-    if request.method == "POST":
-        delete_response(request, pk)
-        return HttpResponseRedirect(reverse('researcher-view'))
+
     nodes = []
     num_nodes = TemplateNodeResponse.objects.filter(
         parent_template_response=response).count()
@@ -31,14 +29,6 @@ def view_response(request, pk):
         return render(request, 'view_response.html', {'response_nodes': nodes, 'response': response})
     else:
         return render(request, 'feedback/view_feedback.html', {'response_nodes': nodes, 'response': response})
-
-
-@user_passes_test(is_researcher)
-def delete_response(request, pk):
-    response = get_object_or_404(TemplateResponse, pk=pk)
-    response_table = TemplateResponse.objects.all()
-    response_table.filter(pk=pk).delete()
-    return HttpResponseRedirect(reverse('researcher-view'))
 
 
 @user_passes_test(is_researcher)

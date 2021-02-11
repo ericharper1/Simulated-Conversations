@@ -3,7 +3,9 @@
   {% csrf_token %}
   <div class="modal-header">
     <h3 class="modal-title">Delete Response</h3>
-    <a class= "button" href="{% url 'researcher-view' %}" class="close" data-dismiss="modal" aria-label="close">Cancel Delete</a>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">Cancel</span>
+    </button>
   </div>
 
   <div class="modal-body">

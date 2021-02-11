@@ -9,6 +9,8 @@ from django_tables2 import RequestConfig
 class ResponseTable(tables.Table):
     name = tables.columns.Column(
         accessor="student.get_full_name", order_by="student.last_name")
+    self_rating = tables.columns.Column(
+        verbose_name="Student Self Rating", order_by="self_rating")
     response = tables.TemplateColumn(
         ''' <a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}" >View</a>''', verbose_name='')
     delete = tables.TemplateColumn(
@@ -17,7 +19,8 @@ class ResponseTable(tables.Table):
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'response-table'}
         model = TemplateResponse
-        fields = ['template', 'name', 'completion_date', 'feedback']
+        fields = ['template', 'name', 'completion_date',
+                  'feedback', 'self_rating']
 
 
 def is_researcher(user):
