@@ -26,6 +26,24 @@ class FolderCreationForm(BSModalModelForm):
             self.fields['templates'].queryset = templates.all()
         self.fields['name'].required = True
 
+    def clean(self):
+        data = self.cleaned_data
+        instance = str(self.instance)
+
+        # Validation for when creating a new folder and entering a duplicate name
+        if not instance and 'name' in data:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
+
+        # Validation for when editing a folder and entering a duplicate name
+        if instance and 'name' in data and data['name'] != self.initial['name']:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
+
+        return data
+
     class Meta:
         model = TemplateFolder
         fields = ['name', 'templates']
@@ -88,9 +106,9 @@ class TemplateNodeChoiceForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         ct_node = kwargs.pop('ct_node', None)
-        choice_list = TemplateNodeChoice.objects.filter(parent_template=ct_node)
+        choice_list = TemplateNodeChoice.objects.filter(parent_template_node=ct_node)
         super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
-        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)
+        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template_node=ct_node)
         self.fields['choices'].widget = CustomChoiceRadioSelectWidget(name="choice-widget", data_list=choice_list)
 
     def is_valid(self):
