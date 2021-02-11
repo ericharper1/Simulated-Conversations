@@ -1,6 +1,7 @@
 from django import forms
 from django.db.models.functions import Lower
 from .models import TemplateFolder, TemplateNodeChoice, ConversationTemplate
+from users.models import Researcher
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 
@@ -25,6 +26,18 @@ class FolderCreationForm(BSModalModelForm):
             templates = ConversationTemplate.objects.filter(researcher=self.request.user.id)
             self.fields['templates'].queryset = templates.all()
         self.fields['name'].required = True
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if TemplateFolder.objects.get(name=name, researcher=self.request.user.id):
+            self.add_error('name', 'heelo')
+
+        return name
+
+    def is_valid(self):
+        print('hello')
+        super(FolderCreationForm, self).is_valid()
+
 
     class Meta:
         model = TemplateFolder
