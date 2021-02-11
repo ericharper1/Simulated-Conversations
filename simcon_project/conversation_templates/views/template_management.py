@@ -165,7 +165,7 @@ class TemplateDeleteView(BSModalDeleteView):
     """
     model = ConversationTemplate
     template_name = 'template_management/template_delete_modal.html'
-    success_message = None
+    success_message = None  # Don't delete this. BSModalDeleteView needs success message for some reason
     success_url = reverse_lazy('management:main')
 
     def get(self, request, *args, **kwargs):
