@@ -1,6 +1,7 @@
 from django import forms
 from django.db.models.functions import Lower
 from .models import TemplateFolder, TemplateNodeChoice, ConversationTemplate
+from users.models import Researcher
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 
@@ -25,6 +26,24 @@ class FolderCreationForm(BSModalModelForm):
             templates = ConversationTemplate.objects.filter(researcher=self.request.user.id)
             self.fields['templates'].queryset = templates.all()
         self.fields['name'].required = True
+
+    def clean(self):
+        data = self.cleaned_data
+        instance = str(self.instance)
+
+        # Validation for when creating a new folder and entering a duplicate name
+        if not instance and 'name' in data:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
+
+        # Validation for when editing a folder and entering a duplicate name
+        if instance and 'name' in data and data['name'] != self.initial['name']:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
+
+        return data
 
     class Meta:
         model = TemplateFolder

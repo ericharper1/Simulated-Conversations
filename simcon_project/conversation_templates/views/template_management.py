@@ -1,4 +1,5 @@
 from django.views.generic import DeleteView, RedirectView
+from django.db import IntegrityError
 from django.db.models import Q
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -164,6 +165,7 @@ class TemplateDeleteView(BSModalDeleteView):
     """
     model = ConversationTemplate
     template_name = 'template_management/template_delete_modal.html'
+    success_message = None  # Don't delete this. BSModalDeleteView needs success message for some reason
     success_url = reverse_lazy('management:main')
 
     def get(self, request, *args, **kwargs):
