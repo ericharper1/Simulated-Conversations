@@ -27,17 +27,23 @@ class FolderCreationForm(BSModalModelForm):
             self.fields['templates'].queryset = templates.all()
         self.fields['name'].required = True
 
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if TemplateFolder.objects.get(name=name, researcher=self.request.user.id):
-            self.add_error('name', 'heelo')
+    def clean(self):
+        data = self.cleaned_data
+        instance = str(self.instance)
 
-        return name
+        # Validation for when creating a new folder and entering a duplicate name
+        if not instance and 'name' in data:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
 
-    def is_valid(self):
-        print('hello')
-        super(FolderCreationForm, self).is_valid()
+        # Validation for when editing a folder and entering a duplicate name
+        if instance and 'name' in data and data['name'] != self.initial['name']:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
 
+        return data
 
     class Meta:
         model = TemplateFolder
