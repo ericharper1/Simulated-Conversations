@@ -65,4 +65,4 @@ class TemplateNodeChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         ct_node = kwargs.pop('ct_node', None)
         super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
-        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)
+        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template_node=ct_node)

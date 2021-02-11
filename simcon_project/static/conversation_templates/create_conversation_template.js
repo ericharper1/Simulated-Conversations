@@ -93,8 +93,17 @@ function submit() {
             templateDescription: templateDescription
         })
 
+        // Determines the post url without direct hard coding.
+        let currentUrl = window.location.href
+        let postUrl = ""
+        if(currentUrl.split("edit").length == 1) {
+           postUrl = currentUrl
+        } else {
+            postUrl = currentUrl.split("edit")[0] + "new/"
+        }
+
         // Make POST request
-        fetch(window.location.href, {
+        fetch(postUrl, {
             method: "POST",
             credentials: "include",
             mode: "same-origin",
@@ -111,7 +120,7 @@ function submit() {
                 window.location.replace(window.location.href.split('new')[0])
             } else throw new Error(response.status)
         }).catch(function (error) {
-            alert("Something went wrong while submitting the form\nError: " + error)
+            alert("Something went wrong while submitting the form\n" + error)
         })
     } else { // If the input was invalid turn on validation and validate everything
         validating = true
@@ -128,10 +137,47 @@ function submit() {
  */
 function loadState() {
     $(document).ready(() => {
-        addStepNode()
-        updateNodeInFocus(1)
-        currentNodeInFocus.isFirst = true
-        getFirstStepToggle().checked = true
+
+        if(modelObject) {
+            templateDescription = modelObject.description
+            templateName = modelObject.name
+
+            let nodeIdToIndexMap = new Map()
+            for(const serverNode of modelObject.nodes) {
+                nodeIdToIndexMap.set(serverNode.id, lastUsedNodeIndex + 1)
+                addStepNode()
+            }
+            for(const serverNode of modelObject.nodes) {
+                let clientNode = nodes.get(nodeIdToIndexMap.get(serverNode.id))
+
+                for(const serverChoiceNode of serverNode.choices) {
+                    let serverChoiceNodeDestination = nodeIdToIndexMap.get(serverChoiceNode.choice_destination)
+                    if(serverChoiceNodeDestination == "" || !serverChoiceNodeDestination) {
+                       serverChoiceNodeDestination = 0
+                    } else {
+                        serverChoiceNodeDestination = Number(serverChoiceNodeDestination)
+                    }
+                    clientNode.responseChoices.set(clientNode.lastChoiceIndex, new Choice(
+                        serverChoiceNode.choice_text,
+                        serverChoiceNodeDestination
+                    ))
+                    clientNode.lastChoiceIndex++
+                }
+                clientNode.videoUrl = serverNode.video_url
+                clientNode.nodeDescription = serverNode.description
+                clientNode.isFirst = serverNode.start
+                clientNode.isTerminal = serverNode.terminal
+            }
+
+            updateNodeInFocus(1)
+            getTemplateNameInput().value = templateName
+            getTemplateDescriptionInput().value = templateDescription
+        } else {
+            addStepNode()
+            updateNodeInFocus(1)
+            currentNodeInFocus.isFirst = true
+            getFirstStepToggle().checked = true
+        }
 
         // Enable tooltips (bootstrap)
         $("[data-toggle='tooltip']").tooltip()
