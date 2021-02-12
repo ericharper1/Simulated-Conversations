@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% extends "researcher_base.html" %}
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -13,10 +14,11 @@
     <title>Create Assignment</title>
   </head>
   <body>
+    {% block content %}
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
         <h2>Simulated Conversations</h2>
         <!--left part -->
-        <div class="left" style="width:50%; float:left;">
+        <div class="left" style="width:45%; float:left; margin-left:2%; margin-top:20px;">
             <div class="form-group">
                 <label for="assign_name">Assignment name:</label>
                 <input type="text" class="form-control col-lg-10" id="assign_name" required>
@@ -51,7 +53,7 @@
         </div>
 
         <!--right part -->
-        <div class="right" style="width:50%; float: left;">
+        <div class="right" style="width:47%; float: right; margin-right:2%; margin-top:20px;">
 
             <!--add template -->
             <div class="form-group">
@@ -97,8 +99,8 @@
             <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"/>
         </div>
     </form>
-
   </body>
+
   <script>
       var students={{ student|safe }};
       var templates={{ template|safe }};
@@ -306,4 +308,5 @@
           })
       }
   </script>
+    {% endblock %}
 </html>
