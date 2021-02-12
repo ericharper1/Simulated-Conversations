@@ -10,6 +10,9 @@ from bootstrap_modal_forms.generic import BSModalDeleteView
 
 
 class AssignmentsTable(tables.Table):
+    """
+    Table for main view.
+    """
     name = tables.Column(verbose_name='Name', accessor='name')
     date_assigned = tables.Column(verbose_name='Date Assigned', accessor='date_assigned')
     # attempts blank until updated model merged into main
@@ -26,6 +29,9 @@ class AssignmentsTable(tables.Table):
 
 
 class TemplatesContainedTable(tables.Table):
+    """
+    Table for templates modal
+    """
     name = tables.Column(verbose_name='Name',
                          accessor='name',
                          orderable=False)
@@ -39,6 +45,9 @@ class TemplatesContainedTable(tables.Table):
 
 
 class AssignedStudentsTable(tables.Table):
+    """
+    Table for students modal
+    """
     name = tables.Column(verbose_name='Name',
                          accessor='name',
                          orderable=False)
@@ -74,10 +83,17 @@ class AssignmentDeleteView(BSModalDeleteView):
 
 @user_passes_test(is_researcher)
 def assignment_management_view(request):
+    """
+    Main view for assignment management. Has table of researcher's assignments with modals for more info and
+    option to delete.
+    :param request:
+    :return:
+    """
     assignment_rows = []
     researcher = Researcher.objects.get(id=request.user.id)
     assignments = Assignment.objects.filter(researcher=researcher)
 
+    # build each row for table. one assignment per row
     for assignment in assignments:
         total_assigned_templates = ConversationTemplate.objects.filter(assignments=assignment).count() * \
                                    assignment.students.count()
@@ -87,8 +103,11 @@ def assignment_management_view(request):
                                                                     template__in=templates) \
                                                             .values('student') \
                                                             .distinct().count()
-        completion_percent = total_completed_templates / total_assigned_templates
-        completion_percent = str(completion_percent*100)[:-2] + '%'
+        if total_assigned_templates <= 0:
+            completion_percent = 'N/A'
+        else:
+            completion_percent = total_completed_templates / total_assigned_templates
+            completion_percent = str(completion_percent*100)[:-2] + '%'
 
         row_data = {}
         row_data.update({"id": assignment.id,
@@ -105,8 +124,16 @@ def assignment_management_view(request):
 
 @user_passes_test(is_researcher)
 def view_templates(request, pk):
+    """
+    View for templates modal. Shows all templates in an assignment and links to excel page to see submissions.
+    :param request:
+    :param pk:
+    :return:
+    """
     assignment = Assignment.objects.get(pk=pk)
     templates = ConversationTemplate.objects.filter(assignments=assignment)
+    # get each template in assignment. limit description to 200 total characters
+    # one template per row in table.
     for template in templates:
         if len(template.description) >= 200:
             template.description = template.description[:197] + '...'
@@ -116,12 +143,22 @@ def view_templates(request, pk):
 
 @user_passes_test(is_researcher)
 def view_students(request, pk):
+    """
+    View for students modal. Shows students that were given assignment. Number of templates completed
+    out of total assigned is shown per student and overall completion is shown.
+    :param request:
+    :param pk:
+    :return:
+    """
     student_rows = []
     total_completed_templates = 0
     assignment = Assignment.objects.get(pk=pk)
     students = Student.objects.filter(assignments=assignment)
     templates = ConversationTemplate.objects.filter(assignments=assignment)
     assigned_template_count = ConversationTemplate.objects.filter(assignments=assignment).count()
+
+    # per student, count number of templates in assignment they have at least one submission for
+    # as well as getting name and email. One student per row for table.
     for student in students:
         completed_template_count = TemplateResponse.objects.exclude(completion_date=None) \
                                                             .filter(assignment=assignment,
@@ -148,7 +185,10 @@ def view_students(request, pk):
         total_completed_templates = assigned_template_count
     if total_completed_templates < 0:
         total_completed_templates = 0
-    completion_percent = total_completed_templates / total_assigned_templates
-    completion_percent = str(completion_percent * 100).split('.', 1)[0] + '%'
+    if total_assigned_templates <= 0:
+        completion_percent = 'N/A'
+    else:
+        completion_percent = total_completed_templates / total_assigned_templates
+        completion_percent = str(completion_percent * 100).split('.', 1)[0] + '%'
     return render(request, 'assignment_management/view_students_modal.html', {'table': assigned_students_table,
                                                                                'completion_percent': completion_percent})
