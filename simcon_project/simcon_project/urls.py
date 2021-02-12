@@ -29,14 +29,20 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('redirect-from-login/', redirect_from_login, name="redirect-from-login"),
+    path('password-reset/', views.PasswordResetView.as_view(template_name='registration/password_reset.html'), name="password-reset"),
+    path('password-reset/done/', views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'),name="password-reset-done"),
+    path('password-reset-confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'),name="password-reset-confirm"),
+    path('password-reset-complete/', views.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'),name="password-reset-complete"),
+
 
     # Stuff students can see
     path('student/', student_view, name="student-view"),
     path('student/settings/', student_settings_view, name="student-settings-view"),
     path('student/register/<uidb64>/', student_registration, name="student-registration"),
     path('student/conversation/', include('conversation_templates.urls.conv_urls'), name='conversation'),
+    path('student/feedback/', include('conversation_templates.urls.feedback_urls'), name='view-feedback'),
 
-    # Stuff researcher can see
+    # Stuff researchers can see
     path('researcher/', researcher_view, name="researcher-view"),
     path('researcher/register/<uidb64>/', researcher_registration, name="researcher-registration"),
     path('researcher/templates/', include('conversation_templates.urls.templates_urls'), name="template-management-view"),
@@ -45,9 +51,11 @@ urlpatterns = [
     path('researcher/students/<str:name>/', student_management, name="student-management"),
     path('researcher/students/', student_management, name="student-management"),
     path('researcher/assignments/', include('users.urls.ass_man_urls'), name="assignment-management"),
-    path('researcher/response/', view_response, name="view-response"),
+    path('researcher/response/<uuid:pk>/', view_response, name="view-response"),
+    path('researcher/response/delete/<uuid:pk>/', ResponseDeleteView.as_view(), name="delete-response"),
     path('researcher/response/update/<uuid:pk>/', update_overall_response_feedback, name='update-overall-response-feedback'),
     path('researcher/response/updatenode/<uuid:pk>/', update_node_response_feedback, name='update-node-response-feedback'),
+    path('researcher/response/updatetranscription/<uuid:pk>/', update_node_transcription, name='update-node-transcription'),
 ]
 
 if settings.DEBUG:

@@ -26,13 +26,6 @@ class ResearcherTable(tables.Table):
     first_name = tables.Column(accessor='first_name')
     last_name = tables.Column(accessor='last_name')
     email_address = tables.Column(accessor='email')
-    """
-    commented out lines to use smaller trash icon if we want to later.
-    html_delete_button = '<a href="{% url \'settings:delete-researcher\' record.id %}" class="delete-icon" ' \
-                         'data-form-url="{% url \'settings:delete-researcher\' record.id %}">' \
-                         '<span class="glyphicon glyphicon-trash"></span></a>'
-    delete = tables.TemplateColumn(html_delete_button, verbose_name='')
-    """
     delete = tables.TemplateColumn(verbose_name='', template_name='settings/buttons_template.html')
 
 

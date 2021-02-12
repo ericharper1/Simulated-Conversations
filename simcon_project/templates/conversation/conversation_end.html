@@ -39,6 +39,18 @@
                     <input type="text" name="{{ response.id }}" id="{{ response.id }}"><br>
                 </div>
             {% endfor %}
+
+            Rate your performance:<br>
+            <input type="radio" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}" value=1>
+            <label for="{{ ct_response.self_rating }}">1 - Very Unsatisfied</label><br>
+            <input type="radio" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}" value=2>
+            <label for="{{ ct_response.self_rating }}">2 - Unsatisfied</label><br>
+            <input type="radio" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}" value=3>
+            <label for="{{ ct_response.self_rating }}">3 - Somewhat Satisfied</label><br>
+            <input type="radio" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}" value=4>
+            <label for="{{ ct_response.self_rating }}">4 - Satisfied</label><br>
+            <input type="radio" name="{{ ct_response.self_rating }}" id="{{ ct_response.self_rating }}" value=5>
+            <label for="{{ ct_response.self_rating }}">5 - Very Satisfied</label><br>
             <button type="submit" class="btn btn-primary btn-sm">Finish</button>
         </form>
         <script>

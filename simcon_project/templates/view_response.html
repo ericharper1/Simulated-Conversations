@@ -1,4 +1,6 @@
+{% extends "researcher_base.html" %}
 {% load static %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,9 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
     <!-- prevent line breaks when using form fields -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}
 
@@ -26,11 +27,20 @@
 
 <body>
 <div class="container">
+    <div class="col-sm-4" style=" float: right;">
+        <form method="POST">
+            {% csrf_token %}
+            <button class="bs-modal btn btn-danger" type="button" name="button" data-form-url="{% url 'delete-response' response.pk %}" >Delete</button>
+        </form>
+    </div>
+    <br>
     <h2> Response for: {{response.template.name}} </h2>
-    Student: {{response.student}}
+    <h4> {{response.student}} </h4> 
+    <br> 
+    <p>They rated themself: {{response.self_rating}}/5</p>
 
     <div class="container">
-        {% block content %}
+        {% block content-2 %}
         <div class="row">
             <h2>Overall feedback:</h2>
         </div>
@@ -50,7 +60,7 @@
                 <audio src="{% static node.audio_response %}" controls></audio>
             </div>
             <div class="col-sm-4">
-                {{node.transcription}}
+                {{node.transcription}} <a href="{% url 'update-node-transcription' node.id %}">Edit</a>
             </div>
             <div class="col-sm-4" id="feedback">
                 {{node.feedback}} <a href="{% url 'update-node-response-feedback' node.id %}">Edit</a>
@@ -62,10 +72,25 @@
     </div>
 
 </div> <!-- /container -->
-
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+              <div class="modal-content"></div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        $(".bs-modal").each(function () {
+            $(this).modalForm({
+                formURL: $(this).data('form-url')
+            });
+        });
+    });
+  </script>
 <!-- Bootstrap core JavaScript
 ================================================== -->
 
 <!-- Placed at the end of the document so the pages load faster -->
 </body>
 </html>
+{% endblock %}
+

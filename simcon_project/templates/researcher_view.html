@@ -10,34 +10,45 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" src="{% static 'users/researcherTable.css' %}">
     <title>
     SimCon | Researcher View
     </title>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
   </head>
   <body>
-    <div style="display: inline-block">
-
-<div class="table-container" style="display: inline-block; float: left;"> 
-  {% render_table response_table %}
-</div>
-<div class="delete-buttons" style="display: inline-block">
-  <br>
-  {% for obj in response_table %}
-    <form method="POST">
-        {% csrf_token %}
-        <br>
-        <button type="submit" name="delete_items" value="{{ obj.pk }}">Delete</button>
-        <p></p>
-        <!-- The paragraph gave the perfect spacing -->
+    <br>
+    <br>
+  <div style="float: right;">
+    <form method="GET" action="">
+      <input type="text" name="searchParam" placeholder="Search">
+      <button type="submit"> Search </button>
     </form>
-{% endfor %}
+    <br> <br>
+  </div>
+
+<div class="table-container" style="text-align: center;"> 
+  <br> <br>
+{% if responseTable %}
+  {% render_table responseTable %}
+{% else %} 
+  <span> No Responses </span> 
+{% endif %}
 </div>
-    </div>
-  </body>
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+            <div class="modal-content"></div>
+  </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $(".bs-modal").each(function () {
+          $(this).modalForm({
+              formURL: $(this).data('form-url')
+          });
+      });
+  });
+</script>
+</body>
 </html>
 {% endblock %}
