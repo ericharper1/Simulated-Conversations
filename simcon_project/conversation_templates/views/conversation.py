@@ -68,8 +68,9 @@ def conversation_start(request, ct_id, assign_id):
     """
     # Check if user has retries
     assignment = Assignment.objects.get(id=assign_id)
+    ct = ConversationTemplate.objects.get(id=ct_id)
     student = Student.objects.get(email=request.user)
-    student_attempts = TemplateResponse.objects.filter(student=student, assignment=assignment).count()
+    student_attempts = TemplateResponse.objects.filter(student=student, template=ct).count()
     if student_attempts >= assignment.attempts:
         return HttpResponseNotFound('<h1>Sorry, maximum number of attempts reached for this conversation.</h1>')
 
