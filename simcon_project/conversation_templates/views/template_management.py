@@ -1,4 +1,5 @@
 from django.views.generic import DeleteView, RedirectView
+from django.db import IntegrityError
 from django.db.models import Q
 from django.http import HttpResponse
 from django.urls import reverse_lazy, reverse
@@ -132,7 +133,6 @@ class FolderCreateView(BSModalCreateView):
     """
     template_name = 'template_management/folder_creation_modal.html'
     form_class = FolderCreationForm
-    success_message = 'Success: Folder was created.'
 
     def get_success_url(self):
         success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
@@ -163,7 +163,6 @@ class FolderDeleteView(DeleteView):
     if the current folder that is being viewed is deleted.
     """
     model = TemplateFolder
-    success_message = 'Success: Book was deleted.'
     success_url = reverse_lazy('management:main')
 
 
@@ -174,7 +173,7 @@ class TemplateDeleteView(BSModalDeleteView):
     """
     model = ConversationTemplate
     template_name = 'template_management/template_delete_modal.html'
-    success_message = 'Success: Book was deleted.'
+    success_message = None  # Don't delete this. BSModalDeleteView needs success message for some reason
     success_url = reverse_lazy('management:main')
 
     def get(self, request, *args, **kwargs):

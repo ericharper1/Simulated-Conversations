@@ -1,3 +1,4 @@
+{% extends "researcher_base.html" %}
 {% load static %}
 {% block content %}
     <!DOCTYPE html>
@@ -99,7 +100,12 @@
         </div>
     </div>
 
-    <script> loadState() </script>
+    <script>
+        if ("{{ modelObject }}") {
+            var modelObject = JSON.parse("{{modelObject|escapejs}}")
+        }
+        loadState()
+    </script>
     </body>
     </html>
 {% endblock %}

@@ -68,8 +68,9 @@ def conversation_start(request, ct_id, assign_id):
     """
     # Check if user has retries
     assignment = Assignment.objects.get(id=assign_id)
+    ct = ConversationTemplate.objects.get(id=ct_id)
     student = Student.objects.get(email=request.user)
-    student_attempts = TemplateResponse.objects.filter(student=student, assignment=assignment).count()
+    student_attempts = TemplateResponse.objects.filter(student=student, template=ct).count()
     if student_attempts >= assignment.attempts:
         return HttpResponseNotFound('<h1>Sorry, maximum number of attempts reached for this conversation.</h1>')
 
@@ -124,12 +125,18 @@ def conversation_step(request, ct_node_id):
         else:
             choice_form = TemplateNodeChoiceForm(request.POST, ct_node=ct_node)
             if choice_form.is_valid():
-                choice = choice_form.cleaned_data['choices']
+                if request.POST.get('choices') == 'custom-response':
+                    custom_response = request.POST.get('custom-text')
+                    choice = None
+                else:
+                    custom_response = None
+                    choice = choice_form.cleaned_data['choices']
 
                 # Edit node response to add remaining fields
                 update_node_response = TemplateNodeResponse.objects.get(id=request.session.get('ct_node_response_id'))
                 update_node_response.template_node = ct_node
                 update_node_response.selected_choice = choice
+                update_node_response.custom_response = custom_response
                 update_node_response.save()
 
                 # Persist that node response id
@@ -141,7 +148,7 @@ def conversation_step(request, ct_node_id):
                 return HttpResponseNotFound('An invalid choice was selected')
 
         # End conversation or go to next node
-        if ct_node.terminal:
+        if ct_node.terminal or choice is None:
             return redirect(ct_response)
         return redirect(choice.destination_node)
 

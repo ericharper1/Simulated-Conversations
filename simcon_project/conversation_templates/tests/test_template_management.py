@@ -98,8 +98,8 @@ class TemplateManagementTests(TestCase):
                                             , video_url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
         node2 = TemplateNode.objects.create(description='Node', parent_template=self.template1
                                             , video_url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-        TemplateNodeChoice.objects.create(parent_template=start_node, destination_node=node1)
-        TemplateNodeChoice.objects.create(parent_template=start_node, destination_node=node2)
+        TemplateNodeChoice.objects.create(parent_template_node=start_node, destination_node=node1)
+        TemplateNodeChoice.objects.create(parent_template_node=start_node, destination_node=node2)
         label = SubjectLabel.objects.create(label_name='label', researcher=self.researcher)
         label.students.set([student])
         assignment1 = Assignment.objects.create(name='assignment', date_assigned=date.today(),

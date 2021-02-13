@@ -14,27 +14,41 @@
     <title>
     SimCon | Researcher View
     </title>
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
   </head>
   <body>
-    <div style="display: inline-block">
-
-<div class="table-container" style="display: inline-block; float: left;"> 
-  {% render_table response_table %}
-</div>
-<div class="delete-buttons" style="display: inline-block">
-  <br>
-  {% for obj in response_table %}
-    <form method="POST">
-        {% csrf_token %}
-        <br>
-        <br>
-        <button type="submit" name="delete_items" value="{{ obj.pk }}">Delete</button>
-        <p></p>
-        <!-- The paragraph gave the perfect spacing -->
+    <br>
+    <br>
+  <div style="float: right;">
+    <form method="GET" action="">
+      <input type="text" name="searchParam" placeholder="Search">
+      <button type="submit"> Search </button>
     </form>
-{% endfor %}
+    <br> <br>
+  </div>
+
+<div class="table-container" style="text-align: center;"> 
+  <br> <br>
+{% if responseTable %}
+  {% render_table responseTable %}
+{% else %} 
+  <span> No Responses </span> 
+{% endif %}
 </div>
-    </div>
-  </body>
+<div class="modal" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog" role="document">
+            <div class="modal-content"></div>
+  </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $(".bs-modal").each(function () {
+          $(this).modalForm({
+              formURL: $(this).data('form-url')
+          });
+      });
+  });
+</script>
+</body>
 </html>
 {% endblock %}
