@@ -1,5 +1,6 @@
 from django.views.generic import DeleteView, RedirectView
 from django.db.models import Q
+from django.http import HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
@@ -10,6 +11,7 @@ from users.models import Researcher
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
 from django_tables2 import TemplateColumn, tables, RequestConfig, A
 import re
+import datetime
 
 
 class FolderTemplateTable(tables.Table):
@@ -18,8 +20,8 @@ class FolderTemplateTable(tables.Table):
     The "delete" button has been replaced with a "remove button to
     remove a template from the folder.
     """
-    buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
-                             extra_context={"in_folder": True})
+    remove_buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
+                                    extra_context={"in_folder": True})
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
     class Meta:
@@ -33,7 +35,7 @@ class AllTemplateTable(tables.Table):
     Table for showing the templates for a specific folder.
     Only used when all templates are displayed.
     """
-    buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
+    remove_buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
     class Meta:
@@ -60,10 +62,10 @@ def main_view(request):
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
-    show_archived = False
-    if request.POST:
-        if 'show-archived' in request.POST:
-            show_archived = True
+    if request.COOKIES.get('show_archived') is None:
+        request.COOKIES.get('show_archived', False)
+    print(request.COOKIES.get('show_archived'))
+
     all_templates = get_templates(request.user)
     templates = filter_templates(request, all_templates)
     if templates:
@@ -83,7 +85,7 @@ def main_view(request):
         'templateTable': template_table,
         'folderTable': folder_table,
         'folder_pk': None,
-        'show_archived': show_archived,
+        'show_archived': request.COOKIES.get('show_archived'),
     }
 
     return render(request, 'template_management/main_view.html', context)
@@ -113,7 +115,8 @@ def folder_view(request, pk):
     context = {
         'templateTable': template_table,
         'folderTable': folder_table,
-        'folder_pk': pk
+        'folder_pk': pk,
+        'show_archived': request.COOKIES.get('show_archived'),
     }
 
     return render(request, 'template_management/main_view.html', context)
@@ -249,3 +252,37 @@ def filter_templates(request, templates):
 def get_templates(user):
     researcher = get_object_or_404(Researcher, email=user)
     return ConversationTemplate.objects.filter(researcher=researcher)
+
+
+def set_cookie(response, key, value, days_expire=7):
+    if days_expire is None:
+        max_age = 365 * 24 * 60 * 60  # one year
+    else:
+        max_age = days_expire * 24 * 60 * 60
+    expires = datetime.datetime.strftime(
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
+        "%a, %d-%b-%Y %H:%M:%S GMT",
+    )
+    response.set_cookie(
+        key,
+        value,
+        max_age=max_age,
+        expires=expires,
+    )
+
+
+def update_cookie(request, show_archived):
+    request.session.set_test_cookie()
+    if request.session.test_cookie_worked():
+        request.session.delete_test_cookie()
+
+    back = route_to_current_folder(request.META['HTTP_REFERER'])
+    response = redirect(back)
+
+    print(show_archived)
+    if int(show_archived) is 0:
+        response.set_cookie('show_archived', False)
+    else:
+        response.set_cookie('show_archived', True)
+
+    return response

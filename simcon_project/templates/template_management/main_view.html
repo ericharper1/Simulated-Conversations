@@ -18,8 +18,7 @@
                 <input name="folder-filter" type="text" placeholder="Search Folders">
             </form>
         {% else %}
-            <form action="{% url 'management:main' %}" method="get">
-                {% csrf_token %}
+            <form method="get">
                 <input name="folder-filter" type="text" placeholder="Search Folders">
             </form>
         {% endif %}
@@ -35,17 +34,15 @@
 
         <h3>Templates</h3>
         <!-- Show/Hide Archived Templates Button -->
-        {% if show_archived %}
-            <form method="post" action="{% url 'management:main' %}">
+        {% if show_archived == 'True' %}
+            <form action="{% url 'management:display-archived-templates' 0 %}" method="post">
                 {% csrf_token %}
-                <button name="show-archived" type="submit" value="False">
-                Hide Archived Templates</button>
+                <button name="show-archived" class ="btn btn-danger" type="submit">Hide Archived Templates</button>
             </form>
         {% else %}
-            <form method="post" action="{% url 'management:main-archived' %}">
+            <form action="{% url 'management:display-archived-templates' 1 %}" method="post">
                 {% csrf_token %}
-                <button name="show-archived" type="submit" value="True">
-                    Show Archived Templates</button>
+                <button name="show-archived" class ="btn btn-success" type="submit">Display Archived Templates</button>
             </form>
         {% endif %}
         <!-- Templates Search Bar-->
@@ -119,22 +116,6 @@
                 formURL: "{% url 'management:create-folder' %}",
                 modalID: "#create_modal"
             });
-
-            //if({{ show_archived }}) {
-            //    $("#show-archived").prop('checked', true)
-            //}
-
-            //$("#show-archived").change(function (){
-            //    if($(this).is(":checked")){
-            //        if(String(document.location).includes("?")) {
-            //            document.location.search = "&show-archived=true"
-            //        } else {
-            //            document.location.search = "?show-archived=true"
-            //        }
-            //    } else {
-            //        document.location.search = "?show-archived=false"
-            //    }
-            //});
         });
         </script>
     </body>
