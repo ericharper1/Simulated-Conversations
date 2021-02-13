@@ -166,11 +166,12 @@ def view_students(request, pk):
                                                                     student=student) \
                                                             .values('template') \
                                                             .distinct().count()
-        total_completed_templates = total_completed_templates + completed_template_count
         if completed_template_count > assigned_template_count:
             completed_template_count = assigned_template_count
         if completed_template_count < 0:
             completed_template_count = 0
+        total_completed_templates = total_completed_templates + completed_template_count
+
         row_data = {}
         row_data.update({'id': student.id,
                          'name': student.first_name + ' ' + student.last_name,
@@ -181,8 +182,8 @@ def view_students(request, pk):
 
     total_assigned_templates = ConversationTemplate.objects.filter(assignments=assignment).count() * \
                                                                         assignment.students.count()
-    if total_completed_templates > assigned_template_count:
-        total_completed_templates = assigned_template_count
+    if total_completed_templates > total_assigned_templates:
+        total_completed_templates = total_assigned_templates
     if total_completed_templates < 0:
         total_completed_templates = 0
     if total_assigned_templates <= 0:
