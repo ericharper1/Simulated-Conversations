@@ -115,7 +115,7 @@ def update_node_transcription(request, pk):
             feedback_instance.save()
 
         # redirect to a new URL:
-        return HttpResponseRedirect(reverse('view-response'))
+        return HttpResponseRedirect(reverse('view-response', kwargs={'pk': pk}))
 
     # If this is a GET (or any other method) create the default form.
     else:
