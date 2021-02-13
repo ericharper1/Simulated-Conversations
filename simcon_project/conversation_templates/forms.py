@@ -26,6 +26,24 @@ class FolderCreationForm(BSModalModelForm):
             self.fields['templates'].queryset = templates.all()
         self.fields['name'].required = True
 
+    def clean(self):
+        data = self.cleaned_data
+        instance = str(self.instance)
+
+        # Validation for when creating a new folder and entering a duplicate name
+        if not instance and 'name' in data:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
+
+        # Validation for when editing a folder and entering a duplicate name
+        if instance and 'name' in data and data['name'] != self.initial['name']:
+            name = self.cleaned_data['name']
+            if TemplateFolder.objects.filter(name=name, researcher=self.request.user.id):
+                self.add_error('name', f'{name} already exists. Choose a new folder name.')
+
+        return data
+
     class Meta:
         model = TemplateFolder
         fields = ['name', 'templates']
@@ -53,6 +71,30 @@ class SelectTemplateForm(forms.Form):
             self.fields['templates'] = forms.ChoiceField(choices=template_list)
 
 
+class CustomChoiceRadioSelectWidget(forms.RadioSelect):
+    """
+    RadioSelect Widget that has a text input box as the last choice
+    """
+    def __init__(self, name, data_list, *args, **kwargs):
+        super(CustomChoiceRadioSelectWidget, self).__init__(*args, **kwargs)
+        self._name = name
+        self._list = data_list
+
+    def render(self, name, value, attrs=None, renderer=None):
+        choice_html = f'<ul id="id_{name}">'
+        for idx, choice in enumerate(self._list):
+            choice_html += f'<li><label for="id_choice-{idx}"><input type="radio" id="id_choice-{idx}"' \
+                            f'name={name} value="{choice.id}" class="node-choice"> {choice.choice_text}  </label></li>'
+
+        choice_html += f'<li><label for="id_choice-custom"><input type="radio" id="id_choice-custom"' \
+                       f'name={name} value="custom-response" class="node-choice"><input name="custom-text" type="text"'\
+                       f'placeholder="Enter Custom Response" id="id_custom-input"></label></li>'
+
+        choice_html += '</ul>'
+
+        return choice_html
+
+
 class TemplateNodeChoiceForm(forms.Form):
     """
     Form to display choices related to a TemplateNode
@@ -64,5 +106,18 @@ class TemplateNodeChoiceForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         ct_node = kwargs.pop('ct_node', None)
+        choice_list = TemplateNodeChoice.objects.filter(parent_template_node=ct_node)
         super(TemplateNodeChoiceForm, self).__init__(*args, **kwargs)
-        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template=ct_node)
+        self.fields['choices'].queryset = TemplateNodeChoice.objects.filter(parent_template_node=ct_node)
+        self.fields['choices'].widget = CustomChoiceRadioSelectWidget(name="choice-widget", data_list=choice_list)
+
+    def is_valid(self):
+        valid = super(TemplateNodeChoiceForm, self).is_valid()
+
+        # Return True if the custom response choice is selected and the input box is filled out
+        if not valid:
+            if 'choices' in self.data and self.data['custom-text'].strip() != '':
+                return True
+            return False
+
+        return True

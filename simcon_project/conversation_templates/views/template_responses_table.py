@@ -40,7 +40,8 @@ class TemplateResponsesView(UserPassesTestMixin, LoginRequiredMixin, SingleTable
             extra_columns.append((node.description, tables.columns.Column(orderable=False)))
 
         # Populate the table with data for each response
-        for response in template.template_responses.all().order_by('-completion_date'):
+        completed_responses = template.template_responses.exclude(completion_date__isnull=True)
+        for response in completed_responses.order_by('-completion_date'):
             column_data = {
                 "first": response.student.first_name,
                 "last": response.student.last_name,

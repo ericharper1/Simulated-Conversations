@@ -1,21 +1,56 @@
 from django.shortcuts import render
+from django.db.models import Q
 from conversation_templates.models import TemplateResponse
 from django.contrib.auth.decorators import user_passes_test
-from django.core.paginator import Paginator
+import django_tables2 as tables
+from django_tables2 import RequestConfig
+
+
+class ResponseTable(tables.Table):
+    name = tables.columns.Column(
+        accessor="student.get_full_name", order_by="student.last_name")
+    self_rating = tables.columns.Column(
+        verbose_name="Student Self Rating", order_by="self_rating")
+    response = tables.TemplateColumn(
+        ''' <a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}" >View</a>''', verbose_name='')
+    delete = tables.TemplateColumn(
+        '''<button class="bs-modal btn btn-danger" type="button" name="button" data-form-url="{% url 'delete-response' record.id %}" >Delete</button>''', verbose_name='')
+
+    class Meta:
+        attrs = {'class': 'table table-sm', 'id': 'response-table'}
+        model = TemplateResponse
+        fields = ['template', 'name', 'completion_date',
+                  'feedback', 'self_rating']
 
 
 def is_researcher(user):
     return user.is_authenticated and user.get_is_researcher()
 
 
-@user_passes_test(is_researcher)
+@ user_passes_test(is_researcher)
 def researcher_view(request):
-    response_table = TemplateResponse.objects.all()
-    if request.method == "POST":
-        items_to_delete = request.POST.getlist('delete_items')
-        response_table.filter(pk__in=items_to_delete).delete()
-    paginator = Paginator(response_table, 10)
-    page_number = request.GET.get('page')
-    page_object = paginator.get_page(page_number)
-    return render(request, 'researcher_view.html', locals())
+    responses = TemplateResponse.objects.filter(
+        template__researcher__email=request.user)
+    filtered_responses = filter_search(request, responses)
 
+    if filtered_responses:
+        response_table = ResponseTable(filtered_responses)
+        RequestConfig(request, paginate={"per_page": 5}).configure(
+            response_table)
+    else:
+        response_table = None
+
+    context = {'responseTable': response_table}
+
+    return render(request, 'researcher_view.html', context)
+
+
+def filter_search(request, responses):
+    if 'searchParam' in request.GET:
+        param = request.GET['searchParam']
+        filter_fields = Q(student__first_name__contains=param) | Q(student__last_name__contains=param) | \
+            Q(template__name__contains=param) | \
+            Q(assignment__subject_labels__label_name__contains=param)
+        responses = responses.filter(filter_fields)
+
+    return responses
