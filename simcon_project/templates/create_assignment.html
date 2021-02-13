@@ -9,6 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Create Assignment</title>
+      <!-- Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
+      <!-- Tempus Dominus -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
+
   </head>
   <body>
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
@@ -25,6 +31,15 @@
                 <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="YYYY-MM-DD" required>
             </div>
 
+{#            This commented out code is for the datetimepicker. It is not formatted correctly as of now.#}
+
+{#           <div class="input-group date" id="datetimepicker1" data-target-input="nearest">#}
+{#              <label for="assign_date">Assignment start date:</label>#}
+{#              <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" required/>#}
+{#              <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">#}
+{#                <div class="input-group-text"><i class="fa fa-calendar"></i></div>#}
+{#              </div>#}
+{#           </div>#}
 
             <!--add student -->
             <div class="form-group">
@@ -98,6 +113,11 @@
   </body>
 
   <script>
+      // This for the datetimepicker
+      $(function () {
+        $("#datetimepicker1").datetimepicker();
+      });
+
       var students={{ student|safe }};
       var templates={{ template|safe }};
       var subLabels={{ subLabel|safe }};
