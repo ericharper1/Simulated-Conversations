@@ -1,6 +1,6 @@
 {% extends "researcher_base.html" %}
 {% load static %}
-{% block nav-researcherView %}{% endblock %} 
+{% block nav-researcherView %}<strong class="nav_bar_selected"> Home </strong>{% endblock %} 
 {% load render_table from django_tables2 %}
 {% block content %}
 <!DOCTYPE html>
@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
-    <link rel="stylesheet" src="{% static 'users/researcherTable.css' %}">
+    <link rel="stylesheet" href="{% static 'users/researcherTable.css' %}">
     <title>
     SimCon | Researcher View
     </title>
@@ -19,16 +19,14 @@
   <body>
     <br>
     <br>
-  <div style="float: right;">
-    <form method="GET" action="">
-      <input type="text" name="searchParam" placeholder="Search">
-      <button type="submit"> Search </button>
-    </form>
-    <br> <br>
-  </div>
 
 <div class="table-container" style="text-align: center;"> 
-  <br> <br>
+  <div class="mb-3" style="text-align: justify; margin-left: 15%;">
+    <form method="GET" action="">
+      <input type="text" name="searchParam" placeholder="Search">
+      <button type="submit" class="btn btn-outline-secondary btn-sm" > Search </button>
+    </form> 
+  </div>
 {% if responseTable %}
   {% render_table responseTable %}
 {% else %} 

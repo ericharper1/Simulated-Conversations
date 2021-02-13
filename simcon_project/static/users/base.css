@@ -1,0 +1,62 @@
+body {
+ background-color: #e8e8e8;
+}
+
+.nav_bar_selected{
+    font-weight: normal;
+    color: #6A7F10 !important;
+}
+
+.nav_bar_unselected {
+    color: white;
+}
+.navbar .container-fluid{
+    width: 90%;
+    min-width: 750px;
+    max-width: 1200px;
+}
+.navbar-brand{
+    color: white !important;
+}
+.navbar a {
+    color: white;
+}
+
+table{
+    padding-right: 90px;
+
+}
+.table-container{
+    min-width: 750px;
+    max-width: 1200px;
+}
+.table{
+    background-color: white;
+    border-collapse: collapse;
+    border-radius: 5px;
+  
+  overflow: hidden;
+}
+
+th, td {
+    text-align: center;
+    color: darkslategrey;
+    padding-bottom: 20px;
+}
+
+th a {
+    color: white;
+}
+
+th{
+    background-color: #8a9b3e;
+}
+.page-link {
+    color: darkslategrey;
+}
+.pagination > .active > a
+{
+    color: white;
+    background-color: #8a9b3e !Important;
+    border: solid 1px #8a9b3e !Important;
+}

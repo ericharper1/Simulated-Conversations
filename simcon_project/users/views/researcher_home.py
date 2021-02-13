@@ -12,9 +12,9 @@ class ResponseTable(tables.Table):
     self_rating = tables.columns.Column(
         verbose_name="Student Self Rating", order_by="self_rating")
     response = tables.TemplateColumn(
-        ''' <a class="btn btn-info btn-sm" href="{% url 'view-response' record.id %}" >View</a>''', verbose_name='')
+        ''' <a class="btn btn btn-outline-secondary btn-sm" href="{% url 'view-response' record.id %}" >View</a>''', verbose_name='')
     delete = tables.TemplateColumn(
-        '''<button class="bs-modal btn btn-danger" type="button" name="button" data-form-url="{% url 'delete-response' record.id %}" >Delete</button>''', verbose_name='')
+        '''<button class="bs-modal btn btn-outline-secondary btn-sm" type="button" name="button" data-form-url="{% url 'delete-response' record.id %}" >Delete</button>''', verbose_name='')
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'response-table'}
@@ -35,7 +35,7 @@ def researcher_view(request):
 
     if filtered_responses:
         response_table = ResponseTable(filtered_responses)
-        RequestConfig(request, paginate={"per_page": 5}).configure(
+        RequestConfig(request, paginate={"per_page": 1}).configure(
             response_table)
     else:
         response_table = None
