@@ -5,6 +5,8 @@ from django.views.generic import TemplateView
 from django.core import serializers
 from django.http import HttpResponse
 from django.core.mail import send_mail
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
 from django.contrib.auth.decorators import user_passes_test
@@ -14,6 +16,7 @@ import datetime
 
 
 class CreateAssignmentView(TemplateView):
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         curResearcher=request.user
 
@@ -64,7 +67,6 @@ def add_assignment(request):
     name=data.get('name')
     date=data.get('date')
     researcher=request.user
-    #researcher='researcher@111.com'
     students=data.get('stuData')
     templates=data.get('tempData')
     labels=data.get('labelData')

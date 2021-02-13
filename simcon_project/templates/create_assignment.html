@@ -1,15 +1,16 @@
-<!DOCTYPE html>
 {% extends "researcher_base.html" %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Create Assignment</title>
   </head>
   <body>
-    {% block content %}
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
         <h2>Simulated Conversations</h2>
         <!--left part -->
@@ -29,8 +30,8 @@
             <div class="form-group">
                 <label for="add_stu">Add student</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please Input a Student Email." list="stu_list">
-                    <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please input student email." list="stu_list">
+                    <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add student" onclick="add_stu(tbl, stu_name.value)">
                     <datalist id="stu_list"></datalist>
                 </div>
                 <br>
@@ -54,8 +55,8 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please Input a Template Name." list="temp_list">
-                    <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." list="temp_list">
+                    <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                     <datalist id="temp_list"></datalist>
                 </div>
                 <br>
@@ -75,8 +76,8 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please Input a Label Name." list="label_list">
-                    <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." list="label_list">
+                    <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add label" onclick="add_label(tbl2, label_name.value)">
                     <datalist id="label_list"></datalist>
                 </div>
                 <br>
@@ -303,5 +304,6 @@
           })
       }
   </script>
-    {% endblock %}
 </html>
+
+{% endblock %}
