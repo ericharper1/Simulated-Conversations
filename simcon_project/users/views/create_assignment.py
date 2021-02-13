@@ -66,6 +66,7 @@ def add_assignment(request):
     data=request.POST
     name=data.get('name')
     date=data.get('date')
+    time=data.get('time')
     researcher=request.user
     students=data.get('stuData')
     templates=data.get('tempData')
@@ -77,11 +78,17 @@ def add_assignment(request):
     labels=decode(labels)
 
     #Verify date
-    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    dateTmp=datetime.datetime.strptime(date, "%Y-%m-%d")
+    today=datetime.date.today()
+    time = datetime.time.today()
+    dateTmp=datetime.datetime.strptime(date, "%m/%d/%Y")
+    timeTmp = datetime.datetime.strptime(time, "%H:%M:%S")
     assignToday=False
-    if dateTmp==today:
-        assignToday=True
+    if dateTmp>=today:
+        if timeTmp>=time:
+            assignToday=True
+        else:
+            success = 1
+            errMsg = errMsg + 'The assignment time cannot be before now.\n\n'
     if dateTmp<today:
         success=1
         errMsg=errMsg+'The assigned date cannot before today.\n\n'

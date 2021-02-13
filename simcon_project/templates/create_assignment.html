@@ -9,6 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Create Assignment</title>
+      <!-- Font Awesome -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
       <!-- Moment.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
       <!-- Tempus Dominus -->
@@ -27,19 +29,15 @@
             </div>
 
             <div class="form-group">
-                <label for="assign_date">Assignment start date:</label>
-                <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="YYYY-MM-DD" required>
+                <label for="assign_datetime">Assignment start date:</label>
+               <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                  <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
+                         id="assign_datetime" required/>
+                  <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+               </div>
             </div>
-
-{#            This commented out code is for the datetimepicker. It is not formatted correctly as of now.#}
-
-{#           <div class="input-group date" id="datetimepicker1" data-target-input="nearest">#}
-{#              <label for="assign_date">Assignment start date:</label>#}
-{#              <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" required/>#}
-{#              <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">#}
-{#                <div class="input-group-text"><i class="fa fa-calendar"></i></div>#}
-{#              </div>#}
-{#           </div>#}
 
             <!--add student -->
             <div class="form-group">
@@ -284,20 +282,31 @@
           });
           //get data
           assign_name=document.getElementById("assign_name").value;
-          assign_date=document.getElementById("assign_date").value;
+          assign_datetime=document.getElementById("assign_datetime").value;
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
 
-          //varify name and date
+          //verify name and datetime
           if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
               window.alert("Assignments Must Have a Name!");
               return;
           }
-          if(typeof assign_date == "undefined" || assign_date == null || assign_date.split("-").length !=3){
-              window.alert("Must have a valid start date. example YYYY-MM-DD!");
+
+          if(typeof assign_datetime == "undefined" || assign_datetime == null){
+              window.alert("You must pick an assignment date and time!");
               return;
           }
+          var date = assign_datetime.split(" ")[0];
+          var time = assign_datetime.split(" ")[1];
+            if(typeof date == "undefined" || date == null || date.split("/") != 3){
+              window.alert("The date must be in this format: MM/DD/YYYY !");
+              return;
+            }
+            if(typeof time == "undefined" || time == null || time.split(":") != 2){
+              window.alert("The time must be in this format: HH:MM AM/PM !");
+              return;
+            }
 
           //post data to server
           $.ajax({
@@ -305,7 +314,8 @@
               type:'POST',
               data: {
                   'name': assign_name,
-                  'date': assign_date,
+                  'date': date,
+                  'time': time,
                   'stuData': stuJSON,
                   'tempData': tempJSON,
                   'labelData': labelJSON
