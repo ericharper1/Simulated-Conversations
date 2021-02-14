@@ -1,5 +1,16 @@
 body {
- background-color: #e8e8e8;
+    background-color: #e8e8e8;
+}
+
+/**
+Navbar style
+ */
+.navbar .container-fluid{
+    width: 80%;
+}
+
+.navbar a {
+    color: white;
 }
 
 .nav_bar_selected{
@@ -10,32 +21,20 @@ body {
 .nav_bar_unselected {
     color: white;
 }
-.navbar .container-fluid{
-    width: 90%;
-    min-width: 750px;
-    max-width: 1200px;
-}
+
 .navbar-brand{
     color: white !important;
 }
-.navbar a {
-    color: white;
-}
 
-table{
-    padding-right: 90px;
+/**
+Table style
+ */
 
-}
-.table-container{
-    min-width: 750px;
-    max-width: 1200px;
-}
 .table{
     background-color: white;
     border-collapse: collapse;
     border-radius: 5px;
-  
-  overflow: hidden;
+    overflow: hidden;
 }
 
 th, td {
@@ -48,12 +47,18 @@ th a {
     color: white;
 }
 
-th{
+th {
     background-color: #8a9b3e;
 }
+
+/**
+Pagination style
+ */
+
 .page-link {
     color: darkslategrey;
 }
+
 .pagination > .active > a
 {
     color: white;

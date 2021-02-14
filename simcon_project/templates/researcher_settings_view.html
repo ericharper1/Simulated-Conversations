@@ -4,53 +4,73 @@
 {% load static %}
 {% load render_table from django_tables2 %}
 {% block content %}
-<html lang="en">
-  <head>
+    <html lang="en">
+    <head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
-    <!-- prevent line breaks when using form fields -->
-    <style type="text/css">
-    form {display:inline; margin:0px; padding:0px;}
-    </style>
+        <!-- prevent line breaks when using form fields -->
+        <style type="text/css">
+            form {display:inline; margin:0px; padding:0px;}
+        </style>
 
+        <title>
+            {% block title %}Simulated Conversations | Settings{% endblock %}
+        </title>
+        <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
 
-    <title>
-    {% block title %}Simulated Conversations | Settings{% endblock %}
-    </title>
-      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+        {% block extrahead %} {% endblock %}
+    </head>
+    <body>
+    <div class="container-fluid mt-3" style="width: 80%">
+        <div class="row justify-content-center">
 
-    {% block extrahead %} {% endblock %}
-  </head>
-  <body>
-    <div class="container">
-      <h1>Settings</h1>
-        {% for message in messages %}
-            <div class="alert alert-warning">
-                <a class="close" href="#" data-dismiss="alert">×</a>
-                {{ message }}
+            <div class="col-4">
+                <form id="change_password_form" method="post">
+                    {% csrf_token %}
+                    {#              {{ change_password_form }}#}
+                    {% for field in change_password_form %}
+                        <div class="form-group">
+                            <label for="{{ field.attrs.id  }}">{{ field.label }} </label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <p>
+                        - Your password can’t be too similar to your other personal information.
+                        <br>
+                        - Your password must contain at least 8 characters.
+                        <br>
+                        - Your password can’t be a commonly used password.
+                        <br>
+                        - Your password can’t be entirely numeric.
+                    </p>
+                    <button type="submit" class="btn btn-outline-secondary" form="change_password_form" name="change_password">Save changes</button>
+                </form>
+                <br>
             </div>
-        {% endfor %}
-          <form id="change_password_form" method="post">
-            {% csrf_token %}
-            {{ change_password_form }}
-            <button type="submit" form="change_password_form" name="change_password">Save changes</button>
-          </form>
-          <br>
+        </div>
+
         {% if researchers_table %}
             {% render_table researchers_table %}
         {% endif %}
         <br>
         {% if add_researcher_form %}
             <form id="add_researcher_form" method="post">
-              {% csrf_token %}
-              {{ add_researcher_form }}
-              <button type="submit" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
+                {% csrf_token %}
+                {{ add_researcher_form }}
+                <button type="submit" class="btn btn-outline-secondary" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
             </form>
         {% endif %}
+
+        {% for message in messages %}
+            <div class="alert alert-warning">
+                <a class="close" href="#" data-dismiss="alert">×</a>
+                {{ message }}
+            </div>
+        {% endfor %}
     </div> <!-- /container -->
 
     <!-- Bootstrap core JavaScript
@@ -59,19 +79,19 @@
     <!-- Code needed for the modal to work properly.
          Content in folder_creation_modal.html is rendered between "#modal-content" div
     -->
-        <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content"></div>
-            </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="create_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content"></div>
         </div>
+    </div>
 
-        <div class="modal fade" tabindex="-1" role="dialog" id="modal">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content"></div>
-            </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content"></div>
         </div>
+    </div>
 
-        <script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function() {
             $(".bs-modal").each(function () {
                 $(this).modalForm({
@@ -79,7 +99,7 @@
                 });
             });
         });
-        </script>
-  </body>
-</html>
+    </script>
+    </body>
+    </html>
 {% endblock %}

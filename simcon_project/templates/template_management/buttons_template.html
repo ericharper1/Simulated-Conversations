@@ -7,10 +7,10 @@
     <form action="{% url 'management:remove-template' record.id %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="back" value="{{ request.path }}">
-        <button id="remove-template" class="btn btn-danger" type="submit">Remove</button>
+        <button id="remove-template" class="btn btn-sm btn-outline-secondary" type="submit">Remove</button>
     </form>
 {% else %}
-    <button id="delete-template" class="bs-modal btn btn-danger" type="button" name="button"
+    <button id="delete-template" class="bs-modal btn btn-sm btn-outline-secondary" type="button" name="button"
             data-form-url="{% url 'management:delete-template' record.id %}">Delete</button>
 {% endif %}
 {% endblock %}
