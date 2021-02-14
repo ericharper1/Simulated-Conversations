@@ -37,11 +37,13 @@
         {% if show_archived == 'True' %}
             <form action="{% url 'management:display-archived-templates' 0 %}" method="post">
                 {% csrf_token %}
+                <input type="hidden" name="back" value="{{ request.path }}">
                 <button name="show-archived" class ="btn btn-danger" type="submit">Hide Archived Templates</button>
             </form>
         {% else %}
             <form action="{% url 'management:display-archived-templates' 1 %}" method="post">
                 {% csrf_token %}
+                <input type="hidden" name="back" value="{{ request.path }}">
                 <button name="show-archived" class ="btn btn-success" type="submit">Display Archived Templates</button>
             </form>
         {% endif %}
