@@ -1,15 +1,24 @@
-<!DOCTYPE html>
 {% extends "researcher_base.html" %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Create Assignment</title>
+      <!-- Font Awesome -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+      <!-- Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
+      <!-- Tempus Dominus -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
+
   </head>
   <body>
-    {% block content %}
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
         <h2>Simulated Conversations</h2>
         <!--left part -->
@@ -18,19 +27,23 @@
                 <label for="assign_name">Assignment name:</label>
                 <input type="text" class="form-control col-lg-10" id="assign_name" required>
             </div>
-
             <div class="form-group">
-                <label for="assign_date">Assignment start date:</label>
-                <input type="text" class="form-control col-lg-10" id="assign_date" placeholder="YYYY-MM-DD" required>
+                <label for="assign_datetime">Assignment start date:</label>
+               <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                  <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
+                         id="assign_datetime" required/>
+                  <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                  </div>
+               </div>
             </div>
-
 
             <!--add student -->
             <div class="form-group">
                 <label for="add_stu">Add student</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please Input a Student Email." list="stu_list">
-                    <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please input student email." list="stu_list">
+                    <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add student" onclick="add_stu(tbl, stu_name.value)">
                     <datalist id="stu_list"></datalist>
                 </div>
                 <br>
@@ -54,8 +67,8 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please Input a Template Name." list="temp_list">
-                    <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." list="temp_list">
+                    <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                     <datalist id="temp_list"></datalist>
                 </div>
                 <br>
@@ -75,8 +88,8 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please Input a Label Name." list="label_list">
-                    <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." list="label_list">
+                    <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add label" onclick="add_label(tbl2, label_name.value)">
                     <datalist id="label_list"></datalist>
                 </div>
                 <br>
@@ -97,6 +110,11 @@
   </body>
 
   <script>
+      // This for the datetimepicker
+      $(function () {
+        $("#datetimepicker1").datetimepicker();
+      });
+
       var students={{ student|safe }};
       var templates={{ template|safe }};
       var subLabels={{ subLabel|safe }};
@@ -263,11 +281,40 @@
           });
           //get data
           assign_name=document.getElementById("assign_name").value;
-          assign_date=document.getElementById("assign_date").value;
+          assign_datetime=document.getElementById("assign_datetime").value;
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
 
+          //verify name and datetime
+          if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
+              window.alert("Assignment name must not be empty!");
+              return;
+          }
+
+          if(typeof assign_datetime == "undefined" || assign_datetime == null){
+              window.alert("You must pick an assignment date and time!");
+              return;
+          }
+          var date = assign_datetime.split(" ")[0];
+          var time = assign_datetime.split(" ")[1];
+            if(typeof date == "undefined" || date == null || date.split("/") != 3){
+              window.alert("The date must be in this format: MM/DD/YYYY !");
+              return;
+            }
+            if(typeof time == "undefined" || time == null || time.split(":") != 2){
+              window.alert("The time must be in this format: HH:MM AM/PM !");
+              return;
+            }
+
+          //post data to server
+          $.ajax({
+              url:"{% url 'assignments:add-data' %}",
+              type:'POST',
+              data: {
+                  'name': assign_name,
+                  'date': date,
+                  'time': time,
           //varify name and date
           if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
               window.alert("Assignments Must Have a Name!");
@@ -303,5 +350,6 @@
           })
       }
   </script>
-    {% endblock %}
 </html>
+
+{% endblock %}

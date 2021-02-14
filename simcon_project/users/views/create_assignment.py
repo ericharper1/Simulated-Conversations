@@ -5,6 +5,8 @@ from django.views.generic import TemplateView
 from django.core import serializers
 from django.http import HttpResponse
 from django.core.mail import send_mail
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from apscheduler.schedulers.background import BackgroundScheduler
 from tzlocal import get_localzone
 from django.contrib.auth.decorators import user_passes_test
@@ -14,6 +16,7 @@ import datetime
 
 
 class CreateAssignmentView(TemplateView):
+    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         curResearcher=request.user
 
@@ -63,8 +66,8 @@ def add_assignment(request):
     data=request.POST
     name=data.get('name')
     date=data.get('date')
+    time=data.get('time')
     researcher=request.user
-    #researcher='researcher@111.com'
     students=data.get('stuData')
     templates=data.get('tempData')
     labels=data.get('labelData')
@@ -75,11 +78,17 @@ def add_assignment(request):
     labels=decode(labels)
 
     #Verify date
-    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    dateTmp=datetime.datetime.strptime(date, "%Y-%m-%d")
+    today=datetime.date.today()
+    time = datetime.time.today()
+    dateTmp=datetime.datetime.strptime(date, "%m/%d/%Y")
+    timeTmp = datetime.datetime.strptime(time, "%H:%M:%S")
     assignToday=False
-    if dateTmp==today:
-        assignToday=True
+    if dateTmp>=today:
+        if timeTmp>=time:
+            assignToday=True
+        else:
+            success = 1
+            errMsg = errMsg + 'The assignment time cannot be before now.\n\n'
     if dateTmp<today:
         success=1
         errMsg=errMsg+'The assigned date cannot before today.\n\n'
