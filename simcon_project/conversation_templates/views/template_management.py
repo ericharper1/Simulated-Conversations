@@ -18,6 +18,7 @@ class FolderTemplateTable(tables.Table):
     The "delete" button has been replaced with a "remove button to
     remove a template from the folder.
     """
+    edit_button = TemplateColumn(verbose_name='', template_name='template_management/edit_button.html')
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html',
                              extra_context={"in_folder": True})
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
@@ -33,6 +34,7 @@ class AllTemplateTable(tables.Table):
     Table for showing the templates for a specific folder.
     Only used when all templates are displayed.
     """
+    edit_button = TemplateColumn(verbose_name='', template_name='template_management/edit_button.html')
     buttons = TemplateColumn(verbose_name='', template_name='template_management/buttons_template.html')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
