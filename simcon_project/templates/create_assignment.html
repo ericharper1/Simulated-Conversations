@@ -5,11 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
-    />
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Create Assignment</title>
   </head>
@@ -34,7 +29,7 @@
             <div class="form-group">
                 <label for="add_stu">Add student</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please input student email." list="stu_list">
+                    <input type="text" class="form-control col-lg-7" id="stu_name" placeholder="Please Input a Student Email." list="stu_list">
                     <input type="button" class="btn btn-primary" value="Add student" onclick="add_stu(tbl, stu_name.value)">
                     <datalist id="stu_list"></datalist>
                 </div>
@@ -59,7 +54,7 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." list="temp_list">
+                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please Input a Template Name." list="temp_list">
                     <input type="button" class="btn btn-primary" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                     <datalist id="temp_list"></datalist>
                 </div>
@@ -80,7 +75,7 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." list="label_list">
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please Input a Label Name." list="label_list">
                     <input type="button" class="btn btn-primary" value="Add label" onclick="add_label(tbl2, label_name.value)">
                     <datalist id="label_list"></datalist>
                 </div>
@@ -193,16 +188,16 @@
               var stuTmp=students[i];
               if(stuTmp.email==stu){
                   find=true;
+                  var name = stuTmp.first_name + " " + stuTmp.last_name;
                   if(stuTmp.is_active!=1){
-                      window.alert("Add failed. This user is a not an active user");
+                      window.alert("Adding Studet "+name+" Failed, They are not an active user.");
                   }
                   else{
                       //Determine whether this student is already in the table.
                       if(addedStu.indexOf(stu)>-1){
-                          window.alert("Adding failed, the student is already in the table.");
+                          window.alert("Adding Student "+name+" failed, They have already been added");
                       }
                       else {
-                          var name = stuTmp.first_name + " " + stuTmp.last_name;
                           add2table(tbl, name, stu, 1);
                           addedStu.push(stu);
                       }
@@ -275,17 +270,17 @@
 
           //varify name and date
           if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
-              window.alert("Assignment name must not be empty!");
+              window.alert("Assignments Must Have a Name!");
               return;
           }
           if(typeof assign_date == "undefined" || assign_date == null || assign_date.split("-").length !=3){
-              window.alert("Assignment start date must in YYYY-MM-DD format and not be empty!");
+              window.alert("Must have a valid start date. example YYYY-MM-DD!");
               return;
           }
 
           //post data to server
           $.ajax({
-              url:"{% url 'assignments:add-data' %}",
+              url:"{% url 'assignments:add-assignment' %}",
               type:'POST',
               data: {
                   'name': assign_name,
