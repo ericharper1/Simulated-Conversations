@@ -89,7 +89,7 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please input label name." list="label_list">
+                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please Input a Label Name." list="label_list">
                     <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add label" onclick="add_label(tbl2, label_name.value)">
                     <datalist id="label_list"></datalist>
                 </div>
@@ -299,11 +299,13 @@
           }
           var date = assign_datetime.split(" ")[0];
           var time = assign_datetime.split(" ")[1];
-            if(typeof date == "undefined" || date == null || date.split("/") != 3){
+          console.log(date);
+          console.log(time);
+            if(typeof date == "undefined" || date == null || date.split("/").length != 3){
               window.alert("The date must be in this format: MM/DD/YYYY !");
               return;
             }
-            if(typeof time == "undefined" || time == null || time.split(":") != 2){
+            if(typeof time == "undefined" || time == null || time.split(":").length != 2){
               window.alert("The time must be in this format: HH:MM AM/PM !");
               return;
             }
