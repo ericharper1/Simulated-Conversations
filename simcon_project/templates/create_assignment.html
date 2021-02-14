@@ -187,7 +187,8 @@
               }
               //label
               else{
-                  var index = addedLabel.indexOf(em);
+                  var name=this.parentNode.parentNode.cells[0].innerHTML;
+                  var index = addedLabel.indexOf(name);
                   if (index > -1) {
                       addedLabel.splice(index, 1);
                   }
@@ -298,8 +299,6 @@
           }
           var date = assign_datetime.split(" ")[0];
           var time = assign_datetime.split(" ")[1];
-          console.log(date);
-          console.log(time);
             if(typeof date == "undefined" || date == null || date.split("/").length != 3){
               window.alert("The date must be in this format: MM/DD/YYYY !");
               return;

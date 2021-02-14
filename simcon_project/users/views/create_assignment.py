@@ -78,15 +78,14 @@ def add_assignment(request):
     labels=decode(labels)
 
     #Verify date
-    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    dateTmp=datetime.datetime.strptime(date, "%m/%d/%Y")
-
+    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0)) #current date
+    dateTmp=datetime.datetime.strptime(date, "%m/%d/%Y")    #date
     now = datetime.datetime.now()   #current time
     timeTmp = datetime.time(now.hour, now.minute)
-
-    assignTimeTmp=datetime.datetime.strptime(time, "%H:%M")
+    assignTimeTmp=datetime.datetime.strptime(time, "%H:%M") #time
     assignTime=datetime.time(assignTimeTmp.hour, assignTimeTmp.minute)
-    #timeTmp = datetime.datetime.strptime(curtime, "%H:%M:%S")
+    dateTime=f"{dateTmp.year}-{dateTmp.month}-{dateTmp.day} {assignTimeTmp.hour}:{assignTimeTmp.minute}:00" #The complete date and time format.
+
     assignToday=False
     if dateTmp==today:
         if timeTmp>=assignTime:
@@ -137,9 +136,12 @@ def add_assignment(request):
             assignment.conversation_templates.add(tempTmp)
 
     #Assign label information to assignment
+    lbStu=set()
     if not labelIsNull:
         for label in labels:
             labelTmp=SubjectLabel.objects.get(label_name=label)
+            lbEmail=list([i[0] for i in labelTmp.students.all().values_list('email')])
+            lbStu.update(lbEmail)
             assignment.subject_labels.add(labelTmp)
 
     #Send email
@@ -150,16 +152,20 @@ def add_assignment(request):
     subject='New Simulated Conversation Assignment'
     msg='You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
     schedId='Assignment--'+name+'--'+date
+    if not stuIsNull:
+        lbStu.update(students)
+    recipient=list(lbStu)
+
     #when an error occurs, there is no need to add this task to the schedule.
     researcher='simulated.conversation@mail.com'
     if success==0:
         #If the assignment date is the same day.
         if assignToday:
-            sendMail(subject, msg, students, researcher)
+            sendMail(subject, msg, recipient, researcher)
         else:
             #To test the sending mail function, change the content of run_date to the time you want.
             #run_date='2021-01-22 18:35:00'
-            sched.add_job(sendMail, trigger='date', id=schedId, run_date=date, args=(subject, msg, students, researcher),replace_existing=True)
+            sched.add_job(sendMail, trigger='date', id=schedId, run_date=dateTime, args=(subject, msg, recipient, researcher),replace_existing=True)
             sched.start()
     else:
         assignment.delete()
