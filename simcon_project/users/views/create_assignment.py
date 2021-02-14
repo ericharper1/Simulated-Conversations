@@ -78,13 +78,18 @@ def add_assignment(request):
     labels=decode(labels)
 
     #Verify date
-    today=datetime.date.today()
-    time = datetime.time.today()
+    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     dateTmp=datetime.datetime.strptime(date, "%m/%d/%Y")
-    timeTmp = datetime.datetime.strptime(time, "%H:%M:%S")
+
+    now = datetime.datetime.now()   #current time
+    timeTmp = datetime.time(now.hour, now.minute)
+
+    assignTimeTmp=datetime.datetime.strptime(time, "%H:%M")
+    assignTime=datetime.time(assignTimeTmp.hour, assignTimeTmp.minute)
+    #timeTmp = datetime.datetime.strptime(curtime, "%H:%M:%S")
     assignToday=False
-    if dateTmp>=today:
-        if timeTmp>=time:
+    if dateTmp==today:
+        if timeTmp>=assignTime:
             assignToday=True
         else:
             success = 1
@@ -96,6 +101,8 @@ def add_assignment(request):
     #Save the data that can be directly assigned to assignment.
     assignment=Assignment()
     assignment.name=name
+    dt=date.split('/')
+    date=dt[2]+"-"+dt[0]+"-"+dt[1]
     assignment.date_assigned=date
     researcher=Researcher.objects.get(email=researcher)
     assignment.researcher=researcher
