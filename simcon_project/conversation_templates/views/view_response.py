@@ -8,6 +8,7 @@ from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
 from bootstrap_modal_forms.generic import BSModalDeleteView
+from django.core.mail import send_mail
 
 
 @user_passes_test(is_authenticated)
@@ -136,15 +137,8 @@ class ResponseDeleteView(BSModalDeleteView):
     template_name = 'response_delete_modal.html'
     success_message = None
     success_url = reverse_lazy('researcher-view')
-    email_address = add_researcher_form.cleaned_data.get('email')
-            user = Researcher.objects.create(email=email_address, first_name='N/A', last_name='N/A',
-                                             is_researcher=True)
-            user.set_unusable_password()
-            current_site = get_current_site(request)
-            subject = 'Activate Your Simulated Conversations account'
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            site = current_site.domain
-            message = 'Hi, \nPlease register here: \nhttp://' + site + '/researcher/register/' \
-                      + uid + '\n'
-            send_mail(subject, message, 'simulated.conversation@mail.com', [email_address], fail_silently=False)
-            messages.success(request, 'A link to register has been sent to the researcher\'s email provided.')
+   # email_address = TemplateResponse.student.email
+   # print(email_address)
+    subject = 'New Re-Assigned Assignment for Simulated Conversations'
+    message = 'Please check your Portal to complete the new assignment'
+   # send_mail(subject, message, 'simulated.conversation@mail.com', [email_address], fail_silently=False)
