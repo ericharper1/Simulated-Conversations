@@ -3,13 +3,13 @@
         <form action="{% url 'management:archive-template' record.id %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="back" value="{{ request.path }}">
-            <button id="archive-template" class="btn btn-success" type="submit">Unarchive</button>
+            <button id="archive-template" class="btn btn-sm btn-outline-secondary" type="submit">Unarchive</button>
         </form>
     {% else %}
         <form action="{% url 'management:archive-template' record.id %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="back" value="{{ request.path }}">
-            <button id="archive-template" class="btn btn-danger" type="submit">Archive</button>
+            <button id="archive-template" class="btn btn-sm btn-outline-secondary" type="submit">Archive</button>
         </form>
     {% endif %}
 {% endblock %}

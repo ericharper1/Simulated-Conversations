@@ -30,23 +30,22 @@ class LabelList(tables.Table):  # collects the table names
     label_name = tables.Column(linkify={"viewname": "student-management", "args": [tables.A("label_name")]},
                                accessor='label_name', verbose_name='Label Name')
 
-
 @user_passes_test(is_researcher)
 def student_management(request, name="All Students"):
     # gets current researcher for use later
     added_by = Researcher.objects.get(email=request.user)
 
-    # if the label with label_nam = name is not found load default of All Students
+    # if the label with label_name = name is not found load default of All Students
     if not SubjectLabel.objects.filter(label_name=name, researcher=added_by):
         name = "All Students"
 
     # if the table for All Students is deleted or does not exist, make it and add all students the researcher
     # has added and add them to it.
-    #if not SubjectLabel.objects.filter(label_name='All Students', researcher=added_by):
-     #   all_stu_lbl = SubjectLabel().create_label('All Students', added_by)
-      #  all_students = Student.objects.filter(added_by=added_by, is_active=True)
-       # for stud in all_students:
-        #    all_stu_lbl.students.add(stud)
+    if not SubjectLabel.objects.filter(label_name='All Students', researcher=added_by):
+       all_stu_lbl = SubjectLabel().create_label('All Students', added_by)
+       all_students = Student.objects.filter(added_by=added_by, is_active=True)
+       for stud in all_students:
+           all_stu_lbl.students.add(stud)
 
     # if researcher presses a submit button
     if request.method == "POST":
@@ -117,7 +116,7 @@ def student_management(request, name="All Students"):
     # creates the table for the labels
     all_lbl = SubjectLabel.objects.filter(researcher=added_by).values('label_name')
     label_table = LabelList(all_lbl, prefix="1-")
-    RequestConfig(request, paginate={"per_page": 10}).configure(label_table)
+    RequestConfig(request, paginate={"per_page": 20}).configure(label_table)
 
     # creates the table for the students in current label
     if not name == 'All Students':
@@ -127,7 +126,7 @@ def student_management(request, name="All Students"):
             'students__email',
             'students__registered')
         student_table = StudentList(stu_contents, prefix="2-")
-        RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
+        RequestConfig(request, paginate={"per_page": 20}).configure(student_table)
     else:
         stu_contents = Student.objects.filter(added_by=added_by).values(
             'first_name',

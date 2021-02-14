@@ -34,7 +34,7 @@ class LabelTable(tables.Table):
 
 
 class AddToLabel(forms.Form):
-    email = forms.EmailField(max_length=254, required=True)
+    email = forms.EmailField(max_length=254, required=True, widget=forms.TextInput(attrs={'placeholder': 'Student name'}), label='')
 
 
 class SendEmail(forms.Form):
@@ -42,7 +42,7 @@ class SendEmail(forms.Form):
 
 
 class NewLabel(forms.Form):
-    label_name = forms.CharField(max_length=100)
+    label_name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Label name'}), label='')
 
 
 class CustomUserChangeForm(UserChangeForm):

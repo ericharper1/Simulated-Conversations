@@ -65,7 +65,16 @@ def main_view(request):
     Main template management view.
     Main contents of the page are the tables showing all templates and folders the researcher has created.
     """
-    context = main_view_helper(request, None)
+    show_archived = request.COOKIES.get('show_archived')
+    if show_archived is None:
+        request.COOKIES.get('show_archived', False)
+
+    if show_archived == "True":
+        templates = get_templates(request.user)
+    else:
+        templates = get_templates(request.user).filter(archived=False)
+
+    context = main_view_helper(request, templates, None)
     return render(request, 'template_management/main_view.html', context)
 
 
@@ -75,26 +84,27 @@ def folder_view(request, pk):
     Main template management view.
     Shows the all folders, but shows only templates belonging to the selected folder
     """
-    get_object_or_404(TemplateFolder, pk=pk)
-    context = main_view_helper(request, pk)
-    return render(request, 'template_management/main_view.html', context)
+    current_folder = get_object_or_404(TemplateFolder, pk=pk)
 
-
-def main_view_helper(request, pk):
-    """
-    Set up the template table and folder table for the main view.
-    What is displayed depends on if the user has selected a folder and if archived
-    templates are being displayed or not.
-    """
     show_archived = request.COOKIES.get('show_archived')
     if show_archived is None:
         request.COOKIES.get('show_archived', False)
 
     if show_archived == "True":
-        all_templates = get_templates(request.user)
+        templates = current_folder.templates.all()
     else:
-        all_templates = get_templates(request.user).filter(archived=False)
+        templates = current_folder.templates.filter(archived=False)
 
+    context = main_view_helper(request, templates, pk)
+    return render(request, 'template_management/main_view.html', context)
+
+
+def main_view_helper(request, all_templates, pk):
+    """
+    Filter template table for search value and sets up folder table for the main view.
+    What is displayed depends on if the user has selected a folder and if archived
+    templates are being displayed or not.
+    """
     templates = filter_templates(request, all_templates)
     if templates:
         if pk:
@@ -102,17 +112,17 @@ def main_view_helper(request, pk):
         else:
             template_table = AllTemplateTable(templates, prefix="1-")
 
-        if show_archived != "True":
-            template_table.exclude = ('archived')
+        if request.COOKIES.get('show_archived') != "True":
+            template_table.exclude = ('archived',)
 
-        RequestConfig(request, paginate={"per_page": 5}).configure(template_table)
+        RequestConfig(request, paginate={"per_page": 8}).configure(template_table)
     else:
         template_table = None
 
     folders = filter_folder(request)
     if folders:
         folder_table = FolderTable(folders, prefix="2-")
-        RequestConfig(request, paginate={"per_page": 5}).configure(folder_table)
+        RequestConfig(request, paginate={"per_page": 8}).configure(folder_table)
     else:
         folder_table = None
 
@@ -120,7 +130,7 @@ def main_view_helper(request, pk):
         'templateTable': template_table,
         'folderTable': folder_table,
         'folder_pk': pk,
-        'show_archived': show_archived,
+        'show_archived': request.COOKIES.get('show_archived'),
     }
 
     return context
