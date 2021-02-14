@@ -54,7 +54,7 @@ def isNull(data):
     return False
 
 @user_passes_test(is_researcher)
-def add_data(request):
+def add_assignment(request):
     #Error signs and error messages.
     errMsg=''
     success=0
@@ -102,7 +102,7 @@ def add_data(request):
     if stuIsNull:
         if labelIsNull:
             success=1
-            errMsg=errMsg+'One of the students or labels must not be empty.\n\n'
+            errMsg=errMsg+'You must have at least one student or label added.\n\n'
     else:
         for stu in students:
             stuTmp=Student.objects.get(email=stu)
@@ -111,7 +111,7 @@ def add_data(request):
     #Assign template information to assignment
     if tempIsNull:
         success=1
-        errMsg=errMsg+'Template must not be empty.\n\n'
+        errMsg=errMsg+'Must include at-least one template.\n\n'
     else:
         for temp in templates:
             tempList=temp.split('--')
@@ -131,7 +131,7 @@ def add_data(request):
     tz = get_localzone()
     sched = BackgroundScheduler(timezone=tz, job_defaults=job_defaults)
 
-    subject='Simulated Conversation Assignment Update'
+    subject='New Simulated Conversation Assignment'
     msg='You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
     schedId='Assignment--'+name+'--'+date
     #when an error occurs, there is no need to add this task to the schedule.
