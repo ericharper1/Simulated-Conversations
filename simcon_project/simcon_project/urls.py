@@ -46,7 +46,7 @@ urlpatterns = [
     path('researcher/', researcher_view, name="researcher-view"),
     path('researcher/register/<uidb64>/', researcher_registration, name="researcher-registration"),
     path('researcher/templates/', include('conversation_templates.urls.templates_urls'), name="template-management-view"),
-    path('researcher/settings/', include('users.urls'), name="researcher-settings-view"),
+    path('researcher/settings/', include('users.urls.researcher_settings_urls'), name="researcher-settings-view"),
     path('researcher/view-all-responses/<uuid:pk>/', TemplateResponsesView.as_view(), name="view-all-responses"),
     path('researcher/students/<str:name>/', student_management, name="student-management"),
     path('researcher/students/', student_management, name="student-management"),
@@ -55,7 +55,7 @@ urlpatterns = [
     path('researcher/response/update/<uuid:pk>/', update_overall_response_feedback, name='update-overall-response-feedback'),
     path('researcher/response/updatenode/<uuid:pk>/', update_node_response_feedback, name='update-node-response-feedback'),
     path('researcher/response/updatetranscription/<uuid:pk>/', update_node_transcription, name='update-node-transcription'),
-    path('researcher/create-assignment/', include('users.create_assignment_urls'), name="create-assignment-view"),
+    path('researcher/create-assignment/', include('users.urls.create_assignment_urls'), name="create-assignment-view"),
 ]
 
 if settings.DEBUG:

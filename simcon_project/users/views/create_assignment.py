@@ -7,24 +7,24 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
+from django_apscheduler.jobstores import DjangoJobStore
 from tzlocal import get_localzone
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
 import json
 import datetime
 
-
 class CreateAssignmentView(TemplateView):
     @method_decorator(ensure_csrf_cookie)
     def get(self, request):
-        curResearcher=request.user
+        curResearcher = request.user
 
-        stud=Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active')
-        label=SubjectLabel.objects.all().filter(researcher=curResearcher)
-        template=ConversationTemplate.objects.all().filter(researcher=curResearcher)
+        stud = Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active')
+        label = SubjectLabel.objects.all().filter(researcher=curResearcher)
+        template = ConversationTemplate.objects.all().filter(researcher=curResearcher)
 
-        student=json.dumps(list(stud))
+        student = json.dumps(list(stud))
         subLabel = serializers.serialize("json",label)
         template = serializers.serialize("json",template)
 
@@ -34,142 +34,124 @@ class CreateAssignmentView(TemplateView):
             'template': template,
         })
 
-#Transfer string type list to list type
+
+# Transfer string type list to list type
 def decode(str):
-    if str[0]!='[':
+    if str[0] != '[':
         print("Decode failed. The data is not a list type.")
         return
-    temp=str[1:-1]
-    temp=temp.split(',')
-    listTmp=[]
+    temp = str[1:-1]
+    temp = temp.split(',')
+    listTmp = []
     for t in temp:
-        t=t[1:-1]
+        t = t[1:-1]
         listTmp.append(t)
     return listTmp
 
-def sendMail(subject, msg, recipient, researcher):
-    send_mail(subject,msg,researcher,recipient,fail_silently=False)
 
-#Determine if data is empty.
+def sendMail(subject, msg, recipient, email_address):
+    send_mail(subject, msg, email_address, recipient, fail_silently=False)
+
+
+# Determine if data is empty.
 def isNull(data):
     if len(data)==0 or (len(data)==1 and data[0]==''):
         return True
     return False
 
+
 @user_passes_test(is_researcher)
 def add_assignment(request):
-    #Error signs and error messages.
-    errMsg=''
-    success=0
+    # Error signs and error messages.
+    errMsg = ''
+    success = 0
 
-    #Get raw data
-    data=request.POST
-    name=data.get('name')
-    date=data.get('date')
-    time=data.get('time')
-    researcher=request.user
-    students=data.get('stuData')
-    templates=data.get('tempData')
-    labels=data.get('labelData')
+    # Get raw data
+    data = request.POST
+    name = data.get('name')
+    date = data.get('date')
+    researcher = request.user
+    students = data.get('stuData')
+    templates = data.get('tempData')
+    labels = data.get('labelData')
 
-    #Transfer string type list to list type
-    students=decode(students)
-    templates=decode(templates)
-    labels=decode(labels)
+    # Transfer string type list to list type
+    students = decode(students)
+    templates = decode(templates)
+    labels = decode(labels)
 
-    #Verify date
-    today=datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0)) #current date
-    dateTmp=datetime.datetime.strptime(date, "%m/%d/%Y")    #date
-    now = datetime.datetime.now()   #current time
-    timeTmp = datetime.time(now.hour, now.minute)
-    assignTimeTmp=datetime.datetime.strptime(time, "%H:%M") #time
-    assignTime=datetime.time(assignTimeTmp.hour, assignTimeTmp.minute)
-    dateTime=f"{dateTmp.year}-{dateTmp.month}-{dateTmp.day} {assignTimeTmp.hour}:{assignTimeTmp.minute}:00" #The complete date and time format.
+    # Verify date
+    datetime_now = datetime.datetime.now(get_localzone())
+    sched_datetime = get_localzone().localize(datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M"))
+    if sched_datetime < datetime_now:
+        success = 1
+        errMsg = errMsg+'The assignment start cannot be before now.\n\n'
 
-    assignToday=False
-    if dateTmp==today:
-        if timeTmp>=assignTime:
-            assignToday=True
-        else:
-            success = 1
-            errMsg = errMsg + 'The assignment time cannot be before now.\n\n'
-    if dateTmp<today:
-        success=1
-        errMsg=errMsg+'The assigned date cannot before today.\n\n'
+    # Determine if students, labels, and templates are empty.
+    stuIsNull = isNull(students)
+    labelIsNull = isNull(labels)
+    tempIsNull = isNull(templates)
 
-    #Save the data that can be directly assigned to assignment.
-    assignment=Assignment()
-    assignment.name=name
-    dt=date.split('/')
-    date=dt[2]+"-"+dt[0]+"-"+dt[1]
-    assignment.date_assigned=date
-    researcher=Researcher.objects.get(email=researcher)
-    assignment.researcher=researcher
+    # Save the data that can be directly assigned to assignment.
+    assignment = Assignment()
+    assignment.name = name
+    assignment.date_assigned = sched_datetime
+    researcher = Researcher.objects.get(email=researcher)
+    assignment.researcher = researcher
     assignment.save()
 
-    #Determine if students, labels, and templates are empty.
-    stuIsNull=isNull(students)
-    labelIsNull=isNull(labels)
-    tempIsNull=isNull(templates)
-
-    #Assign student information to assignment,
-    #and judge whether there is an error that both students and labels are empty.
-    if stuIsNull:
-        if labelIsNull:
-            success=1
-            errMsg=errMsg+'You must have at least one student or label added.\n\n'
-    else:
+    # Assign student information to assignment,
+    # and judge whether there is an error that both students and labels are empty.
+    # Also check if chosen labels have any students in them
+    if stuIsNull and labelIsNull:
+        success = 1
+        errMsg = errMsg+'Either students or labels must not be empty.\n\n'
+    labelStudents = Student.objects.filter(labels__label_name__in=labels)
+    if stuIsNull and not labelIsNull:
+        if stuIsNull and labelStudents.count() <= 0:
+            success = 1
+            errMsg = errMsg + 'The chosen label(s) does not contain any students.\n\n'
+    if not stuIsNull:
         for stu in students:
-            stuTmp=Student.objects.get(email=stu)
+            stuTmp = Student.objects.get(email=stu)
             assignment.students.add(stuTmp)
-
-    #Assign template information to assignment
-    if tempIsNull:
-        success=1
-        errMsg=errMsg+'Must include at-least one template.\n\n'
-    else:
-        for temp in templates:
-            tempList=temp.split('--')
-            tempName=tempList[0]
-            tempDate=tempList[1]
-            tempTmp=ConversationTemplate.objects.get(name=tempName,creation_date=tempDate)
-            assignment.conversation_templates.add(tempTmp)
-
-    #Assign label information to assignment
-    lbStu=set()
     if not labelIsNull:
+        for students in labelStudents:
+            stuTmp = Student.objects.get(email=students.email)
+            assignment.students.add(stuTmp)
+        # Assign label information to assignment
         for label in labels:
-            labelTmp=SubjectLabel.objects.get(label_name=label)
-            lbEmail=list([i[0] for i in labelTmp.students.all().values_list('email')])
-            lbStu.update(lbEmail)
+            labelTmp = SubjectLabel.objects.get(label_name=label)
             assignment.subject_labels.add(labelTmp)
 
+    # Assign template information to assignment
+    if tempIsNull:
+        success = 1
+        errMsg = errMsg+'Template must not be empty.\n\n'
+    else:
+        for temp in templates:
+            tempList = temp.split('--')
+            tempName = tempList[0]
+            tempDate = tempList[1]
+            tempTmp = ConversationTemplate.objects.get(name=tempName, creation_date=tempDate)
+            assignment.conversation_templates.add(tempTmp)
+
+
     #Send email
-    job_defaults = { 'max_instances': 20 }
-    tz = get_localzone()
-    sched = BackgroundScheduler(timezone=tz, job_defaults=job_defaults)
+    sched = BlockingScheduler(timezone=get_localzone())
+    sched.add_jobstore(DjangoJobStore(), "default")
 
-    subject='New Simulated Conversation Assignment'
-    msg='You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
-    schedId='Assignment--'+name+'--'+date
-    if not stuIsNull:
-        lbStu.update(students)
-    recipient=list(lbStu)
-
+    subject='Simulated Conversation Assignment Update'
+    msg = 'You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
+    schedId = 'Assignment--'+name+'--'+str(sched_datetime)
     #when an error occurs, there is no need to add this task to the schedule.
-    researcher='simulated.conversation@mail.com'
-    if success==0:
-        #If the assignment date is the same day.
-        if assignToday:
-            sendMail(subject, msg, recipient, researcher)
-        else:
-            #To test the sending mail function, change the content of run_date to the time you want.
-            #run_date='2021-01-22 18:35:00'
-            sched.add_job(sendMail, trigger='date', id=schedId, run_date=dateTime, args=(subject, msg, recipient, researcher),replace_existing=True)
-            sched.start()
+
+    if success == 0:
+        sched.add_job(sendMail, run_date=sched_datetime, id=schedId,
+                     args=(subject, msg, students, 'simcon.dev@gmail.com'), replace_existing=True)
+        sched.start()
     else:
         assignment.delete()
-
 
     return HttpResponse(json.dumps({
         'success': success,

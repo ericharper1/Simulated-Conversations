@@ -29,13 +29,7 @@
             </div>
             <div class="form-group">
                 <label for="assign_datetime">Assignment start date:</label>
-               <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                  <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
-                         id="assign_datetime" required/>
-                  <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                  </div>
-               </div>
+                <input type="datetime-local" id="assign_datetime" required>
             </div>
 
             <!--add student -->
@@ -287,26 +281,18 @@
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
 
-          //verify name and datetime
+          //verify name
           if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
               window.alert("Assignments Must Have a Name!");
               return;
           }
 
-          if(typeof assign_datetime == "undefined" || assign_datetime == null){
+        //verify datetime is valid
+        var timestamp = Date.parse(assign_datetime)
+        if(isNaN(timestamp)){
               window.alert("You must pick an assignment date and time!");
               return;
-          }
-          var date = assign_datetime.split(" ")[0];
-          var time = assign_datetime.split(" ")[1];
-            if(typeof date == "undefined" || date == null || date.split("/").length != 3){
-              window.alert("The date must be in this format: MM/DD/YYYY !");
-              return;
-            }
-            if(typeof time == "undefined" || time == null || time.split(":").length != 2){
-              window.alert("The time must be in this format: HH:MM AM/PM !");
-              return;
-            }
+        }
 
           //post data to server
           $.ajax({
@@ -314,8 +300,7 @@
               type:'POST',
               data: {
                   'name': assign_name,
-                  'date': date,
-                  'time': time,
+                  'date': assign_datetime,
                   'stuData': stuJSON,
                   'tempData': tempJSON,
                   'labelData': labelJSON
