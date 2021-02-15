@@ -4,6 +4,8 @@ from conversation_templates.models import TemplateResponse
 from django.contrib.auth.decorators import user_passes_test
 import django_tables2 as tables
 from django_tables2 import RequestConfig
+import functools
+import operator
 
 
 class ResponseTable(tables.Table):
@@ -48,9 +50,15 @@ def researcher_view(request):
 def filter_search(request, responses):
     if 'searchParam' in request.GET:
         param = request.GET['searchParam']
-        filter_fields = Q(student__first_name__contains=param) | Q(student__last_name__contains=param) | \
+        if param == "":
+            filter_fields = Q(student__first_name__contains=param) | Q(student__last_name__contains=param) | \
             Q(template__name__contains=param) | \
             Q(assignment__subject_labels__label_name__contains=param)
+        else:
+            params = param.split()
+            filter_fields = functools.reduce(operator.and_, (Q(student__first_name__icontains=param) | Q(student__last_name__icontains=param) | \
+            Q(template__name__icontains=param) | \
+            Q(assignment__subject_labels__label_name__icontains=param) for param in params))
         responses = responses.filter(filter_fields)
 
     return responses
