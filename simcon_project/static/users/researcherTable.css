@@ -9,21 +9,6 @@
     Container the Table lives in 
 */
 .table-container {
-    width: 70%;
+    width: 80%;
     margin: auto;
-}
-
-/*
-    Researcher View table will take up to the full width of the page
-*/
-table {
-    width: 100%;
-
-}
-
-/*
-    Footer to be at the bottom of the page
-*/
-footer {
-    text-align: center;
 }

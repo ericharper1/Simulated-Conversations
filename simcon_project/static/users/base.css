@@ -1,0 +1,67 @@
+body {
+    background-color: #e8e8e8;
+}
+
+/**
+Navbar style
+ */
+.navbar .container-fluid{
+    width: 80%;
+}
+
+.navbar a {
+    color: white;
+}
+
+.nav_bar_selected{
+    font-weight: normal;
+    color: #6A7F10 !important;
+}
+
+.nav_bar_unselected {
+    color: white;
+}
+
+.navbar-brand{
+    color: white !important;
+}
+
+/**
+Table style
+ */
+
+.table{
+    background-color: white;
+    border-collapse: collapse;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+th, td {
+    text-align: center;
+    color: darkslategrey;
+    padding-bottom: 20px;
+}
+
+th a {
+    color: white;
+}
+
+th {
+    background-color: #8a9b3e;
+}
+
+/**
+Pagination style
+ */
+
+.page-link {
+    color: darkslategrey;
+}
+
+.pagination > .active > a
+{
+    color: white;
+    background-color: #8a9b3e !Important;
+    border: solid 1px #8a9b3e !Important;
+}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% extends "student_base.html" %}
 {% load static %}
-{% block nav-studentView %}{% endblock %}
+{% block nav-studentView %}<strong class="nav_bar_selected"> Home </strong>{% endblock %}
 {% load render_table from django_tables2 %}
 {% block content %}
 <html lang="en">
@@ -24,10 +24,14 @@
       {% if incomplete_table %}
       <h2>Incomplete Templates</h2>
           {% render_table incomplete_table %}
+      {% else %} 
+          <span> No Templates to Complete </span> 
       {% endif  %}
       {% if completed_table %}
       <h2>Completed Templates</h2>
           {% render_table completed_table %}
+      {% else %} 
+          <span> No Completed Templates </span> 
       {% endif  %}
      </div><!-- /container -->
 
