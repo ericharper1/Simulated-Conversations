@@ -17,8 +17,6 @@ recordButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
 
 function startRecording() {
-	console.log("recordButton clicked");
-
 	/*
 		Simple constraints object, for more advanced audio features see
 		https://addpipe.com/blog/audio-constraints-getusermedia/
@@ -35,8 +33,6 @@ function startRecording() {
     	https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 	*/
 	navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-		console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
-
 		/*
 			create an audio context after getUserMedia is called
 			sampleRate might change after getUserMedia is called, like it does on macOS when recording through AirPods
@@ -59,8 +55,6 @@ function startRecording() {
 		//start the recording process
 		rec.record()
 
-		console.log("Recording started");
-
 	}).catch(function(err) {
 	  	//enable the record button if getUserMedia() fails
 		toggleAudioControls(false, true);
@@ -68,8 +62,6 @@ function startRecording() {
 }
 
 function stopRecording() {
-	console.log("stopButton clicked");
-
 	//disable the record and stop button so user can't re-record
 	toggleAudioControls(true, true);
 

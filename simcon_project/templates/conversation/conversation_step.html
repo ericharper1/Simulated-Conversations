@@ -70,27 +70,31 @@
         <script src="{% static 'conversation_templates/recorder.js' %}"></script>
         <script>
             $(document).ready(function() {
+                // Modal for exit button
                 $(".bs-modal").each(function () {
                     $(this).modalForm({
                         formURL: $(this).data('form-url')
                     });
                 });
 
-                // Make input for custom response required when radio is clicked
-                $('.node-choice').change(function () {
-                    console.log('click')
-                    if (this.value == 'custom-response') {
-                        $('#id_custom-input').attr('required', true);
-                    } else {
-                        $('#id_custom-input').attr('required', false);
-                    }
-                });
+                {% if allow_typed_response %}
+                    // Make input for custom response required when radio is clicked
+                    $('.node-choice').change(function () {
+                        console.log('click')
+                        if (this.value == 'custom-response') {
+                            $('#id_custom-input').attr('required', true);
+                        } else {
+                            $('#id_custom-input').attr('required', false);
+                        }
+                    });
 
-                // Make input for custom text required if radio is initially selected on page refresh
-                if($('#id_choice-custom').is(':checked')){
-                    $('#id_custom-input').attr('required', true);
-                };
+                    // Make input for custom text required if radio is initially selected on page refresh
+                    if($('#id_choice-custom').is(':checked')){
+                        $('#id_custom-input').attr('required', true);
+                    };
+                {% endif %}
             });
+
             {% if not audio_response %}
                 document.getElementById("choice-form").style.display = "none";
             {% else %}
@@ -100,7 +104,7 @@
             function saveRecording(blob) {
                 let formData = new FormData();
                 formData.append('data', blob);
-                let data = { recording:blob };
+                {#console.log('{{ csrf_token }}')#}
                 $.ajax({
                     type: 'POST',
                     url: '{% url 'save-audio' %}',

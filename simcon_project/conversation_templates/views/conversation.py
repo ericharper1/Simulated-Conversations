@@ -57,6 +57,10 @@ def flush_session_data(request):
         del request.session['ct_node_response_id']
     if 'validation_key' in request.session:
         del request.session['validation_key']
+    if 'allow_typed_response' in request.session:
+        del request.session['allow_typed_response']
+    if 'allow_self_rating' in request.session:
+        del request.session['allow_self_rating']
     request.session.modified = True
 
 
@@ -85,6 +89,8 @@ def conversation_start(request, ct_id, assign_id):
     request.session['assign_id'] = assign_id
     request.session['page_dict'] = {}
     request.session['validation_key'] = secrets.token_hex(8)
+    request.session['allow_typed_response'] = assignment.allow_typed_response
+    request.session['allow_self_rating'] = assignment.allow_self_rating
     ctx.update({
         'ct': ct,
         'ct_node': ct_node,
@@ -107,6 +113,7 @@ def conversation_step(request, ct_node_id):
     t = '{}/conversation_step.html'.format(ct_templates_dir)
     ct_node = TemplateNode.objects.get(id=ct_node_id)
     ct_node_response_id = request.session.get('ct_node_response_id')
+    allow_typed_response = request.session['allow_typed_response']
     audio_response = None
 
     # POST request
@@ -123,7 +130,11 @@ def conversation_step(request, ct_node_id):
             node_response = get_node_response(request, ct_node_id)
             choice = node_response.selected_choice
         else:
-            choice_form = TemplateNodeChoiceForm(request.POST, ct_node=ct_node)
+            choice_form = TemplateNodeChoiceForm(
+                request.POST,
+                ct_node=ct_node,
+                allow_typed_response=allow_typed_response
+            )
             if choice_form.is_valid():
                 if request.POST.get('choices') == 'custom-response':
                     custom_response = request.POST.get('custom-text')
@@ -153,7 +164,7 @@ def conversation_step(request, ct_node_id):
         return redirect(choice.destination_node)
 
     # GET request
-    choice_form = TemplateNodeChoiceForm(ct_node=ct_node)
+    choice_form = TemplateNodeChoiceForm(ct_node=ct_node, allow_typed_response=allow_typed_response)
     ct = ct_node.parent_template
 
     # Check for page refresh
@@ -175,6 +186,7 @@ def conversation_step(request, ct_node_id):
         'ct_node': ct_node,
         'choice_form': choice_form,
         'audio_response': audio_response,
+        'allow_typed_response': allow_typed_response,
     })
     return render(request, t, ctx)
 
@@ -209,6 +221,8 @@ def conversation_end(request, ct_response_id):
     t = '{}/conversation_end.html'.format(ct_templates_dir)
     ct_response = TemplateResponse.objects.get(id=ct_response_id)
     ct = ct_response.template
+    assignment = Assignment.objects.get(id=request.session.get('assign_id'))
+    allow_self_rating = assignment.allow_self_rating
 
     # Get responses in order
     ct_node_responses = TemplateNodeResponse.objects.filter(parent_template_response=ct_response) \
@@ -227,7 +241,10 @@ def conversation_end(request, ct_response_id):
             response.transcription = request.POST.get(str(response.id), '')
             response.save()
         # The key has to be 0, I have no clue why, just don't touch it
-        ct_response.self_rating = request.POST.get('0', 0)
+        if allow_self_rating:
+            ct_response.self_rating = request.POST.get('0', 0)
+        else:
+            ct_response.self_rating = 0
         ct_response.save()
         if ct_response.completion_date is None:
             ct_response.completion_date = timezone.now()
@@ -242,7 +259,8 @@ def conversation_end(request, ct_response_id):
         'ct': ct,
         'ct_response': ct_response,
         'ct_node_table': ct_node_table,
-        'ct_node_responses': ct_node_responses
+        'ct_node_responses': ct_node_responses,
+        'allow_self_rating': allow_self_rating
     })
     return render(request, t, ctx)
 
