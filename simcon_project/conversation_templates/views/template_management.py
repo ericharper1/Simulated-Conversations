@@ -65,6 +65,7 @@ def main_view(request):
     all_templates = get_templates(request.user)
     templates = filter_templates(request, all_templates)
     if templates:
+        templates = templates.order_by('-creation_date')
         template_table = AllTemplateTable(templates, prefix="1-")
         RequestConfig(request, paginate={"per_page": 5}).configure(template_table)
     else:
@@ -97,6 +98,7 @@ def folder_view(request, pk):
     all_templates = current_folder.templates.all()
     templates = filter_templates(request, all_templates)
     if templates:
+        templates = templates.order_by('-creation_date')
         template_table = FolderTemplateTable(templates, prefix="1-")
         RequestConfig(request, paginate={"per_page": 5}).configure(template_table)
     else:
