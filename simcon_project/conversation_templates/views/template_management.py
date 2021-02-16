@@ -18,8 +18,14 @@ class FolderTemplateTable(tables.Table):
     The "delete" button has been replaced with a "remove button to
     remove a template from the folder.
     """
-    archived = tables.columns.Column(accessor="archived")
-    archive_button = TemplateColumn(verbose_name='', template_name='template_management/archive_button.html')
+    def __init__(self, *args, **kwargs):
+        name = kwargs.pop('archive_col_name')
+        super().__init__(*args, **kwargs)
+        if name:
+            self.base_columns['archive_button'].verbose_name = name
+
+    archive_button = TemplateColumn(template_name='template_management/archive_button.html', order_by="archived",
+                                    verbose_name='')
     remove_buttons = TemplateColumn(template_name='template_management/delete_or_remove_template_button.html',
                                     extra_context={"in_folder": True}, verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
@@ -35,11 +41,17 @@ class AllTemplateTable(tables.Table):
     Table for showing the templates for a specific folder.
     Only used when all templates are displayed.
     """
-    archived = tables.columns.Column(accessor="archived")
-    archive_button = TemplateColumn(verbose_name='', template_name='template_management/archive_button.html')
+    archive_button = TemplateColumn(template_name='template_management/archive_button.html', order_by='archived',
+                                    verbose_name='')
     remove_buttons = TemplateColumn(template_name='template_management/delete_or_remove_template_button.html',
                                     verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
+
+    def __init__(self, *args, **kwargs):
+        name = kwargs.pop('archive_col_name')
+        super().__init__(*args, **kwargs)
+        if name:
+            self.base_columns['archive_button'].verbose_name = name
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'template-table'}
@@ -106,14 +118,16 @@ def main_view_helper(request, all_templates, pk):
     templates are being displayed or not.
     """
     templates = filter_templates(request, all_templates)
-    if templates:
-        if pk:
-            template_table = FolderTemplateTable(templates, prefix="1-")
-        else:
-            template_table = AllTemplateTable(templates, prefix="1-")
 
+    if templates:
+        name = ''
         if request.COOKIES.get('show_archived') != "True":
-            template_table.exclude = ('archived',)
+            name = 'Archived'
+
+        if pk:
+            template_table = FolderTemplateTable(templates, prefix="1-", archive_col_name=name)
+        else:
+            template_table = AllTemplateTable(templates, prefix="1-", archive_col_name=name)
 
         RequestConfig(request, paginate={"per_page": 8}).configure(template_table)
     else:
