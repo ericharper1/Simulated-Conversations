@@ -4,17 +4,20 @@ URL = window.URL || window.webkitURL;
 let gumStream; 						//stream from getUserMedia()
 let rec; 							//Recorder.js object
 let input; 							//MediaStreamAudioSourceNode we'll be recording
+let recordAttempts = 0;				//Count of record response attempts
+let blob;							//Audio blob
 
 // shim for AudioContext when it's not avb.
 let AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioContext //audio context to help us record
+let audioContext;
 
 let recordButton = document.getElementById("recordButton");
 let stopButton = document.getElementById("stopButton");
+let nextButton = document.getElementById("nextButton");
 
-//add events to those 2 buttons
 recordButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
+nextButton.addEventListener("click", acceptRecording);
 
 function startRecording() {
 	/*
@@ -22,11 +25,7 @@ function startRecording() {
 		https://addpipe.com/blog/audio-constraints-getusermedia/
 	*/
     let constraints = { audio: true, video:false }
-
- 	/*
-    	Disable the record button until we get a success or fail from getUserMedia()
-	*/
-	toggleAudioControls(true, false);
+	toggleAudioControls(true, false, true);
 
 	/*
     	We're using the standard promise based getUserMedia()
@@ -50,70 +49,72 @@ function startRecording() {
 			Create the Recorder object and configure to record mono sound (1 channel)
 			Recording 2 channels  will double the file size
 		*/
-		rec = new Recorder(input,{numChannels:1})
-
-		//start the recording process
-		rec.record()
+		rec = new Recorder(input,{numChannels:1});
+		rec.record();
 
 	}).catch(function(err) {
 	  	//enable the record button if getUserMedia() fails
-		toggleAudioControls(false, true);
+		toggleAudioControls(false, true, true);
 	});
 }
 
 function stopRecording() {
-	//disable the record and stop button so user can't re-record
-	toggleAudioControls(true, true);
-
-	//hide and show elements
-    toggleElementDisplay();
-
-	//tell the recorder to stop the recording
+	recordAttempts++;
+	if (hasAttempts()) {
+		toggleAudioControls(false, true, false);
+	}
+	else {
+		toggleAudioControls(true, true, false);
+	}
 	rec.stop();
 
 	//stop microphone access
 	gumStream.getAudioTracks()[0].stop();
-
-	//create the wav blob and pass it on to createDownloadLink
 	rec.exportWAV(createDownloadLink);
 }
 
-function createDownloadLink(blob) {
+function acceptRecording() {
+	toggleAudioControls(true, true, true);
+	toggleElementDisplay();
+	saveRecording();
+}
 
+function createDownloadLink(audioBlob) {
+    blob = audioBlob;
 	let url = URL.createObjectURL(blob);
 	let au = document.createElement('audio');
 	let p = document.createElement('p');
 	let link = document.createElement('a');
 
-	//name of .wav file to use during upload and download (without extension)
+	//name of .wav file for browser download
 	let filename = new Date().toISOString();
-
-	//add controls to the <audio> element
 	au.controls = true;
 	au.src = url;
-
-	//save to disk link
 	link.href = url;
-	link.download = filename+".wav"; //download forces the browser to download the file using the  filename
+	link.download = filename+".wav"; //forces the browser to download the file using the filename
 
-	//add the new audio element to p
+    //Check for old recording
+	if (p.children.length > 0) {
+		p.removeChild(p.firstChild);
+	}
 	p.appendChild(au);
 
-	//add the p element to the page
+	if (recording.children.length > 0) {
+		recording.removeChild(recording.firstChild);
+	}
 	recording.appendChild(p);
-
-	//save recording
-	saveRecording(blob);
 }
 
 function toggleElementDisplay() {
 	document.getElementById("choice-form").style.display = "block";
 	document.getElementById("embedded-video").style.display = "none";
-	document.getElementById("recordButton").style.display = "none";
-	document.getElementById("stopButton").style.display = "none";
+	recordButton.style.display = "none";
+	stopButton.style.display = "none";
+	nextButton.style.display = "none";
 }
 
-function toggleAudioControls(record, stop) {
+function toggleAudioControls(record, stop, next) {
 	recordButton.disabled = record;
 	stopButton.disabled = stop;
+	nextButton.disabled = next;
 }
