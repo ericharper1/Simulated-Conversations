@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from users.models import SubjectLabel, Assignment, Student, Researcher
+from users.models import SubjectLabel, Assignment, Student, Researcher, Email
 from conversation_templates.models import ConversationTemplate
 from django.views.generic import TemplateView
 from django.core import serializers
@@ -7,13 +7,12 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
-from apscheduler.schedulers.blocking import BlockingScheduler
-from django_apscheduler.jobstores import DjangoJobStore
 from tzlocal import get_localzone
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
 import json
 import datetime
+
 
 class CreateAssignmentView(TemplateView):
     @method_decorator(ensure_csrf_cookie)
@@ -81,7 +80,6 @@ def add_assignment(request):
     templates = decode(templates)
     labels = decode(labels)
 
-    print(assign_now)
     # Verify date
     datetime_now = datetime.datetime.now(get_localzone())
     if assign_now is False:
@@ -142,24 +140,16 @@ def add_assignment(request):
             assignment.conversation_templates.add(tempTmp)
 
 
-    #Send email
-    sched = BlockingScheduler(timezone=get_localzone())
-    sched.add_jobstore(DjangoJobStore(), "default")
-
     subject='Simulated Conversation Assignment Update'
     msg = 'You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
-    schedId = 'Assignment--'+name+'--'+str(sched_datetime)
     #when an error occurs, there is no need to add this task to the schedule.
-
     if success == 0:
         if assign_now is False:
             print(assign_now)
             sendMail(subject, msg, students, 'simcon.dev@gmail.com')
         else:
-            # TODO: implement scheduled email sending
-            sched.add_job(sendMail, run_date=sched_datetime, id=schedId,
-                         args=(subject, msg, students, 'simcon.dev@gmail.com'), replace_existing=True)
-            sched.start()
+            email = Email(subject=subject, message=msg, assignment=assignment)
+            email.save()
     else:
         assignment.delete()
 
