@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% extends "researcher_base.html" %}
 {% load static %}
-{% block nav-assignmentmanagementView %}{% endblock %}
+{% block nav-assignmentmanagementView %}<strong class="nav_bar_selected"> Assignments </strong>{% endblock %}
 {% load render_table from django_tables2 %}
 {% block content %}
 <html lang="en">
@@ -11,9 +11,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
-
-    <link rel="stylesheet" href="{% static 'users/django_tables2.css' %}">
-
+    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
     <!-- prevent line breaks when using form fields -->
     <style type="text/css">
     form {display:inline; margin:0px; padding:0px;}
@@ -23,7 +21,6 @@
     <title>
     {% block title %}Simulated Conversations | Assignment Management{% endblock %}
     </title>
-      <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
 
     {% block extrahead %} {% endblock %}
   </head>

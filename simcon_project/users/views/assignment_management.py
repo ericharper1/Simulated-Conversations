@@ -187,9 +187,10 @@ def view_students(request, pk):
     if total_completed_templates < 0:
         total_completed_templates = 0
     if total_assigned_templates <= 0:
-        completion_percent = 'N/A'
+        completion_string = 'No students were given this assignment.'
     else:
         completion_percent = total_completed_templates / total_assigned_templates
         completion_percent = str(completion_percent * 100).split('.', 1)[0] + '%'
+        completion_string = completion_percent + ' of assigned templates have been completed at least once.'
     return render(request, 'assignment_management/view_students_modal.html', {'table': assigned_students_table,
-                                                                               'completion_percent': completion_percent})
+                                                                               'completion_string': completion_string})

@@ -15,8 +15,8 @@
     </div>
 
     <div class="modal-body">
-      {% if completion_percent %}
-        <p>{{ completion_percent }} of assigned templates have been completed at least once.</p>
+      {% if completion_string %}
+        <p>{{ completion_string }}</p>
       {% endif %}
       {% if table %}
         {% render_table table %}
