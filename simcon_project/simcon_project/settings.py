@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
     'django_tables2',
     'embed_video',
-    'django_cleanup.apps.CleanupConfig',
+    'django_cleanup.apps.CleanupConfig',  # This needs to stay at end of INSTALLED_APPS
 ]
 
 MIDDLEWARE = [

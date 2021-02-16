@@ -47,6 +47,7 @@
             <audio controls src="{{ audio_response.url }}">
             </audio>
         {% endif %}
+        <div id="info"></div>
         <form action="{{ ct_node.get_absolute_url }}" method="POST" id="choice-form" name="choice-form">
             {% csrf_token %}
             {{  choice_form.choices }}
@@ -117,7 +118,7 @@
             }
 
             function hasAttempts() {
-               return recordAttempts < {{ recorded_response_attempts }};
+               return {{ recorded_response_attempts }} - recordAttempts;
             }
         </script>
         <!-- Optional JavaScript -->

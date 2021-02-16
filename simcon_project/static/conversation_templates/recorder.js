@@ -1,4 +1,4 @@
-//webkitURL is deprecated but nevertheless
+// webkitURL is deprecated but nevertheless
 URL = window.URL || window.webkitURL;
 
 let gumStream; 						//stream from getUserMedia()
@@ -14,6 +14,8 @@ let audioContext;
 let recordButton = document.getElementById("recordButton");
 let stopButton = document.getElementById("stopButton");
 let nextButton = document.getElementById("nextButton");
+let info = document.getElementById("info");
+let recording = document.getElementById("recording");
 
 recordButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
@@ -26,6 +28,10 @@ function startRecording() {
 	*/
     let constraints = { audio: true, video:false }
 	toggleAudioControls(true, false, true);
+    // remove previous recording
+	if (recording.children.length > 0) {
+		recording.removeChild(recording.firstChild);
+	}
 
 	/*
     	We're using the standard promise based getUserMedia()
@@ -39,7 +45,7 @@ function startRecording() {
 		*/
 		audioContext = new AudioContext();
 
-		/*  assign to gumStream for later use  */
+		/* assign to gumStream for later use */
 		gumStream = stream;
 
 		/* use the stream */
@@ -51,30 +57,38 @@ function startRecording() {
 		*/
 		rec = new Recorder(input,{numChannels:1});
 		rec.record();
+		info.innerText = "Recording...";
 
 	}).catch(function(err) {
-	  	//enable the record button if getUserMedia() fails
+	  	// enable the record button if getUserMedia() fails
 		toggleAudioControls(false, true, true);
+		info.innerText = "";
 	});
 }
 
 function stopRecording() {
 	recordAttempts++;
-	if (hasAttempts()) {
+	let attemptsLeft = hasAttempts();
+	if (attemptsLeft > 1) {
 		toggleAudioControls(false, true, false);
-	}
-	else {
+		info.innerText = recordAttempts + " attempts left to record";
+	} else if (attemptsLeft === 1) {
+		toggleAudioControls(false, true, false);
+		info.innerText = recordAttempts + " attempt left to record";
+	} else {
 		toggleAudioControls(true, true, false);
+		info.innerText = "No attempts left to record";
 	}
 	rec.stop();
 
-	//stop microphone access
+	// stop microphone access
 	gumStream.getAudioTracks()[0].stop();
 	rec.exportWAV(createDownloadLink);
 }
 
 function acceptRecording() {
 	toggleAudioControls(true, true, true);
+	info.innerText = "";
 	toggleElementDisplay();
 	saveRecording();
 }
@@ -86,22 +100,18 @@ function createDownloadLink(audioBlob) {
 	let p = document.createElement('p');
 	let link = document.createElement('a');
 
-	//name of .wav file for browser download
+	// name of .wav file for browser download
 	let filename = new Date().toISOString();
 	au.controls = true;
 	au.src = url;
 	link.href = url;
 	link.download = filename+".wav"; //forces the browser to download the file using the filename
 
-    //Check for old recording
+    // Check for old recording
 	if (p.children.length > 0) {
 		p.removeChild(p.firstChild);
 	}
 	p.appendChild(au);
-
-	if (recording.children.length > 0) {
-		recording.removeChild(recording.firstChild);
-	}
 	recording.appendChild(p);
 }
 
