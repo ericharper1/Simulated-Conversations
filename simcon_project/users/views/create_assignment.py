@@ -69,6 +69,7 @@ def add_assignment(request):
     # Get raw data
     data = request.POST
     name = data.get('name')
+    assign_now = data.get('assign_now')
     date = data.get('date')
     researcher = request.user
     students = data.get('stuData')
@@ -80,9 +81,13 @@ def add_assignment(request):
     templates = decode(templates)
     labels = decode(labels)
 
+    print(assign_now)
     # Verify date
     datetime_now = datetime.datetime.now(get_localzone())
-    sched_datetime = get_localzone().localize(datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M"))
+    if assign_now is False:
+        sched_datetime = datetime_now
+    else:
+        sched_datetime = get_localzone().localize(datetime.datetime.strptime(date, "%m/%d/%Y %I:%M %p"))
     if sched_datetime < datetime_now:
         success = 1
         errMsg = errMsg+'The assignment start cannot be before now.\n\n'
@@ -147,9 +152,14 @@ def add_assignment(request):
     #when an error occurs, there is no need to add this task to the schedule.
 
     if success == 0:
-        sched.add_job(sendMail, run_date=sched_datetime, id=schedId,
-                     args=(subject, msg, students, 'simcon.dev@gmail.com'), replace_existing=True)
-        sched.start()
+        if assign_now is False:
+            print(assign_now)
+            sendMail(subject, msg, students, 'simcon.dev@gmail.com')
+        else:
+            # TODO: implement scheduled email sending
+            sched.add_job(sendMail, run_date=sched_datetime, id=schedId,
+                         args=(subject, msg, students, 'simcon.dev@gmail.com'), replace_existing=True)
+            sched.start()
     else:
         assignment.delete()
 

@@ -1,22 +1,20 @@
+<!DOCTYPE html>
 {% extends "researcher_base.html" %}
 {% load static %}
 {% block content %}
-
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Create Assignment</title>
-      <!-- Font Awesome -->
+   <!-- Font Awesome -->
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
       <!-- Moment.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
       <!-- Tempus Dominus -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
-
   </head>
   <body>
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
@@ -29,7 +27,16 @@
             </div>
             <div class="form-group">
                 <label for="assign_datetime">Assignment start date:</label>
-                <input type="datetime-local" id="assign_datetime" required>
+                <br>
+                <label for="assign_now">Assign Now?</label>
+                <input type="radio" id="assign_now" onclick="clearDate()">
+               <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                  <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
+                         id="assign_datetime" onclick="deselectRadio()"/>
+                  <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text" onclick="deselectRadio()"><i class="fa fa-calendar"></i></div>
+                  </div>
+               </div>
             </div>
 
             <!--add student -->
@@ -104,10 +111,18 @@
   </body>
 
   <script>
-      // This for the datetimepicker
       $(function () {
         $("#datetimepicker1").datetimepicker();
       });
+
+    function clearDate() {
+        document.getElementById('assign_datetime').value = "";
+    }
+
+    function deselectRadio() {
+        document.getElementById('assign_datetime').disable = false;
+        document.getElementById('assign_now').checked = false;
+    }
 
       var students={{ student|safe }};
       var templates={{ template|safe }};
@@ -276,6 +291,7 @@
           });
           //get data
           assign_name=document.getElementById("assign_name").value;
+          assign_now=document.getElementById("assign_now").checked;
           assign_datetime=document.getElementById("assign_datetime").value;
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
@@ -283,16 +299,24 @@
 
           //verify name
           if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
-              window.alert("Assignments Must Have a Name!");
+              window.alert("You must provide a name for the assignment.");
               return;
           }
+        console.log(assign_datetime);
+         console.log(assign_now);
+        //check that either assign now or assign_datetime is set and both aren't set
+        if((assign_now == false && assign_datetime == "") || (assign_now == true && assign_datetime != "")) {
+              window.alert("You must assign now or pick a date on the calendar.");
+              return;
+        }
 
         //verify datetime is valid
         var timestamp = Date.parse(assign_datetime)
-        if(isNaN(timestamp)){
-              window.alert("You must pick an assignment date and time!");
+        if(assign_now == false && isNaN(timestamp)){
+              window.alert("The chosen assignment date/time is not valid.");
               return;
         }
+
 
           //post data to server
           $.ajax({
@@ -300,6 +324,7 @@
               type:'POST',
               data: {
                   'name': assign_name,
+                  'assign_now' : assign_now,
                   'date': assign_datetime,
                   'stuData': stuJSON,
                   'tempData': tempJSON,
