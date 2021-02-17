@@ -24,10 +24,14 @@
       {% if incomplete_table %}
       <h2>Incomplete Templates</h2>
           {% render_table incomplete_table %}
+      {% else %} 
+          <span> No Templates to Complete </span> 
       {% endif  %}
       {% if completed_table %}
       <h2>Completed Templates</h2>
           {% render_table completed_table %}
+      {% else %} 
+          <span> No Completed Templates </span> 
       {% endif  %}
      </div><!-- /container -->
 

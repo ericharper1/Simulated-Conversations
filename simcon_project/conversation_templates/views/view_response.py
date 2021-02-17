@@ -8,6 +8,7 @@ from conversation_templates.models import TemplateResponse, TemplateNodeResponse
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
 from bootstrap_modal_forms.generic import BSModalDeleteView
+from django.core.mail import send_mail
 
 
 @user_passes_test(is_authenticated)
@@ -115,7 +116,7 @@ def update_node_transcription(request, pk):
             feedback_instance.save()
 
         # redirect to a new URL:
-        return HttpResponseRedirect(reverse('view-response'))
+        return HttpResponseRedirect(reverse('view-response', kwargs={'pk': pk}))
 
     # If this is a GET (or any other method) create the default form.
     else:
@@ -136,3 +137,18 @@ class ResponseDeleteView(BSModalDeleteView):
     template_name = 'response_delete_modal.html'
     success_message = None
     success_url = reverse_lazy('researcher-view')
+    def get(self, request, pk):
+        this_response = TemplateResponse.objects.get(pk=pk)
+        context = {"template_name": this_response.template.name, "student": this_response.student.first_name}
+        return render(request, self.template_name, context)
+    
+    def post(self, request, pk):
+        this_response = TemplateResponse.objects.get(pk=pk)
+        student_email = this_response.student.email
+        if 'reassign' in request.POST:
+            template_name= this_response.template.name
+            subject = 'New Re-Assigned Template for Simulated Conversations: '+ template_name
+            message = 'Please check your Portal to complete: '+ template_name
+            send_mail(subject, message, 'smtp.gmail.com', [student_email], fail_silently=False)
+        this_response.delete()
+        return redirect(reverse('researcher-view'))
