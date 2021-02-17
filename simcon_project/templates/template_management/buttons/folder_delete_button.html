@@ -1,0 +1,7 @@
+{% block content %}
+<form method="post" action="{% url 'management:delete-folder' record.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="back" value="{{ request.path }}">
+    <button id="delete-folder" class="btn btn-outline-danger ml-3" type="submit">Delete</button>
+</form>
+{% endblock %}

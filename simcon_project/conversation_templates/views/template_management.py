@@ -24,9 +24,9 @@ class FolderTemplateTable(tables.Table):
         if name:
             self.base_columns['archive_button'].verbose_name = name
 
-    archive_button = TemplateColumn(template_name='template_management/archive_button.html', order_by="archived",
+    archive_button = TemplateColumn(template_name='template_management/buttons/archive_button.html', order_by="archived",
                                     verbose_name='')
-    remove_buttons = TemplateColumn(template_name='template_management/delete_or_remove_template_button.html',
+    remove_buttons = TemplateColumn(template_name='template_management/buttons/delete_or_remove_template_button.html',
                                     extra_context={"in_folder": True}, verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
@@ -41,9 +41,9 @@ class AllTemplateTable(tables.Table):
     Table for showing the templates for a specific folder.
     Only used when all templates are displayed.
     """
-    archive_button = TemplateColumn(template_name='template_management/archive_button.html', order_by='archived',
+    archive_button = TemplateColumn(template_name='template_management/buttons/archive_button.html', order_by='archived',
                                     verbose_name='')
-    remove_buttons = TemplateColumn(template_name='template_management/delete_or_remove_template_button.html',
+    remove_buttons = TemplateColumn(template_name='template_management/buttons/delete_or_remove_template_button.html',
                                     verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
@@ -63,6 +63,10 @@ class FolderTable(tables.Table):
     """
     Table showing all folders (unique to a researcher in the future)
     """
+    edit_button = tables.columns.TemplateColumn(template_name='template_management/buttons/edit_button.html',
+                                                verbose_name='')
+    delete_button = tables.columns.TemplateColumn(template_name='template_management/buttons/folder_delete_button.html',
+                                                  verbose_name='')
     name = tables.columns.LinkColumn('management:folder-view', args=[A('pk')])
 
     class Meta:
@@ -135,6 +139,7 @@ def main_view_helper(request, all_templates, pk):
 
     folders = filter_folder(request)
     if folders:
+        folders = folders.order_by('name')
         folder_table = FolderTable(folders, prefix="2-")
         RequestConfig(request, paginate={"per_page": 8}).configure(folder_table)
     else:
@@ -145,6 +150,8 @@ def main_view_helper(request, all_templates, pk):
         'folderTable': folder_table,
         'folder_pk': pk,
         'show_archived': request.COOKIES.get('show_archived'),
+        'folders': folders,
+        'templates': templates.order_by('name'),
     }
 
     return context
