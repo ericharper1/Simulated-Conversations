@@ -82,14 +82,13 @@ def add_assignment(request):
 
     # Verify date
     datetime_now = datetime.datetime.now(get_localzone())
-    if assign_now=='true':
+    if assign_now == 'true':
         sched_datetime = datetime_now
     else:
         sched_datetime = get_localzone().localize(datetime.datetime.strptime(date, "%m/%d/%Y %I:%M %p"))
     if sched_datetime < datetime_now:
         success = 1
         errMsg = errMsg+'The assignment start cannot be before now.\n\n'
-
     # Determine if students, labels, and templates are empty.
     stuIsNull = isNull(students)
     labelIsNull = isNull(labels)
@@ -145,8 +144,7 @@ def add_assignment(request):
     recipient = [i[0] for i in assignment.students.values_list('email')]
     #when an error occurs, there is no need to add this task to the schedule.
     if success == 0:
-        if assign_now is False:
-            print(assign_now)
+        if assign_now == 'true':
             sendMail(subject, msg, recipient, 'simcon.dev@gmail.com')
         else:
             email = Email(subject=subject, message=msg, assignment=assignment)
