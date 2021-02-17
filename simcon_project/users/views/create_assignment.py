@@ -19,7 +19,7 @@ class CreateAssignmentView(TemplateView):
     def get(self, request):
         curResearcher = request.user
 
-        stud = Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active')
+        stud = Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active','registered')
         label = SubjectLabel.objects.all().filter(researcher=curResearcher)
         template = ConversationTemplate.objects.all().filter(researcher=curResearcher)
 
@@ -82,7 +82,7 @@ def add_assignment(request):
 
     # Verify date
     datetime_now = datetime.datetime.now(get_localzone())
-    if assign_now is False:
+    if assign_now=='true':
         sched_datetime = datetime_now
     else:
         sched_datetime = get_localzone().localize(datetime.datetime.strptime(date, "%m/%d/%Y %I:%M %p"))
@@ -142,11 +142,12 @@ def add_assignment(request):
 
     subject='Simulated Conversation Assignment Update'
     msg = 'You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
+    recipient = [i[0] for i in assignment.students.values_list('email')]
     #when an error occurs, there is no need to add this task to the schedule.
     if success == 0:
         if assign_now is False:
             print(assign_now)
-            sendMail(subject, msg, students, 'simcon.dev@gmail.com')
+            sendMail(subject, msg, recipient, 'simcon.dev@gmail.com')
         else:
             email = Email(subject=subject, message=msg, assignment=assignment)
             email.save()
