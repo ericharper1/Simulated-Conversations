@@ -12,15 +12,16 @@ from django.core.mail import send_mail
 @user_passes_test(is_authenticated)
 def view_response(request, pk):
     response = get_object_or_404(TemplateResponse, pk=pk)
-
     if request.method == 'POST':
         if 'update-overall-feedback' in request.POST:
-            response.feedback = request.GET['overall-feedback-input']
+            response.feedback = request.POST.get('overall-feedback-input')
             response.save()
             return HttpResponseRedirect(reverse('view-response', kwargs={'pk': pk}))
-        if 'updateTranscription' in request.POST:
-            response.transcription = request.GET['transcription-input']
-            response.save()
+        if 'update-node-transcription' in request.POST:
+            nodeId= request.POST.get('template-node-reponse-id')
+            currentNode = get_object_or_404(TemplateNodeResponse, pk=nodeId)
+            currentNode.transcription = request.POST.get('node-transcription-input')
+            currentNode.save()
             return HttpResponseRedirect(reverse('view-response', kwargs={'pk': pk}))
 
     nodes = []
