@@ -14,12 +14,6 @@ contains table of assigned templates. Restricts width to 70% of window size and 
     margin: auto;
 }
 
-/*
-table is set to take up all available width inside table-container.
-*/
-table {
-    width: 100%;
-}
 
 /*
 headers for the table have 20 pixel margin on bottom and 20 pixels from edge of element each direction

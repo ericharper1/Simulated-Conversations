@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {% extends "student_base.html" %}
-{% block nav-studentsView %}{% endblock %}
 {% load static %}
 <html lang="en">
 <head>
@@ -29,7 +28,7 @@
 <body>
 <div class="container">
     <h2> Feedback for: {{response.template.name}} </h2>
-    <p>You rated yourself: {{response.self_rating}}/5</p>
+    <p>You rated yourself: {{self_rating}}/5</p>
 
     <div class="container">
         {% block content %}
