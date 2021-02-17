@@ -51,10 +51,6 @@ class CustomUserChangeForm(UserChangeForm):
         fields = ('email',)
 
 
-class UpdateFeedback(forms.Form):
-    feedback = forms.CharField(help_text="Enter new Feedback")
-
-
 class UpdateTranscription(forms.Form):
     transcription = forms.CharField(help_text="Enter new transcription")
 

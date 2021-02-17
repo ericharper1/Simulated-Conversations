@@ -1,96 +1,120 @@
 {% extends "researcher_base.html" %}
 {% load static %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Created for Simulated Conversations Senior Capstone Project">
 
-    <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
-    <!-- prevent line breaks when using form fields -->
-    <style type="text/css">
-    form {display:inline; margin:0px; padding:0px;}
+        <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
+        <!-- prevent line breaks when using form fields -->
+        <style type="text/css">
+            form {display:inline; margin:0px; padding:0px;}
 
-    </style>
+        </style>
 
 
-    <title>
-        {% block title %}Simulated Conversations | Researcher{% endblock %}
-    </title>
+        <title>
+            {% block title %}Simulated Conversations | Researcher{% endblock %}
+        </title>
 
-    {% block extrahead %} {% endblock %}
-</head>
+        {% block extrahead %} {% endblock %}
+    </head>
 
-<body>
-<div class="container">
-    <div class="col-sm-4" style=" float: right;">
-        <form method="POST">
-            {% csrf_token %}
-            <button class="bs-modal btn btn-danger" type="button" name="button" data-form-url="{% url 'delete-response' response.pk %}" >Delete</button>
-        </form>
-    </div>
-    <br>
-    <h2> Response for: {{response.template.name}} </h2>
-    <h4> {{response.student}} </h4> 
-    <br> 
-    <p>They rated themself: {{response.self_rating}}/5</p>
+    <body>
+    <div class="container-fluid mt-4">
+        <div class="col">
 
-    <div class="container">
-        {% block content-2 %}
-        <div class="row">
-            <h2>Overall feedback:</h2>
-        </div>
-        <div class="row">
-            {{response.feedback}} <a href="{% url 'update-overall-response-feedback' response.id %}"> Edit </a>
-        </div>
-        {% for node in response_nodes %}
-        <div class="row">
-            <h2> Response {{node.position_in_sequence}}</h2>
-        </div>
-        <div class="row">
-             {{node.template_node.description}}
-        </div>
-
-        <div class="row">
-            <div class="col-sm-4">
-                <audio src="{% static node.audio_response %}" controls></audio>
+            <!-- Template Information -->
+            <div class="row justify-content-center">
+                <div class="card w-50">
+                    <h4 class="card-header" style="text-align: center">Submission Information</h4>
+                    <div class="card-body">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-10">
+                                    <h5><strong>Template Name: </strong> {{ response.template.name }} </h5>
+                                    <h5><strong>Student: </strong> {{ response.student.first_name }} {{ response.student.last_name }}</h5>
+                                    <h5><strong>Student Email: </strong> {{ response.student.email }} </h5>
+                                    <h5><strong>Student Self Rating: </strong> {{ self_rating }}</h5>
+                                </div>
+                                <div class="col-2" style="text-align: right">
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <button class="bs-modal btn btn-secondary" type="button" name="button" data-form-url="{% url 'delete-response' response.pk %}" >Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-4">
-                {{node.transcription}} <a href="{% url 'update-node-transcription' node.id %}">Edit</a>
+
+            <!-- Overall Feedback -->
+            <div class="row justify-content-center mt-4">
+                <div class="card w-50">
+                    <h4 class="card-header" style="text-align: center">Feedback</h4>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <textarea class="form-control" name="overall-feedback-input"></textarea>
+                            </div>
+                            <button class="btn btn-secondary" type="submit" name="update-overall-feedback">Update Feedback</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-4" id="feedback">
-                {{node.feedback}} <a href="{% url 'update-node-response-feedback' node.id %}">Edit</a>
+
+            <!-- Response nodes -->
+            <div class="row justify-content-center mt-4">
+                <div class="card w-50">
+                    <h4 class="card-header" style="text-align: center">Steps</h4>
+                    <div class="card-body">
+
+                        <ul class="list-group list-group-flush">
+                            {% for node in response_nodes %}
+                                <li class="list-group-item">
+                                    <h2> Response {{node.position_in_sequence}}</h2>
+                                    {{node.template_node.description}}
+
+                                    <audio src="{% static node.audio_response %}" controls></audio>
+                                    {{node.transcription}}
+                                </li>
+                                {#                        <div class="col-sm-4" id="feedback">#}
+                                {#                            {{node.feedback}}#}
+                                {#                        </div>#}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="modal" tabindex="-1" role="dialog" id="modal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content"></div>
             </div>
         </div>
-        {% endfor %}
-
-        {% endblock %}
-    </div>
-
-</div> <!-- /container -->
-<div class="modal" tabindex="-1" role="dialog" id="modal">
-    <div class="modal-dialog" role="document">
-              <div class="modal-content"></div>
-    </div>
-  </div>
-  <script type="text/javascript">
-    $(document).ready(function() {
-        $(".bs-modal").each(function () {
-            $(this).modalForm({
-                formURL: $(this).data('form-url')
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $(".bs-modal").each(function () {
+                    $(this).modalForm({
+                        formURL: $(this).data('form-url')
+                    });
+                });
             });
-        });
-    });
-  </script>
-<!-- Bootstrap core JavaScript
-================================================== -->
+        </script>
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
 
-<!-- Placed at the end of the document so the pages load faster -->
-</body>
-</html>
+        <!-- Placed at the end of the document so the pages load faster -->
+    </body>
+    </html>
 {% endblock %}
 
