@@ -31,7 +31,6 @@
             <div class="col-4">
                 <form id="change_password_form" method="post">
                     {% csrf_token %}
-                    {#              {{ change_password_form }}#}
                     {% for field in change_password_form %}
                         <div class="form-group">
                             <label for="{{ field.attrs.id  }}">{{ field.label }} </label>
