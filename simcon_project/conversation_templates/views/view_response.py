@@ -18,8 +18,10 @@ def view_response(request, pk):
             response.save()
             return HttpResponseRedirect(reverse('view-response', kwargs={'pk': pk}))
         if 'update-node-transcription' in request.POST:
-            response.transcription = request.POST.get('node-transcription-input')
-            response.save()
+            nodeId= request.POST.get('template-node-reponse-id')
+            currentNode = get_object_or_404(TemplateNodeResponse, pk=nodeId)
+            currentNode.transcription = request.POST.get('node-transcription-input')
+            currentNode.save()
             return HttpResponseRedirect(reverse('view-response', kwargs={'pk': pk}))
 
     nodes = []
