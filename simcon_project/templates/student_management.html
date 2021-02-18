@@ -7,15 +7,10 @@
     <html lang="en">
     <head>
         <!-- prevent line breaks when using form fields -->
-        <style type="text/css">
-            form {display:inline; margin:0px; padding:0px;}
-        </style>
-
+      
         <title>
             {% block title %}Simulated Conversations | Researcher{% endblock %}
         </title>
-
-        {% block extrahead %} {% endblock %}
     </head>
 
     <div class="container-fluid mt-3" style="width: 80%">
@@ -29,7 +24,9 @@
                         <input type="submit" class="btn btn-sm btn-outline-secondary" value="Add Student"><br/><br/>
                     </form>
                 </div>
+                <div class="table-container" >
                 {% render_table stu_table %}
+                </div>
             </div>
 
 
@@ -42,8 +39,9 @@
                         <input type="submit" class="btn btn-sm btn-outline-secondary" value="Add Label"><br/><br/>
                     </form>
                 </div>
-
+                <div class="table-container" >
                 {% render_table lbl_table %}
+                </div>
                 {% for message in messages %}
                     <div class="alert alert-warning">
                         <a class="close" href="#" data-dismiss="alert">×</a>
