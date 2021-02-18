@@ -1,13 +1,13 @@
-from django.views.generic import DeleteView, RedirectView
+from django.views.generic import DeleteView, RedirectView, CreateView
 from django.db.models import Q
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
 from conversation_templates.models import ConversationTemplate, TemplateFolder, TemplateResponse
-from conversation_templates.forms import FolderCreationForm
+from conversation_templates.forms import FolderCreationForm, FolderEditForm, AddTemplatesForm
 from users.models import Researcher
-from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView, BSModalDeleteView
+from bootstrap_modal_forms.generic import BSModalUpdateView, BSModalDeleteView
 from django_tables2 import TemplateColumn, tables, RequestConfig, A
 import re
 
@@ -111,11 +111,11 @@ def folder_view(request, pk):
     else:
         templates = current_folder.templates.filter(archived=False)
 
-    context = main_view_helper(request, templates, pk)
+    context = main_view_helper(request, templates, current_folder)
     return render(request, 'template_management/main_view.html', context)
 
 
-def main_view_helper(request, all_templates, pk):
+def main_view_helper(request, all_templates, current_folder):
     """
     Filter template table for search value and sets up folder table for the main view.
     What is displayed depends on if the user has selected a folder and if archived
@@ -128,7 +128,7 @@ def main_view_helper(request, all_templates, pk):
         if request.COOKIES.get('show_archived') != "True":
             name = 'Archived'
 
-        if pk:
+        if current_folder:
             template_table = FolderTemplateTable(templates, prefix="1-", archive_col_name=name)
         else:
             template_table = AllTemplateTable(templates, prefix="1-", archive_col_name=name)
@@ -148,34 +148,41 @@ def main_view_helper(request, all_templates, pk):
     context = {
         'templateTable': template_table,
         'folderTable': folder_table,
-        'folder_pk': pk,
+        'current_folder': current_folder,
         'show_archived': request.COOKIES.get('show_archived'),
         'folders': folders,
         'templates': templates.order_by('name'),
+        'folder_creation_form': FolderCreationForm(request=request.user),
+        'add_templates_form': AddTemplatesForm(),
     }
 
     return context
 
 
+def create_folder(request):
+    if request.POST.get('folder_name'):
+        new_folder = FolderCreationForm(request.POST, request=request)
+        if new_folder.is_valid():
+            folder_name = new_folder.cleaned_data.get('folder_name')
+            researcher = Researcher.objects.get(id=request.user.id)
+            TemplateFolder().create_folder(folder_name, researcher)
+
+    back = request.POST.get('back', '/')
+    return redirect(back)
+
+
+def add_templates(request, pk):
+    folder = get_object_or_404(TemplateFolder, pk=pk)
+    if request.POST.get('templates'):
+        templates = AddTemplatesForm(request.POST)
+        print(templates)
+
+    back = request.POST.get('back', '/')
+    return redirect(back)
+
+
 class RedirectToTemplateCreation(RedirectView):
     url = reverse_lazy('management:create-conversation-template-view')
-
-
-class FolderCreateView(BSModalCreateView):
-    """
-    A modal that appears on top of the main_view to create a folder
-    """
-    template_name = 'template_management/folder_creation_modal.html'
-    form_class = FolderCreationForm
-
-    def get_success_url(self):
-        success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))
-        return success_url
-
-    def form_valid(self, form):
-        researcher = Researcher.objects.get(pk=self.request.user.id)
-        form.instance.researcher = researcher
-        return super().form_valid(form)
 
 
 class FolderEditView(BSModalUpdateView):
@@ -183,8 +190,8 @@ class FolderEditView(BSModalUpdateView):
     A modal that appears on top of the main_view to edit the contents of a folder
     """
     model = TemplateFolder
-    template_name = 'template_management/folder_creation_modal.html'
-    form_class = FolderCreationForm
+    template_name = 'template_management/edit_folder_name_modal.html'
+    form_class = FolderEditForm
 
     def get_success_url(self):
         success_url = route_to_current_folder(self.request.META.get('HTTP_REFERER'))

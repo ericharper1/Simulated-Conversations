@@ -55,6 +55,8 @@ urlpatterns = [
     path('researcher/response/update/<uuid:pk>/', update_overall_response_feedback, name='update-overall-response-feedback'),
     path('researcher/response/updatenode/<uuid:pk>/', update_node_response_feedback, name='update-node-response-feedback'),
     path('researcher/response/updatetranscription/<uuid:pk>/', update_node_transcription, name='update-node-transcription'),
+
+    path("select2/", include("django_select2.urls")),
 ]
 
 if settings.DEBUG:

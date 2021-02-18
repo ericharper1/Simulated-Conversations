@@ -15,13 +15,6 @@
              <p class="help-block">{{ error }}</p>
          {% endfor %}
      </div>
-     <div class="form-group{% if form.templates.errors %} invalid{% endif %}">
-       <label for="{{ form.templates.id_for_label }}">{{ form.templates.label }}</label>
-       {{ form.templates }}
-       {% for error in form.templates.errors %}
-         <p class="help-block">{{ error }}</p>
-       {% endfor %}
-     </div>
   </div>
 
   <div class="modal-footer">
