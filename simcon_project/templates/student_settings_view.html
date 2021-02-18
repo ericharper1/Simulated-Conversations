@@ -19,27 +19,46 @@
 
 
     <title>
-    {% block title %}Simulated Conversations | Settings{% endblock %}
+    {% block title %}SimCon | Settings{% endblock %}
     </title>
       <script src="{% static 'js/jquery.bootstrap.modal.forms.js' %}"></script>
 
     {% block extrahead %} {% endblock %}
   </head>
   <body>
-    <div class="container">
-      <h1> This is the Settings Page</h1>
-            {% for message in messages %}
-                <div class="alert alert-warning">
-                    <a class="close" href="#" data-dismiss="alert">×</a>
-                    {{ message }}
-                </div>
-            {% endfor %}
-          <form id="change_password_form" method="post">
-            {% csrf_token %}
-            {{ change_password_form }}
-            <button type="submit" form="change_password_form">Save changes</button>
-          </form>
-    </div> <!-- /container -->
+      {% for message in messages %}
+      <div class="alert alert-warning">
+          <a class="close" href="#" data-dismiss="alert">×</a>
+          {{ message }}
+      </div>
+  {% endfor %}
+      <div class="container-fluid mt-3" style="width: 80%;">
+        <div class="row justify-content-center">
+
+            <div class="col-4 m-3 p-3" style="background-color: white;   border-radius: 5px;">
+                <form id="change_password_form" method="post">
+                    {% csrf_token %}
+                    {% for field in change_password_form %}
+                        <div class="form-group">
+                            <label for="{{ field.attrs.id  }}">{{ field.label }}: </label>
+                            <br>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <p>
+                        - Your password can’t be too similar to your other personal information.
+                        <br>
+                        - Your password must contain at least 8 characters.
+                        <br>
+                        - Your password can’t be a commonly used password.
+                        <br>
+                        - Your password can’t be entirely numeric.
+                    </p>
+                    <button type="submit" class="btn btn-outline-secondary" form="change_password_form" name="change_password">Save changes</button>
+                </form>
+                <br>
+            </div>
+        </div>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
