@@ -59,6 +59,12 @@ def isNull(data):
     return False
 
 
+def convert_boolean(value):
+    if value == "true":
+        return True
+    return False
+
+
 @user_passes_test(is_researcher)
 def add_assignment(request):
     # Error signs and error messages.
@@ -74,6 +80,9 @@ def add_assignment(request):
     students = data.get('stuData')
     templates = data.get('tempData')
     labels = data.get('labelData')
+    record_attempts = data.get('record_attempts')
+    allow_typed_response = convert_boolean(data.get('allow_typed_response'))
+    allow_self_rating = convert_boolean(data.get('allow_self_rating'))
 
     # Transfer string type list to list type
     students = decode(students)
@@ -100,6 +109,9 @@ def add_assignment(request):
     assignment.date_assigned = sched_datetime
     researcher = Researcher.objects.get(email=researcher)
     assignment.researcher = researcher
+    assignment.recorded_response_attempts = record_attempts
+    assignment.allow_typed_response = allow_typed_response
+    assignment.allow_self_rating = allow_self_rating
     assignment.save()
 
     # Assign student information to assignment,
@@ -138,11 +150,10 @@ def add_assignment(request):
             tempTmp = ConversationTemplate.objects.get(name=tempName, creation_date=tempDate)
             assignment.conversation_templates.add(tempTmp)
 
-
-    subject='Simulated Conversation Assignment Update'
+    subject = 'Simulated Conversation Assignment Update'
     msg = 'You received this email because you have a new assignment: '+name+'. Please check the assignment page.'
     recipient = [i[0] for i in assignment.students.values_list('email')]
-    #when an error occurs, there is no need to add this task to the schedule.
+    # when an error occurs, there is no need to add this task to the schedule.
     if success == 0:
         if assign_now == 'true':
             sendMail(subject, msg, recipient, 'simcon.dev@gmail.com')

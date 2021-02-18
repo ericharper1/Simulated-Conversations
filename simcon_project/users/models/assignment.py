@@ -24,6 +24,9 @@ class Assignment(models.Model):
     students = models.ManyToManyField('users.Student', related_name='assignments')
     researcher = models.ForeignKey('users.Researcher', default=0, related_name='assignments', on_delete=models.CASCADE)
     subject_labels = models.ManyToManyField('users.SubjectLabel', related_name='assignments', blank=True)
+    recorded_response_attempts = models.PositiveSmallIntegerField(default=1, blank=False)
+    allow_typed_response = models.BooleanField(default=False)
+    allow_self_rating = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name}, {self.researcher}, ({self.date_assigned})"

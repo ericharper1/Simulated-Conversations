@@ -105,6 +105,16 @@
                     <tbody></tbody>
                 </table>
             </div>
+            <div>
+                <label for="record_attempts">Recorded Response Attempts Allowed</label>
+                <input type="text" id="record_attempts" name="record_attempts" value=1><br>
+            </div>
+            <div>
+                <label for="allow_typed_response">Allow Typed Response?</label>
+                <input type="checkbox" id="allow_typed_response" name="allow_typed_response"><br>
+                <label for="allow_self_rating">Allow Self Rating?</label>
+                <input type="checkbox" id="allow_self_rating" name="allow_self_rating"><br>
+            </div>
             <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"/>
         </div>
     </form>
@@ -298,27 +308,39 @@
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
+          record_attempts=document.getElementById("record_attempts").value;
+          allow_typed_response=document.getElementById("allow_typed_response").checked;
+          allow_self_rating=document.getElementById("allow_self_rating").checked;
 
           //verify name
           if(typeof assign_name == "undefined" || assign_name == null || assign_name == ""){
               window.alert("You must provide a name for the assignment.");
               return;
           }
-        console.log(assign_datetime);
-         console.log(assign_now);
-        //check that either assign now or assign_datetime is set and both aren't set
-        if((assign_now == false && assign_datetime == "") || (assign_now == true && assign_datetime != "")) {
+          console.log(assign_datetime);
+          console.log(assign_now);
+          //check that either assign now or assign_datetime is set and both aren't set
+          if((assign_now == false && assign_datetime == "") || (assign_now == true && assign_datetime != "")) {
               window.alert("You must assign now or pick a date on the calendar.");
               return;
-        }
+          }
 
-        //verify datetime is valid
-        var timestamp = Date.parse(assign_datetime)
-        if(assign_now == false && isNaN(timestamp)){
+          //verify datetime is valid
+          var timestamp = Date.parse(assign_datetime)
+          if(assign_now == false && isNaN(timestamp)){
               window.alert("The chosen assignment date/time is not valid.");
               return;
-        }
+          }
 
+          //verification for recorded response attempts field
+          if(record_attempts === ""){
+              window.alert("You must input a value of 1 or greater for recorded response attempts.")
+              return;
+          }
+          if(record_attempts < 1){
+              window.alert("Recorded response attempts cannot be less than 1.")
+              return;
+          }
 
           //post data to server
           $.ajax({
@@ -330,7 +352,10 @@
                   'date': assign_datetime,
                   'stuData': stuJSON,
                   'tempData': tempJSON,
-                  'labelData': labelJSON
+                  'labelData': labelJSON,
+                  'record_attempts': record_attempts,
+                  'allow_typed_response': allow_typed_response,
+                  'allow_self_rating': allow_self_rating
               },
               dataType:'json',
               success: function(data){
