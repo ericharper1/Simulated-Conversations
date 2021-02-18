@@ -260,7 +260,7 @@ function loadState() {
 function updateNodeInFocus(nodeIndex) {
     // Highlight currently selected node and make all others unhighlighted
     if(currentNodeInFocus !== null) $("#step-"+currentNodeInFocus.index).css("background-color", "white")
-    $("#step-"+nodeIndex).css("background-color", " \t#E8E8E8")
+    $("#step-"+nodeIndex).css("background-color", " \t#aeb3b5")
 
     currentNodeInFocus = nodes.get(nodeIndex)
 

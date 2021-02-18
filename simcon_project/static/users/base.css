@@ -45,10 +45,12 @@ th, td {
 
 th a {
     color: white;
+    padding: .3rem !important;
 }
 
 th {
     background-color: #8a9b3e;
+    padding: .3rem !important;
 }
 
 /**

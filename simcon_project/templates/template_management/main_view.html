@@ -33,13 +33,13 @@
                         <!-- Show/Hide Archived Templates Button -->
                         <div class="col">
                             {% if show_archived == 'True' %}
-                                <form action="{% url 'management:display-archived-templates' 0 %}" method="post">
+                                <form action="{% url 'management:display-archived-templates' 0 %}" method="post" style="text-align: center;">
                                     {% csrf_token %}
                                     <input type="hidden" name="back" value="{{ request.path }}">
                                     <button name="show-archived" class ="btn btn-outline-secondary" type="submit">Hide Archived Templates</button>
                                 </form>
                             {% else %}
-                                <form action="{% url 'management:display-archived-templates' 1 %}" method="post">
+                                <form action="{% url 'management:display-archived-templates' 1 %}" method="post" style="text-align: center;">
                                     {% csrf_token %}
                                     <input type="hidden" name="back" value="{{ request.path }}">
                                     <button name="show-archived" class ="btn btn-outline-secondary" type="submit">Display Archived Templates</button>
@@ -89,7 +89,7 @@
 
                         <div class="col" style="text-align: right">
                             <!-- Create Folder Button--->
-                            <button id="create-folder" class="btn btn-outline-secondary" type="button" name="button">Create Folder</button>
+                            <button style=" white-space: no-wrap" id="create-folder" class="btn btn-outline-secondary" type="button" name="button">Create Folder</button>
                         </div>
                     </div>
 
