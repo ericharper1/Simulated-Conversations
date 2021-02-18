@@ -10,20 +10,24 @@ from django_tables2.config import RequestConfig
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
+from django_tables2 import RequestConfig
+from bootstrap_modal_forms.generic import BSModalDeleteView
+from django.urls import reverse_lazy
+import functools
+import operator
 from django.db.models import Q
 
 
-class StudentList(tables.Table):  # collects info from students to display on the table
+class AllStudentList(tables.Table):  # collects info from students to display on the table
     first_name = tables.Column(verbose_name='First Name', accessor='students__first_name')
     last_name = tables.Column(verbose_name='Last Name', accessor='students__last_name')
     email = tables.Column(verbose_name='Email', accessor='students__email')
     registered = tables.Column(verbose_name='Registered', accessor='students__registered')
+    delete = tables.TemplateColumn(template_name='remove_student_button.html', verbose_name='')
 
-class AllStudentList(tables.Table):  # collects info from students to display on the table
-    first_name = tables.Column(verbose_name='First Name', accessor='first_name')
-    last_name = tables.Column(verbose_name='Last Name', accessor='last_name')
-    email = tables.Column(verbose_name='Email', accessor='email')
-    registered = tables.Column(verbose_name='Registered', accessor='registered')
+    class Meta:
+        attrs = {'class': 'table table-sm', 'id': 'student-table'}
+        model = Student
 
 
 class LabelList(tables.Table):  # collects the table names
@@ -119,23 +123,49 @@ def student_management(request, name="All Students"):
     RequestConfig(request, paginate={"per_page": 20}).configure(label_table)
 
     # creates the table for the students in current label
-    if not name == 'All Students':
-        stu_contents = SubjectLabel.objects.filter(label_name=name, researcher=added_by).values(
-            'students__first_name',
-            'students__last_name',
-            'students__email',
-            'students__registered')
-        student_table = StudentList(stu_contents, prefix="2-")
-        RequestConfig(request, paginate={"per_page": 20}).configure(student_table)
-    else:
-        stu_contents = Student.objects.filter(added_by=added_by).values(
-            'first_name',
-            'last_name',
-            'email',
-            'registered')
-        student_table = AllStudentList(stu_contents, prefix="2-")
-        RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
+    stu_contents = Student.objects.filter(added_by=added_by)
+    student_table = AllStudentList(stu_contents, prefix="2-")
+    RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
+
 
     return render(request, 'student_management.html',  {"name": name, "form": AddToLabel(), "form2": NewLabel(),
                                                         "form3": SendEmail(), 'stu_table': student_table,
                                                         'lbl_table': label_table})
+
+class StudentDeleteView(BSModalDeleteView):
+    """
+    Deletes a template. Confirmation modal pops up to make sure
+    the user wants to delete a template.
+    """
+    model = Student
+    template_name = 'student_delete_modal.html'
+    success_message = None  # Don't delete this. BSModalDeleteView needs success message for some reason
+    success_url = reverse_lazy('student-management')
+'''
+    def get(self, request, *args, **kwargs):
+        """
+        Override post to send template name and name of assignment that
+        will be removed as context to the template
+        """
+        super().get(request, *args, **kwargs)
+        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
+        assignments = this_template.assignments.all()
+        to_delete = []
+        for assignment in assignments:
+            if assignment.conversation_templates.all().count() == 1:
+                to_delete.append(assignment.name)
+        context = {"template_name": this_template.name, "assignments": to_delete}
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Override post to remove assignment if the template being deleted
+        is the only one in the assignment.
+        """
+        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
+        assignments = this_template.assignments.all()
+        for assignment in assignments:
+            if assignment.conversation_templates.all().count() == 1:
+                assignment.delete()
+        super().post(request, *args, **kwargs)
+        return redirect(reverse('management:main'))'''

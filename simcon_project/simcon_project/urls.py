@@ -51,7 +51,8 @@ urlpatterns = [
     path('researcher/students/<str:name>/', student_management, name="student-management"),
     path('researcher/students/', student_management, name="student-management"),
     path('researcher/response/<uuid:pk>/', view_response, name="view-response"),
-    path('researcher/response/delete/<uuid:pk>/', ResponseDeleteView.as_view(), name="delete-response")
+    path('researcher/response/delete/<uuid:pk>/', ResponseDeleteView.as_view(), name="delete-response"),
+    path('researcher/students/delete/<uuid:pk>/', StudentDeleteView.as_view(), name="delete-student")
 ]
 
 if settings.DEBUG:

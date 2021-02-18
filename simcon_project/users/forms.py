@@ -34,11 +34,11 @@ class LabelTable(tables.Table):
 
 
 class AddToLabel(forms.Form):
-    email = forms.EmailField(max_length=254, required=True, widget=forms.TextInput(attrs={'placeholder': 'Student name'}), label='')
+    email = forms.EmailField(max_length=254, required=True, widget=forms.TextInput(attrs={'placeholder': 'Student email'}), label='')
 
 
 class SendEmail(forms.Form):
-    student_email = forms.EmailField(max_length=254, required=True)
+    student_email = forms.EmailField(max_length=254, required=True, widget=forms.TextInput(attrs={'placeholder': 'Student email'}), label='')
 
 
 class NewLabel(forms.Form):
