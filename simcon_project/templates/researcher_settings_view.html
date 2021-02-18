@@ -25,15 +25,16 @@
         {% block extrahead %} {% endblock %}
     </head>
     <body>
-    <div class="container-fluid mt-3" style="width: 80%">
+    <div class="container-fluid mt-3" style="width: 80%;">
         <div class="row justify-content-center">
 
-            <div class="col-4">
+            <div class="col-4 m-3 p-3" style="background-color: white;   border-radius: 5px;">
                 <form id="change_password_form" method="post">
                     {% csrf_token %}
                     {% for field in change_password_form %}
                         <div class="form-group">
-                            <label for="{{ field.attrs.id  }}">{{ field.label }} </label>
+                            <label for="{{ field.attrs.id  }}">{{ field.label }}: </label>
+                            <br>
                             {{ field }}
                         </div>
                     {% endfor %}
@@ -51,17 +52,21 @@
                 <br>
             </div>
         </div>
-
+        <div class="table-container">
         {% if researchers_table %}
-            {% render_table researchers_table %}
-        {% endif %}
+        {% render_table researchers_table %}
+        {% endif %} 
+        </div>
         <br>
         {% if add_researcher_form %}
-            <form id="add_researcher_form" method="post">
-                {% csrf_token %}
-                {{ add_researcher_form }}
-                <button type="submit" class="btn btn-outline-secondary" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
-            </form>
+            <div  >
+                <form id="add_researcher_form" method="post">
+                    {% csrf_token %}
+                    {{ add_researcher_form }}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
+                </form>
+            </div>
+            
         {% endif %}
 
         {% for message in messages %}

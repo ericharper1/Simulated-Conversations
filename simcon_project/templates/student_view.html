@@ -13,22 +13,19 @@
     <link rel="stylesheet" href="{% static 'users/student_home.css' %}">
 
     <title>
-    {% block title %}Simulated Conversations | Student{% endblock %}
+    {% block title %}SimCon | Student Page{% endblock %}
     </title>
-    
-    {% block extrahead %} {% endblock %}
   </head>
-
   <body>
-    <div class="body-container">
+    <div class="body-container mt-3">
       {% if incomplete_table %}
-      <h2>Incomplete Templates</h2>
+      <h2>Current Assignments</h2>
           {% render_table incomplete_table %}
       {% else %} 
           <span> No Templates to Complete </span> 
       {% endif  %}
       {% if completed_table %}
-      <h2>Completed Templates</h2>
+      <h2>Completed Assignments</h2>
           {% render_table completed_table %}
       {% else %} 
           <span> No Completed Templates </span> 
