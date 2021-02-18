@@ -25,10 +25,35 @@
         {% block extrahead %} {% endblock %}
     </head>
     <body>
-    <div class="container-fluid mt-3" style="width: 80%;">
+    <div class="container-fluid mt-3" style="width: 80%">
+        {% if researchers_table %}
+            <h3>Researchers</h3>
+            {% render_table researchers_table %}
+        {% else %}
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <br>
+                    <p>There are no researchers to display.</p>
+                    <br>
+                </div>
+            </div>
+        {% endif %}
+        {% if add_researcher_form %}
+            <div class="row justify-content-center">
+                <div class="col-4">
+                    <p style="text-align:left">Add New Researcher:</p>
+                    <form id="add_researcher_form" method="post">
+                        {% csrf_token %}
+                        {{ add_researcher_form }}
+                        <br>
+                        <button type="submit" class="btn btn-outline-secondary" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
+                    </form>
+                    <br><br><br>
+                </div>
+            </div>
+        {% endif %}
         <div class="row justify-content-center">
-
-            <div class="col-4 m-3 p-3" style="background-color: white;   border-radius: 5px;">
+            <div class="col-4">
                 <form id="change_password_form" method="post">
                     {% csrf_token %}
                     {% for field in change_password_form %}
@@ -52,29 +77,6 @@
                 <br>
             </div>
         </div>
-        <div class="table-container">
-        {% if researchers_table %}
-        {% render_table researchers_table %}
-        {% endif %} 
-        </div>
-        <br>
-        {% if add_researcher_form %}
-            <div  >
-                <form id="add_researcher_form" method="post">
-                    {% csrf_token %}
-                    {{ add_researcher_form }}
-                    <button type="submit" class="btn btn-sm btn-outline-secondary" form="add_researcher_form" name="add_researcher">Send Registration Email</button>
-                </form>
-            </div>
-            
-        {% endif %}
-
-        {% for message in messages %}
-            <div class="alert alert-warning">
-                <a class="close" href="#" data-dismiss="alert">×</a>
-                {{ message }}
-            </div>
-        {% endfor %}
     </div> <!-- /container -->
 
     <!-- Bootstrap core JavaScript
