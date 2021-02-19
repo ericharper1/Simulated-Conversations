@@ -80,6 +80,7 @@ def add_assignment(request):
     students = data.get('stuData')
     templates = data.get('tempData')
     labels = data.get('labelData')
+    response_attempts = data.get('response_attempts')
     record_attempts = data.get('record_attempts')
     allow_typed_response = convert_boolean(data.get('allow_typed_response'))
     allow_self_rating = convert_boolean(data.get('allow_self_rating'))
@@ -109,7 +110,8 @@ def add_assignment(request):
     assignment.date_assigned = sched_datetime
     researcher = Researcher.objects.get(email=researcher)
     assignment.researcher = researcher
-    assignment.recorded_response_attempts = record_attempts
+    assignment.response_attempts = response_attempts
+    assignment.recording_attempts = record_attempts
     assignment.allow_typed_response = allow_typed_response
     assignment.allow_self_rating = allow_self_rating
     assignment.save()

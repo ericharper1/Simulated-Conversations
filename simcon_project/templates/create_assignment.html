@@ -22,21 +22,31 @@
         <!--left part -->
         <div class="left" style="width:45%; float:left; margin-left:2%; margin-top:20px;">
             <div class="form-group">
-                <label for="assign_name">Assignment name:</label>
+                <label for="assign_name">Assignment name</label>
                 <input type="text" class="form-control col-lg-10" id="assign_name" required>
             </div>
             <div class="form-group">
-                <label for="assign_datetime">Assignment start date:</label>
-                <br>
                 <label for="assign_now">Assign Now?</label>
-                <input type="radio" id="assign_now" onclick="clearDate()">
-               <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                  <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
-                         id="assign_datetime" onclick="deselectRadio()"/>
-                  <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-                    <div class="input-group-text" onclick="deselectRadio()"><i class="fa fa-calendar"></i></div>
-                  </div>
-               </div>
+                <input type="checkbox" id="assign_now" onchange="checkbox()" checked>
+                <div id="datetime_fields" style="display: none">
+                   <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                      <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1"
+                             id="assign_datetime" placeholder="Please select an assignment start date."/>
+                      <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                   </div>
+                </div>
+            </div>
+            <div>
+                <label for="response_attempts">Response Attempts Per Template</label>
+                <input type="text" id="response_attempts" name="response_attempts" value="1"><br>
+                <label for="record_attempts">Recording Attempts Per Step</label>
+                <input type="text" id="record_attempts" name="record_attempts" value=1><br>
+                <label for="allow_typed_response">Allow Typed Response?</label>
+                <input type="checkbox" id="allow_typed_response" name="allow_typed_response"><br>
+                <label for="allow_self_rating">Allow Self Rating?</label>
+                <input type="checkbox" id="allow_self_rating" name="allow_self_rating"><br>
             </div>
 
             <!--add student -->
@@ -68,7 +78,7 @@
             <div class="form-group">
                 <label for="add_temp">Add template</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="template_name" placeholder="Please input template name." list="temp_list" autocomplete="off">
+                    <input type="text" class="form-control col-lg-7" id="template_name" list="temp_list" autocomplete="off">
                     <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add template" onclick="add_temp(tbl1, template_name.value)">
                     <datalist id="temp_list"></datalist>
                 </div>
@@ -89,7 +99,7 @@
             <div class="form-group">
                 <label for="add_label">Add label</label>
                 <div class="add" style="display: flex;">
-                    <input type="text" class="form-control col-lg-7" id="label_name" placeholder="Please Input a Label Name." list="label_list" autocomplete="off">
+                    <input type="text" class="form-control col-lg-7" id="label_name" list="label_list" autocomplete="off">
                     <input type="button" class="btn btn-primary" style="margin-left: 2rem!important;" value="Add label" onclick="add_label(tbl2, label_name.value)">
                     <datalist id="label_list"></datalist>
                 </div>
@@ -105,16 +115,6 @@
                     <tbody></tbody>
                 </table>
             </div>
-            <div>
-                <label for="record_attempts">Recorded Response Attempts Allowed</label>
-                <input type="text" id="record_attempts" name="record_attempts" value=1><br>
-            </div>
-            <div>
-                <label for="allow_typed_response">Allow Typed Response?</label>
-                <input type="checkbox" id="allow_typed_response" name="allow_typed_response"><br>
-                <label for="allow_self_rating">Allow Self Rating?</label>
-                <input type="checkbox" id="allow_self_rating" name="allow_self_rating"><br>
-            </div>
             <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"/>
         </div>
     </form>
@@ -125,14 +125,17 @@
         $("#datetimepicker1").datetimepicker();
       });
 
-    function clearDate() {
-        document.getElementById('assign_datetime').value = "";
+    function checkbox() {
+        if (document.getElementById('assign_now').checked == true) {
+            document.getElementById('assign_datetime').value = "";
+            document.getElementById('datetime_fields').style.display = "none";
+        }
+        else {
+            document.getElementById('assign_datetime').value = "";
+            document.getElementById('datetime_fields').style.display = "block";
+        }
     }
 
-    function deselectRadio() {
-        document.getElementById('assign_datetime').disable = false;
-        document.getElementById('assign_now').checked = false;
-    }
 
       var students={{ student|safe }};
       var templates={{ template|safe }};
@@ -309,6 +312,7 @@
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
+          response_attempts=document.getElementById("response_attempts").value;
           record_attempts=document.getElementById("record_attempts").value;
           allow_typed_response=document.getElementById("allow_typed_response").checked;
           allow_self_rating=document.getElementById("allow_self_rating").checked;
@@ -318,8 +322,8 @@
               window.alert("You must provide a name for the assignment.");
               return;
           }
-          console.log(assign_datetime);
-          console.log(assign_now);
+
+
           //check that either assign now or assign_datetime is set and both aren't set
           if((assign_now == false && assign_datetime == "") || (assign_now == true && assign_datetime != "")) {
               window.alert("You must assign now or pick a date on the calendar.");
@@ -343,6 +347,16 @@
               return;
           }
 
+          //verification for response attempts field
+          if(response_attempts === ""){
+              window.alert("You must input a value of 1 or greater for response attempts.")
+              return;
+          }
+          if(response_attempts < 1){
+              window.alert("Response attempts cannot be less than 1.")
+              return;
+          }
+
           //post data to server
           $.ajax({
               url:"{% url 'assignments:add-assignment' %}",
@@ -354,6 +368,7 @@
                   'stuData': stuJSON,
                   'tempData': tempJSON,
                   'labelData': labelJSON,
+                  'response_attempts': response_attempts,
                   'record_attempts': record_attempts,
                   'allow_typed_response': allow_typed_response,
                   'allow_self_rating': allow_self_rating
