@@ -38,6 +38,16 @@
                   </div>
                </div>
             </div>
+            <div>
+                <label for="response_attempts">Response Attempts Per Template</label>
+                <input type="text" id="response_attempts" name="response_attempts" value="1"><br>
+                <label for="record_attempts">Recording Attempts Per Step</label>
+                <input type="text" id="record_attempts" name="record_attempts" value=1><br>
+                <label for="allow_typed_response">Allow Typed Response?</label>
+                <input type="checkbox" id="allow_typed_response" name="allow_typed_response"><br>
+                <label for="allow_self_rating">Allow Self Rating?</label>
+                <input type="checkbox" id="allow_self_rating" name="allow_self_rating"><br>
+            </div>
 
             <!--add student -->
             <div class="form-group">
@@ -104,16 +114,6 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-            </div>
-            <div>
-                <label for="record_attempts">Recorded Response Attempts Allowed</label>
-                <input type="text" id="record_attempts" name="record_attempts" value=1><br>
-            </div>
-            <div>
-                <label for="allow_typed_response">Allow Typed Response?</label>
-                <input type="checkbox" id="allow_typed_response" name="allow_typed_response"><br>
-                <label for="allow_self_rating">Allow Self Rating?</label>
-                <input type="checkbox" id="allow_self_rating" name="allow_self_rating"><br>
             </div>
             <input type="button" class="btn btn-primary" onclick="sub()" value="Submit"/>
         </div>
@@ -309,6 +309,7 @@
           stuJSON=JSON.stringify(addedStu);
           tempJSON=JSON.stringify(addedTmp);
           labelJSON=JSON.stringify(addedLabel);
+          response_attempts=document.getElementById("response_attempts").value;
           record_attempts=document.getElementById("record_attempts").value;
           allow_typed_response=document.getElementById("allow_typed_response").checked;
           allow_self_rating=document.getElementById("allow_self_rating").checked;
@@ -343,6 +344,16 @@
               return;
           }
 
+          //verification for response attempts field
+          if(response_attempts === ""){
+              window.alert("You must input a value of 1 or greater for response attempts.")
+              return;
+          }
+          if(response_attempts < 1){
+              window.alert("Response attempts cannot be less than 1.")
+              return;
+          }
+
           //post data to server
           $.ajax({
               url:"{% url 'assignments:add-assignment' %}",
@@ -354,6 +365,7 @@
                   'stuData': stuJSON,
                   'tempData': tempJSON,
                   'labelData': labelJSON,
+                  'response_attempts': response_attempts,
                   'record_attempts': record_attempts,
                   'allow_typed_response': allow_typed_response,
                   'allow_self_rating': allow_self_rating
