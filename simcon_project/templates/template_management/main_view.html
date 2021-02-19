@@ -29,7 +29,6 @@
                     {% endif %}
                     <div class="row">
                         <div class="col">
-                            <!-- Templates Search Bar
                             {% if current_folder %}
                                 <form action="{% url 'management:folder-view' current_folder.id %}" method="get" autocomplete="off">
                                     {% csrf_token %}
@@ -46,7 +45,6 @@
                                     <option value="{{ template.name }}"></option>
                                 {% endfor %}
                             </datalist>
-                            -->
                         </div>
                         <!-- Show/Hide Archived Templates Button -->
                         <div class="col">
@@ -81,7 +79,7 @@
                                 <div class="col col-sm-10">
                                     <select class="template-select-multiple w-100" name="templates" multiple="multiple">
                                         {% for template in all_templates%}
-                                            <option value="{{ template.id }}">{{ template.name }}: {{template.creation_date }}</option>
+                                            <option value="{{ template.id }}" title="{{ template.name }}">{{ template.name }}: {{template.creation_date }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -109,7 +107,6 @@
                     <h3 style="text-align: center">Folders</h3>
 
                     <div class="row">
-                        <!--
                         <div class="col">
                             {% if current_folder %}
                                 <form action="{% url 'management:folder-view' current_folder.id %}" method="get" autocomplete="off">
@@ -123,13 +120,14 @@
                                 </form>
                             {% endif %}
                             <datalist id="folders">
-                                {% for folder in folders %}
+                                {% for folder in all_folders %}
                                     <option value="{{ folder.name }}"></option>
                                 {% endfor %}
                             </datalist>
                         </div>
-                        -->
+                    </div>
 
+                    <div class="row">
                         <div class="col">
                             <form method="post" action="{% url 'management:create-folder' %}">
                                 {% csrf_token %}
@@ -137,9 +135,6 @@
                                 <input type="submit" value="Create Folder" class="btn btn-sm btn-outline-secondary">
                                 <input type="hidden" name="back" value="{{ request.path }}">
                             </form>
-                            <!-- Create Folder Button
-                            <button id="create-folder" class="btn btn-outline-secondary" type="button" name="button">Create Folder</button>
-                            --->
                         </div>
                     </div>
 
@@ -183,13 +178,29 @@
                 modalID: "#create_modal"
             });
 
-            $(document).ready(function() {
-                $('.template-select-multiple').select2({
-                    placeholder: "Add Templates",
-                    allowClear: true,
-                });
+            $('.template-select-multiple').select2({
+                placeholder: "Add Templates",
+                allowClear: true,
+                templateSelection: formatState,
             });
         });
+
+        // Format so when a template is selected it only shows the template name
+        // inside the multiselect box.
+        function formatState (state) {
+            if (!state.id) {
+              return state.text;
+            }
+
+            var $state = $(
+              '<span><span></span></span>'
+            );
+
+            // Use .text() instead of HTML string concatenation to avoid script injection issues
+            $state.find("span").text(state.title);
+
+            return $state;
+        };
     </script>
     </body>
 {% endblock %}

@@ -20,7 +20,7 @@ class FolderTemplateTable(tables.Table):
     """
     archive_button = TemplateColumn(template_name='template_management/buttons/archive_button.html', order_by='archived'
                                     , verbose_name='Archived')
-    edit_button = TemplateColumn(verbose_name='', template_name='template_management/buttons/edit_button.html')
+    edit_button = TemplateColumn(verbose_name='', template_name='template_management/buttons/edit_template_button.html')
     remove_buttons = TemplateColumn(template_name='template_management/buttons/delete_or_remove_template_button.html',
                                     extra_context={"in_folder": True}, verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
@@ -38,7 +38,7 @@ class AllTemplateTable(tables.Table):
     """
     archive_button = TemplateColumn(template_name='template_management/buttons/archive_button.html', order_by='archived'
                                     , verbose_name='Archived')
-    edit_button = TemplateColumn(verbose_name='', template_name='template_management/buttons/edit_button.html')
+    edit_button = TemplateColumn(verbose_name='', template_name='template_management/buttons/edit_template_button.html')
     remove_buttons = TemplateColumn(template_name='template_management/buttons/delete_or_remove_template_button.html',
                                     verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
@@ -53,7 +53,7 @@ class FolderTable(tables.Table):
     """
     Table showing all folders (unique to a researcher in the future)
     """
-    edit_button = tables.columns.TemplateColumn(template_name='template_management/buttons/edit_button.html',
+    edit_button = tables.columns.TemplateColumn(template_name='template_management/buttons/edit_folder_button.html',
                                                 verbose_name='')
     delete_button = tables.columns.Column(verbose_name='')
     name = tables.columns.LinkColumn('management:folder-view', args=[A('pk')])
@@ -142,7 +142,7 @@ def main_view_helper(request, all_templates, current_folder):
         'folderTable': folder_table,
         'current_folder': current_folder,
         'show_archived': request.COOKIES.get('show_archived'),
-        'folders': folders,
+        'all_folders': TemplateFolder.objects.filter(researcher=request.user),
         'templates': templates.order_by('name'),
         'folder_creation_form': FolderCreationForm(request=request.user),
         'add_templates_form': AddTemplatesForm(),
