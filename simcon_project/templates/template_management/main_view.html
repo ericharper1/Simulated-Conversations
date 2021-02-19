@@ -75,15 +75,22 @@
                     </div>
 
                     {% if current_folder %}
-                        <div class="row">
-                            <div class="col">
-                                <select class="template-select-multiple w-100" name="templates" multiple="multiple">
-                                    <option value="AL">Alabama</option>
-                                    ...
-                                    <option value="WY">Wyoming</option>
-                                </select>
+                        <form method="post" action="{% url 'management:edit-folder-templates' current_folder.id %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col col-sm-10">
+                                    <select class="template-select-multiple w-100" name="templates" multiple="multiple">
+                                        {% for template in all_templates%}
+                                            <option value="{{ template.id }}">{{ template.name }}: {{template.creation_date }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <input type="hidden" name="back" value="{{ request.path }}">
+                                    <input class="btn btn-sm btn-outline-secondary" type="submit" value="Add">
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     {% endif %}
 
                     {%  if templateTable %}
@@ -136,17 +143,10 @@
                         </div>
                     </div>
 
-                    {% if current_folder %}
-                        <div class="row mb-3">
-                            <form method="post" action="{% url 'management:main' %}">
-                                {% csrf_token %}
-                                <input id="back-to-all" class="btn btn-outline-success ml-3" type="submit" value="Back">
-                            </form>
-                        </div>
-                    {% endif %}
-
                     {% if folderTable %}
-                        {% render_table folderTable %}
+                        {% block table-wrapper %}
+                            {% include "template_management/folder_table.html" with table=folderTable%}
+                        {% endblock %}
                     {% else %}
                         <div>There are no folders to show at the moment</div>
                     {% endif %}
@@ -185,7 +185,8 @@
 
             $(document).ready(function() {
                 $('.template-select-multiple').select2({
-                    placeholder: "Add Templates"
+                    placeholder: "Add Templates",
+                    allowClear: true,
                 });
             });
         });

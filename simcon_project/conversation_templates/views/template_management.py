@@ -8,7 +8,7 @@ from conversation_templates.models import ConversationTemplate, TemplateFolder, 
 from conversation_templates.forms import FolderCreationForm, FolderEditForm, AddTemplatesForm
 from users.models import Researcher
 from bootstrap_modal_forms.generic import BSModalUpdateView, BSModalDeleteView
-from django_tables2 import TemplateColumn, tables, RequestConfig, A
+from django_tables2 import TemplateColumn, tables, RequestConfig, A, SingleTableView
 import re
 
 
@@ -65,8 +65,7 @@ class FolderTable(tables.Table):
     """
     edit_button = tables.columns.TemplateColumn(template_name='template_management/buttons/edit_button.html',
                                                 verbose_name='')
-    delete_button = tables.columns.TemplateColumn(template_name='template_management/buttons/folder_delete_button.html',
-                                                  verbose_name='')
+    delete_button = tables.columns.Column(verbose_name='')
     name = tables.columns.LinkColumn('management:folder-view', args=[A('pk')])
 
     class Meta:
@@ -145,6 +144,12 @@ def main_view_helper(request, all_templates, current_folder):
     else:
         folder_table = None
 
+    template_list = None
+    if current_folder:
+        template_list = ConversationTemplate.objects.filter(researcher=request.user.id, archived=False)
+        for template in current_folder.templates.all():
+            template_list = template_list.exclude(id=template.id)
+
     context = {
         'templateTable': template_table,
         'folderTable': folder_table,
@@ -154,9 +159,16 @@ def main_view_helper(request, all_templates, current_folder):
         'templates': templates.order_by('name'),
         'folder_creation_form': FolderCreationForm(request=request.user),
         'add_templates_form': AddTemplatesForm(),
+        'all_templates': template_list,
     }
 
     return context
+
+
+class FolderTableView(SingleTableView):
+    model = TemplateFolder
+    table_class = FolderTable
+    template_name = "template_management/folder_table.html"
 
 
 def create_folder(request):
@@ -174,8 +186,10 @@ def create_folder(request):
 def add_templates(request, pk):
     folder = get_object_or_404(TemplateFolder, pk=pk)
     if request.POST.get('templates'):
-        templates = AddTemplatesForm(request.POST)
-        print(templates)
+        form = AddTemplatesForm(request.POST)
+        if form.is_valid():
+            for template in request.POST.getlist('templates'):
+                folder.templates.add(template)
 
     back = request.POST.get('back', '/')
     return redirect(back)
