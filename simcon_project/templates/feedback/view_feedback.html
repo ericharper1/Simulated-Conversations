@@ -40,7 +40,11 @@
         </div>
         {% for node in response_nodes %}
         <div class="row">
-            <h3> Response {{node.position_in_sequence}}</h3>
+            <h3> Response {{node.position_in_sequence}}
+            {% if node.custom_response != Null %}
+               (Custom)
+            {% endif %}
+            </h3>
             <div class="row">
             {{node.template_node.description}}
             </div>
