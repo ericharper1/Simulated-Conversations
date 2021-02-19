@@ -257,11 +257,12 @@
               if(tempTmp.name==name){
                   find=true;
                   var key=name+"--"+tempTmp.creation_date
+                  var date = tempTmp.creation_date.split('T')[0]
                   if(addedTmp.indexOf(key)>-1){
                       window.alert("Adding failed, the template is already in the table.");
                   }
                   else {
-                      add2table(tbl1, name, tempTmp.creation_date, 2);
+                      add2table(tbl1, name, date, 2);
                       addedTmp.push(key);
                   }
               }
