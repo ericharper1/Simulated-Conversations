@@ -337,15 +337,14 @@
               return;
           }
 
-          //verification for recorded response attempts field
-          if(record_attempts < 1){
-              window.alert("Recording attempts per step cannot be less than 1.")
-              return;
-          }
-
           //verification for response attempts field
           if(response_attempts < 1){
               window.alert("Response attempts per template cannot be less than 1.")
+              return;
+          }
+          //verification for recorded response attempts field
+          if(record_attempts < 1){
+              window.alert("Recording attempts per step cannot be less than 1.")
               return;
           }
 
