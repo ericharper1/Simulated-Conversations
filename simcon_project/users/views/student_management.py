@@ -19,15 +19,12 @@ from django.db.models import Q
 
 
 class AllStudentList(tables.Table):  # collects info from students to display on the table
-    first_name = tables.Column(verbose_name='First Name', accessor='students__first_name')
-    last_name = tables.Column(verbose_name='Last Name', accessor='students__last_name')
-    email = tables.Column(verbose_name='Email', accessor='students__email')
-    registered = tables.Column(verbose_name='Registered', accessor='students__registered')
     delete = tables.TemplateColumn(template_name='remove_student_button.html', verbose_name='')
 
     class Meta:
         attrs = {'class': 'table table-sm', 'id': 'student-table'}
         model = Student
+        fields = ['email', 'first_name', 'last_name', 'registered']
 
 
 class LabelList(tables.Table):  # collects the table names
@@ -123,14 +120,27 @@ def student_management(request, name="All Students"):
     RequestConfig(request, paginate={"per_page": 20}).configure(label_table)
 
     # creates the table for the students in current label
-    stu_contents = Student.objects.filter(added_by=added_by)
+    stu_contents = SubjectLabel.objects.get(label_name=name, researcher=added_by).students.all()
     student_table = AllStudentList(stu_contents, prefix="2-")
     RequestConfig(request, paginate={"per_page": 10}).configure(student_table)
 
+    add_students = Student.objects.filter(added_by=added_by)
 
     return render(request, 'student_management.html',  {"name": name, "form": AddToLabel(), "form2": NewLabel(),
                                                         "form3": SendEmail(), 'stu_table': student_table,
-                                                        'lbl_table': label_table})
+                                                        'lbl_table': label_table, 'add_students': add_students})
+
+
+def add_students_to_label(request, pk):
+    label = get_object_or_404(SubjectLabel, pk=pk)
+    print("*")
+    if request.POST.get('Students'):
+        print("&")
+        form = AddStudentForm(request.POST)
+        if form.is_valid():
+            for student in request.POST.getlist('Students'):
+                label.students.add(student)
+
 
 class StudentDeleteView(BSModalDeleteView):
     """
@@ -141,31 +151,3 @@ class StudentDeleteView(BSModalDeleteView):
     template_name = 'student_delete_modal.html'
     success_message = None  # Don't delete this. BSModalDeleteView needs success message for some reason
     success_url = reverse_lazy('student-management')
-'''
-    def get(self, request, *args, **kwargs):
-        """
-        Override post to send template name and name of assignment that
-        will be removed as context to the template
-        """
-        super().get(request, *args, **kwargs)
-        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
-        assignments = this_template.assignments.all()
-        to_delete = []
-        for assignment in assignments:
-            if assignment.conversation_templates.all().count() == 1:
-                to_delete.append(assignment.name)
-        context = {"template_name": this_template.name, "assignments": to_delete}
-        return render(request, self.template_name, context)
-
-    def post(self, request, *args, **kwargs):
-        """
-        Override post to remove assignment if the template being deleted
-        is the only one in the assignment.
-        """
-        this_template = ConversationTemplate.objects.get(pk=self.kwargs['pk'])
-        assignments = this_template.assignments.all()
-        for assignment in assignments:
-            if assignment.conversation_templates.all().count() == 1:
-                assignment.delete()
-        super().post(request, *args, **kwargs)
-        return redirect(reverse('management:main'))'''

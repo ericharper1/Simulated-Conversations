@@ -52,7 +52,10 @@ urlpatterns = [
     path('researcher/students/', student_management, name="student-management"),
     path('researcher/response/<uuid:pk>/', view_response, name="view-response"),
     path('researcher/response/delete/<uuid:pk>/', ResponseDeleteView.as_view(), name="delete-response"),
-    path('researcher/students/delete/<uuid:pk>/', StudentDeleteView.as_view(), name="delete-student")
+    path('researcher/students/delete/<int:pk>/', StudentDeleteView.as_view(), name="delete-student"),
+    path('researcher/label/add_students/<uuid:pk>/', add_students_to_label, name='add-students-to-label'),
+
+    #path("select2/", include("django_select2.urls")),
 ]
 
 if settings.DEBUG:
