@@ -40,9 +40,9 @@
             </div>
             <div>
                 <label for="response_attempts">Response Attempts Per Template</label>
-                <input type="text" id="response_attempts" name="response_attempts" value="1"><br>
+                <input type="number" id="response_attempts" name="response_attempts" value="1" required><br>
                 <label for="record_attempts">Recording Attempts Per Step</label>
-                <input type="text" id="record_attempts" name="record_attempts" value=1><br>
+                <input type="number" id="record_attempts" name="record_attempts" value=1 required><br>
                 <label for="allow_typed_response">Allow Typed Response?</label>
                 <input type="checkbox" id="allow_typed_response" name="allow_typed_response"><br>
                 <label for="allow_self_rating">Allow Self Rating?</label>
@@ -338,22 +338,14 @@
           }
 
           //verification for recorded response attempts field
-          if(record_attempts === ""){
-              window.alert("You must input a value of 1 or greater for recorded response attempts.")
-              return;
-          }
           if(record_attempts < 1){
-              window.alert("Recorded response attempts cannot be less than 1.")
+              window.alert("Recording attempts per step cannot be less than 1.")
               return;
           }
 
           //verification for response attempts field
-          if(response_attempts === ""){
-              window.alert("You must input a value of 1 or greater for response attempts.")
-              return;
-          }
           if(response_attempts < 1){
-              window.alert("Response attempts cannot be less than 1.")
+              window.alert("Response attempts per template cannot be less than 1.")
               return;
           }
 
