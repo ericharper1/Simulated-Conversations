@@ -18,10 +18,10 @@ class FolderTemplateTable(tables.Table):
     The "delete" button has been replaced with a "remove button to
     remove a template from the folder.
     """
-    archive_button = TemplateColumn(template_name='template_management/archive_button.html', order_by='archived'
+    archive_button = TemplateColumn(template_name='template_management/buttons/archive_button.html', order_by='archived'
                                     , verbose_name='Archived')
-    edit_button = TemplateColumn(verbose_name='', template_name='template_management/edit_button.html')
-    remove_buttons = TemplateColumn(template_name='template_management/delete_or_remove_template_button.html',
+    edit_button = TemplateColumn(verbose_name='', template_name='template_management/buttons/edit_button.html')
+    remove_buttons = TemplateColumn(template_name='template_management/buttons/delete_or_remove_template_button.html',
                                     extra_context={"in_folder": True}, verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
@@ -36,10 +36,10 @@ class AllTemplateTable(tables.Table):
     Table for showing the templates for a specific folder.
     Only used when all templates are displayed.
     """
-    archive_button = TemplateColumn(template_name='template_management/archive_button.html', order_by='archived'
-                                    , verbose_name = 'Archived')
-    edit_button = TemplateColumn(verbose_name='', template_name='template_management/edit_button.html')
-    remove_buttons = TemplateColumn(template_name='template_management/delete_or_remove_template_button.html',
+    archive_button = TemplateColumn(template_name='template_management/buttons/archive_button.html', order_by='archived'
+                                    , verbose_name='Archived')
+    edit_button = TemplateColumn(verbose_name='', template_name='template_management/buttons/edit_button.html')
+    remove_buttons = TemplateColumn(template_name='template_management/buttons/delete_or_remove_template_button.html',
                                     verbose_name='')
     name = tables.columns.LinkColumn('view-all-responses', args=[A('pk')])
 
