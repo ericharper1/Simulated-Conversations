@@ -17,6 +17,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
   </head>
   <body>
+
+    <div class="dim" id="dim-dialog" title="Event"></div>
+
     <form class="bg-light border rounded mx-auto mt-5 p-3 " style="min-height: 100vh;">
         <h2>Simulated Conversations</h2>
         <!--left part -->
@@ -233,7 +236,7 @@
                   find=true;
                   var name = stuTmp.first_name + " " + stuTmp.last_name;
                   if(stuTmp.is_active!=1){
-                      window.alert("Adding Studet "+name+" Failed, They are not an active user.");
+                      window.alert("Adding Student "+name+" Failed, They are not an active user.");
                   }
                   else{
                       //Determine whether this student is already in the table.
@@ -262,7 +265,7 @@
                   var key=name+"--"+tempTmp.creation_date
                   var date = tempTmp.creation_date.split('T')[0]
                   if(addedTmp.indexOf(key)>-1){
-                      window.alert("Adding failed, the template is already in the table.");
+                      window.alert("The template is already in the table.");
                   }
                   else {
                       add2table(tbl1, name, date, 2);
@@ -322,8 +325,6 @@
               window.alert("You must provide a name for the assignment.");
               return;
           }
-
-
           //check that either assign now or assign_datetime is set and both aren't set
           if((assign_now == false && assign_datetime == "") || (assign_now == true && assign_datetime != "")) {
               window.alert("You must assign now or pick a date on the calendar.");
@@ -348,6 +349,8 @@
               return;
           }
 
+          document.getElementById('dim-dialog').style.display = 'block'
+
           //post data to server
           $.ajax({
               url:"{% url 'assignments:add-assignment' %}",
@@ -367,13 +370,19 @@
               dataType:'json',
               success: function(data){
                   if(data.success==0){
+                      document.getElementById('dim-dialog').style.display = 'none'
                       window.alert("Submitted successfully!");
                       location.reload();
                   }
                   else{
+                      document.getElementById('dim-dialog').style.display = 'none'
                       var msgTmp=data.msg;
                       window.alert(msgTmp);
                   }
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  document.getElementById('dim-dialog').style.display = 'none'
+                  alert("Error: " + errorThrown);
               }
           })
       }

@@ -37,7 +37,6 @@ class CreateAssignmentView(TemplateView):
 # Transfer string type list to list type
 def decode(str):
     if str[0] != '[':
-        print("Decode failed. The data is not a list type.")
         return
     temp = str[1:-1]
     temp = temp.split(',')
@@ -98,7 +97,7 @@ def add_assignment(request):
         sched_datetime = get_localzone().localize(datetime.datetime.strptime(date, "%m/%d/%Y %I:%M %p"))
     if sched_datetime < datetime_now:
         success = 1
-        errMsg = errMsg+'The assignment start cannot be before now.\n\n'
+        errMsg = errMsg+'Custom assignment date needs to be in the future.\n\n'
     # Determine if students, labels, and templates are empty.
     stuIsNull = isNull(students)
     labelIsNull = isNull(labels)
