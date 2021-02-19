@@ -14,7 +14,7 @@ class TemplateResponse(models.Model):
     template: ConversationTemplate object that TemplateResponse relates to
     assignment: Assignment object that ConversationTemplate belongs to
     feedback: General feedback left by a Researcher for a Student
-    self_rating: The rating a student gives their performance. Should be out of 10
+    self_rating: The rating a student gives their performance. Should be out of 5
     """
     id = models.UUIDField(unique=True, editable=False, primary_key=True, default=uuid.uuid4)
     completion_date = models.DateTimeField(default=None, null=True)
