@@ -134,6 +134,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'simcon.dev@gmail.com'
 EMAIL_HOST_PASSWORD = 'zhtsjuriiabkdahg'
 EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'simcon.dev@gmail.com'
 
 # Static files (CSS, JavaScript, Images)
