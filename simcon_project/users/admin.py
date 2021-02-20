@@ -33,8 +33,6 @@ admin.site.register(CustomUser, CustomUserAdmin)
 models = apps.get_models()
 for model in models:
     try:
-        if str(model).find('django_apscheduler') == -1:
-            admin.site.register(model)
+        admin.site.register(model)
     except admin.sites.AlreadyRegistered:
         pass
-
