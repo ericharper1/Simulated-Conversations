@@ -1,12 +1,10 @@
 from django.shortcuts import render
 from users.models import SubjectLabel, Assignment, Student, Researcher, Email
 from conversation_templates.models import ConversationTemplate
-from django.views.generic import TemplateView
 from django.core import serializers
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.utils.decorators import method_decorator
 from tzlocal import get_localzone
 from django.contrib.auth.decorators import user_passes_test
 from users.views.researcher_home import is_researcher
@@ -14,24 +12,24 @@ import json
 import datetime
 
 
-class CreateAssignmentView(TemplateView):
-    @method_decorator(ensure_csrf_cookie)
-    def get(self, request):
-        curResearcher = request.user
+@user_passes_test(is_researcher)
+@ensure_csrf_cookie
+def create_assignment_view(request):
+    curResearcher = request.user
 
-        stud = Student.objects.all().filter(added_by=curResearcher).values('email', 'first_name','last_name','is_active','registered')
-        label = SubjectLabel.objects.all().filter(researcher=curResearcher)
-        template = ConversationTemplate.objects.all().filter(researcher=curResearcher)
+    stud = Student.objects.all().filter(added_by=curResearcher).filter(is_active=True).values('email', 'first_name','last_name','is_active','registered')
+    label = SubjectLabel.objects.all().filter(researcher=curResearcher)
+    template = ConversationTemplate.objects.all().filter(researcher=curResearcher)
 
-        student = json.dumps(list(stud))
-        subLabel = serializers.serialize("json",label)
-        template = serializers.serialize("json",template)
+    students = json.dumps(list(stud))
+    subLabel = serializers.serialize("json",label)
+    template = serializers.serialize("json",template)
 
-        return render(request, 'create_assignment.html', {
-            'student': student,
-            'subLabel': subLabel,
-            'template': template,
-        })
+    return render(request, 'create_assignment.html', {
+        'students': students,
+        'subjectLabels': subLabel,
+        'templates': template,
+    })
 
 
 # Transfer string type list to list type
@@ -145,10 +143,7 @@ def add_assignment(request):
         errMsg = errMsg+'Template must not be empty.\n\n'
     else:
         for temp in templates:
-            tempList = temp.split('--')
-            tempName = tempList[0]
-            tempDate = tempList[1]
-            tempTmp = ConversationTemplate.objects.get(name=tempName, creation_date=tempDate)
+            tempTmp = ConversationTemplate.objects.get(pk=temp)
             assignment.conversation_templates.add(tempTmp)
 
     subject = 'Simulated Conversation Assignment Update'
