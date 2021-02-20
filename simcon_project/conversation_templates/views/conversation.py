@@ -5,7 +5,6 @@ from django.core.files.storage import default_storage
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.http import HttpResponseNotFound, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from conversation_templates.models import ConversationTemplate, TemplateNode, TemplateNodeResponse, TemplateResponse
 from conversation_templates.forms import TemplateNodeChoiceForm
 from users.models import Student, Assignment
@@ -60,7 +59,6 @@ def flush_session_data(request):
     request.session.modified = True
 
 
-# Views
 @user_passes_test(is_student)
 def conversation_start(request, ct_id, assign_id):
     """
@@ -71,7 +69,7 @@ def conversation_start(request, ct_id, assign_id):
     ct = ConversationTemplate.objects.get(id=ct_id)
     student = Student.objects.get(email=request.user)
     student_attempts = TemplateResponse.objects.filter(student=student, template=ct).count()
-    if student_attempts >= assignment.attempts:
+    if student_attempts >= assignment.response_attempts:
         return HttpResponseNotFound('<h1>Sorry, maximum number of attempts reached for this conversation.</h1>')
 
     # Else, set up conversation
@@ -179,7 +177,6 @@ def conversation_step(request, ct_node_id):
     return render(request, t, ctx)
 
 
-@csrf_exempt
 def save_audio(request):
     # Check if node response already exists
     if request.session.get('ct_node_response_id') is None:
