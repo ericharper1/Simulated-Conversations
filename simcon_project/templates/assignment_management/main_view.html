@@ -25,10 +25,18 @@
     {% block extrahead %} {% endblock %}
   </head>
   <body>
-    <div class="container">
+    <div class="container-fluid" style="width: 80%">
       <h1>Assignment Management</h1>
+        <div class="mb-3" style="text-align: justify;">
+         <form action="{% url 'assignments:create-assignment' %}" method="post">
+            {% csrf_token %}
+            <button name="create-assignment" class ="btn btn-outline-secondary" type="submit">Create Template</button>
+          </form>
+        </div>
         {% if table %}
             {% render_table table %}
+        {% else %}
+          <span> No Responses </span>
         {% endif %}
     </div> <!-- /container -->
 

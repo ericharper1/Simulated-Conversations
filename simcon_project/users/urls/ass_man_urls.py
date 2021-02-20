@@ -3,8 +3,9 @@ from users.views import *
 
 app_name = 'ass-management'
 urlpatterns = [
-    path('', assignment_management_view, name="main"),
-    path('view-templates/<pk>/', view_templates, name="view-templates"),
-    path('view-students/<pk>/', view_students, name="view-students"),
-    path('delete/<pk>', AssignmentDeleteView.as_view(), name="delete-assignment"),
+    path('', assignment_management_view, name='main'),
+    path('view-details/<pk>/', view_details, name='view-details'),
+    path('view-templates/<pk>/', view_templates, name='view-templates'),
+    path('view-students/<pk>/', view_students, name='view-students'),
+    path('delete/<pk>', AssignmentDeleteView.as_view(), name='delete-assignment'),
 ]

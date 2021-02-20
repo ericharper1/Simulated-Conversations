@@ -1,0 +1,9 @@
+<!--
+    View responses button for assignment management 'view templates' modal
+ -->
+{% block content %}
+    <button  class="bs-modal btn btn-outline-secondary btn-sm" type="button" name="button"
+            data-form-url="{% url 'ass-management:view-details' record.id %}">
+        View Assignment Details
+    </button>
+{% endblock %}
